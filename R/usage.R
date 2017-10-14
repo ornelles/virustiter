@@ -24,7 +24,7 @@ usage <- function() {
 	"   plotOneFit(fm)  # plot fit with options to adjust colors",
 	"   addOneFit(fm) # add best-fit line to existing base graph",
 	"   getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut values",
-	"   
+	"	displayPairs(f, dna = TRUE) # display image pairs in directory containing 'f'",
 	"",
 	" Wrapper to automatically process results data frmae or ImageJ 'Results.txt' file",
 	"   fitAndPlot(res, by)")
