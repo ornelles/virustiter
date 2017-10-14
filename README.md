@@ -1,4 +1,4 @@
-# virus-titer
+# virustiter
 # Generic suite of tools to fit fluorescent titer data from multi-well plates
 #
 # Usage: see code in usage function, usage()
