@@ -1,0 +1,9 @@
+Package: virus-titer
+Title: Viral Titer from DAPI and Fluorescent Micrographs
+Version: 0.0.0.9000
+Authors@R: person("David", "Ornelles", email = "ornelles@wakehealth.edu", role = c("aut", "cre"))
+Description: R functions to read fluorescent images and determine viral titer.
+Depends: R (>= 3.2.1), lattice, EBImage
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
