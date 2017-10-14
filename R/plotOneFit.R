@@ -7,7 +7,7 @@
 plotOneFit <- function(fm, main=NULL, xlab=NULL, ylab=NULL,
 				pch.col="black", line.col="red", ref.col="blue", ...)
 { 		# plot fit in glm fitted model
-	x <- exp(fm$model[[2]])                    # model data.frame holds values used for fit
+	moi <- exp(fm$model[[2]])                    # model data.frame holds values used for fit
 	y <- prop.table(fm$model[[1]],1)[,1]
 	cf <- getTiter(fm)
 	info <- try(sapply(well.info(rownames(fm$model)),unique), silent=TRUE)
@@ -33,16 +33,16 @@ plotOneFit <- function(fm, main=NULL, xlab=NULL, ylab=NULL,
 	unit <- levels(res$unit)[1]
 	txt <- sprintf("%0.3g %s (95%% CI:%0.3g-%0.3g) ", cf[1], unit, cf[2], cf[3])
 
-	xlo <- with(res, min(x[x > 0]))
-	xhi <- with(res, max(x))
+	xlo <- with(res, min(moi[moi > 0]))
+	xhi <- with(res, max(moi))
 	xp <- exp(seq(log(xlo), log(xhi), length=101))
-	yp <- predict(fm, data.frame(x=xp), type="response")
+	yp <- predict(fm, data.frame(moi=xp), type="response")
 	xpp <- cf[1]
 	ypp <- 1-exp(-1)
 	if (is.null(xlab)) xlab <- paste("\n", "One IU = ", txt, sep="")
 	if (is.null(ylab)) ylab <- "Infected fraction"
 
-	plot(y ~ x, subset=x>0, log="x", las=1, ylim=c(0,1),
+	plot(y ~ moi, subset=moi>0, log="x", las=1, ylim=c(0,1),
 		xlab=xlab, ylab=ylab, main=main, col=pch.col, ...)
 	lines(xp, yp, col=line.col)
 	lines(c(xlo,xpp,xpp),c(ypp,ypp,-0.02), lty=2, col=ref.col)

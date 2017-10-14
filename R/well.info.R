@@ -17,5 +17,6 @@ well.info <- function(v, format="%02d") {
 	if (any(column < 1 | column > 384))
 		stop("bad column value")
 	well <- paste(row, sprintf(format, column), sep="")
-	return(list(prefix=prefix, well=well, row=row, column=column))
+	return(list(prefix = prefix, well = well, row = row,
+				column = as.character(column)))
 }

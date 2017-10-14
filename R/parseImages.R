@@ -73,16 +73,22 @@ parseImages <- function(f, k.upper=3, k.lower=1.2, width=32, offset=0.05, sigma=
 	if (missing(f)) f <- file.choose()
 	path <- dirname(dirname(f))
 	dname <- basename(path)
-	ff <- list.files(path, full=TRUE, recursive=TRUE, pattern="tif$")
+	ff <- list.files(path, full=TRUE, recursive=TRUE, pattern="tif$", ignore.case = TRUE)
 	g <- basename(dirname(ff))
 	fl <- split(ff, g)
 
 # apply the workhorse function to extract information
-	ret <- lapply(fl, .fun, k.upper=k.upper, k.lower=k.lower,
-		width=width, offset=offset, sigma=sigma, draw=draw, nx=nx)
+	ret <- rep(list(NULL), length(fl))
+	if (!draw) pb <- txtProgressBar(min = 1, max = length(fl), style = 3)
+	for (i in seq_along(fl)) {
+		if (!draw) setTxtProgressBar(pb, i)
+		ret[[i]] <- .fun(fl[[i]], k.upper=k.upper, k.lower=k.lower,
+				width=width, offset=offset, sigma=sigma, draw=draw, nx=nx)
+	}
 	ret <- do.call(rbind, ret)
 	ret$dname <- factor(dname)
 	rownames(ret) <- NULL
+	if (!draw) close(pb)
 	return(ret)
 }
 #

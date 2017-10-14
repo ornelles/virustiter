@@ -1,7 +1,7 @@
 #########################################################################################
 # getFit
 #
-# fit data in data.frame produced by tally() or score() by sequential order, column, or row
+# fit data in data.frame produced by tally() or by score() as sequential order, column, or row
 # as indicated in argument 'by' and return glm model fit(s). Each fitted model has the
 # unit assigned as an attribute with the text value
 #
@@ -10,24 +10,22 @@
 #
 #########################################################################################
 
-getFit <- function(df, by=c("sequential","column","row"))
+getFit <- function(obj, by = c("sequential", "column", "row"))
 {
-	if (all(c("pos","neg","x") %in% names(df)))		# data.frame produced by tally()
-		res <-  df
-	else if (all(c("positive","well", "x") %in% names(df)))	# data.frame from score()
-		res <- tally(df)
+	if (all(c("pos", "neg", "moi") %in% names(obj)))		# data.frame produced by tally()
+		res <-  obj
+	else if (all(c("positive", "well", "moi") %in% names(obj)))	# data.frame from score()
+		res <- tally(obj)
 	else
-		stop("unable to use ", deparse(substitute(df)))
+		stop(deparse(substitute(obj)), " does not to have been produced by tally() or score()")
 
+	if ("unit" %in% names(res)) unit <- as.character(res$unit[1])
+	else unit <- "none"
 	by <- match.arg(by)
-	if ("unit" %in% names(res))
-		unit <- as.character(res$unit[1])
-	else
-		unit <- "none"
 
 	fmList <- list()
 	if (by == "sequential") {
-		fm <- try(glm(cbind(pos, neg) ~ offset(log(x)), data = res, subset = x > 0,
+		fm <- try(glm(cbind(pos, neg) ~ offset(log(moi)), data = res, subset = moi > 0,
 				family=binomial("cloglog")))
 		if (class(fm)[1] == "try-error")
 			fmList[[1]] <- NULL
@@ -37,9 +35,9 @@ getFit <- function(df, by=c("sequential","column","row"))
 	else if (by == "column") {
 		stopifnot("column" %in% names(res))
 		for (i in levels(as.factor(res[[by]]))) {
-			fm <- try(glm(cbind(pos, neg) ~ offset(log(x)),
+			fm <- try(glm(cbind(pos, neg) ~ offset(log(moi)),
 					family=binomial("cloglog"), data = res,
-					subset = res[[by]] == i & x > 0), silent=TRUE)
+					subset = res[[by]] == i & moi > 0), silent=TRUE)
 			if (class(fm)[1] == "try-error")
 				fmList[[i]] <- NULL
 			else
@@ -49,9 +47,9 @@ getFit <- function(df, by=c("sequential","column","row"))
 	else {	# by == "row"
 		stopifnot("row" %in% names(res))
 		for (i in levels(as.factor(res[[by]]))) {
-			fm <- try(glm(cbind(pos, neg) ~ offset(log(x)),
+			fm <- try(glm(cbind(pos, neg) ~ offset(log(moi)),
 					family=binomial("cloglog"), data = res,
-					subset = res[[by]] == i & x > 0), silent=TRUE)
+					subset = res[[by]] == i & moi > 0), silent=TRUE)
 			if (class(fm)[1] == "try-error")
 				fmList[[i]] <- NULL
 			else

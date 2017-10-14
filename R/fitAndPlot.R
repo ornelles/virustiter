@@ -3,7 +3,7 @@
 # fitAndPlot
 #
 # wrapper to process from results object or ImageJ Results.text file, as a sequential
-# (single plate) or by columns or rows. Control wells (x == 0) are expected to be present.
+# (single plate) or by columns or rows. Control wells (moi == 0) are expected to be present.
 # In addition to plotting and printing the titer, the adjusted data frame is returned
 # as an invisible ojbect
 #

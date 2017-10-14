@@ -10,7 +10,7 @@
 plotFit <-function(fm, by=c("none","column","row"), index=1, line.col=2, ...)
 {
 	.plotFit <- function(fm) {				# internal function to work on glm fitted model
-		x <- exp(fm$model[[2]])				# model data.frame holds values used for fit
+		moi <- exp(fm$model[[2]])				# model data.frame holds values used for fit
 		y <- prop.table(fm$model[[1]],1)[,1]
 		cf <- getTiter(fm)
 		info <- try(sapply(well.info(rownames(fm$model)),unique),silent=TRUE)
@@ -35,13 +35,13 @@ plotFit <-function(fm, by=c("none","column","row"), index=1, line.col=2, ...)
 		unit <- levels(res$unit)[1]
 		txt <- sprintf("%0.3g %s (95%% CI:%0.3g-%0.3g) ", cf[1], unit, cf[2], cf[3])
 
-		xlo <- with(res, min(x[x > 0]))
-		xhi <- with(res, max(x))
+		xlo <- with(res, min(moi[moi > 0]))
+		xhi <- with(res, max(moi))
 		xp <- exp(seq(log(xlo), log(xhi), length=101))
-		yp <- predict(fm, data.frame(x=xp), type="response")
+		yp <- predict(fm, data.frame(moi=xp), type="response")
 		xpp <- cf[1]
 		ypp <- 1-exp(-1)
-		plot(y ~ x, subset=x>0, log="x", las=1, ylim=c(0,1),
+		plot(y ~ moi, subset=moi>0, log="x", las=1, ylim=c(0,1),
 				xlab=paste("\n", "One IU = ", txt, sep=""),
 				ylab="Infected fraction", main=main, ...)
 		lines(xp, yp, col=2)

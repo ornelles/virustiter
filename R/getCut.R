@@ -2,7 +2,7 @@
 # getCut
 #
 # derived from generic code to determine cut (background) values for 'param' (val) with
-# cut points from find.bgnd() by control wells (x==0 or type=="control"), or for each
+# cut points from find.bgnd() by control wells (moi==0 or type=="control"), or for each
 # well, row, or column in the data.frame
 #
 # Dependencies
@@ -33,10 +33,10 @@ getCut <- function(df, by=c("control","well","row","column"), param=val, mult=5,
 	if (by == "control") {				# special case of by "control"
 		if (any(df$type=="control"))
 			temp <- data.frame(g=TRUE, y=subset(df, type=="control")[[param]])
-		else if (any(df$x==0))
-			temp <- data.frame(g=TRUE, y=subset(df, x==0)[[param]])
+		else if (any(df$moi==0))
+			temp <- data.frame(g=TRUE, y=subset(df, moi==0)[[param]])
 		else
-			stop('require type=="control" or x values of 0 to use by="control" option')
+			stop('require type=="control" or moi values of 0 to use by="control" option')
 	}
 	else {
 		temp <- df[c(by, param)]
