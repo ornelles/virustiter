@@ -2,7 +2,8 @@
 This is a suite of tools in R to analyze fluorescent micrographs from a fluorescent focus titration assay to determine viral titers. The code makes use of the `lattice` and `EBImage` package.
 
 ## Overview
-  `f <- system.file("extdata", "sample/b1/file001.tif", package = "virustiter"`
+DAPI files must always come before fluorescent images file...
+
 ## Installation
 
 ## Typical workflow
@@ -11,11 +12,23 @@ Phenotype date should be a data frame with at least each of the following:
   unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
   well  character string indicated the well such as "A1" or "a01"
   moi   numeric value indicating the multiplicity (units per cell)
-See for example:
-  fpd <- system.file("extdata", "phenoData.csv", package = "virustiter")
+
+Example with individual images in folders:
+  fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
+  fimg <- system.file("extdata", "by_folder/b1/file001.tif", package = "virustiter")
+
+  df <- parseImages(fimg)
   pd <- read.csv(fpd)
-  fi <- system.file("extdata", "sample/b1/file001.tif", package = "virustiter")
-  df <- parseImages(fi)
+  df <- mergePdata(pd, df)
+  cut <- getCut(df)
+  df <- score(df, cut)
+  res <- tally(df)
+  fm <- getFit(res)
+  plotFit(fm)
+
+Example with stacked images (repeat sample code above)
+  fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
+  fimg <- system.file("extdata", "by_stack/file001.tif", package = "virustiter")
 
 Data for parseImages() comes as paired TIF files with high contrast DAPI images
 paired with fluorescent images for viral marker.
@@ -43,7 +56,7 @@ Supporting functions:
   getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut values
   displayPairs(f, dna = TRUE) # display image pairs in directory containing 'f'
 
-Wrapper to automatically process results data frmae or ImageJ 'Results.txt' file
+Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
   fitAndPlot(res, by)")
 ```
 

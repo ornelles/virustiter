@@ -12,7 +12,7 @@
 # 
 #########################################################################################
 
-plotCut <- function(df, cut, by = c("well", "row", "column"), param = "val",
+plotCut <- function(df, cut, by = c("well", "row", "column", "file"), param = "val",
 		smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE,
 		return.plot = FALSE, ...)
 {

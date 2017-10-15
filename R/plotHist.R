@@ -1,12 +1,12 @@
 #########################################################################################
 # plotHist
 #
-# display histogram on well by well basis with lattice graphics, display background
-# 'cut' values be a single value or should be a named vector from getCut()
+# display histogram for each well or file with lattice graphics with background cutoff
+# 'cut' value as a single value or named vector from getCut()
 #
 #########################################################################################
 
-plotHist <- function(df, cut=NULL, layout=NULL, ...) {
+plotHist <- function(df, cut = NULL, layout = NULL, ...) {
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
 			'  plotHist(df)      ## uses "positive" values in df',
@@ -15,30 +15,36 @@ plotHist <- function(df, cut=NULL, layout=NULL, ...) {
 		return(invisible(NULL))
 	}
 	library(lattice)
+# select well or file as grouping variable
+	if ("well" %in% names(df))
+		group <- df$well
+	else
+		group <- df$file
+
 	if (is.null(cut))					# use existing 'positive' assignment
-		cut.points <- with(df, tapply(val, list(positive, well), max))[1,]
+		cut.points <- with(df, tapply(val, list(positive, group), max))[1,]
 	else if (length(cut) == 1)			# single value
-		cut.points <- rep(cut, nlevels(df$well))
-	else if (all(names(cut) %in% levels(df$well)))
+		cut.points <- rep(cut, nlevels(group))
+	else if (all(names(cut) %in% levels(group)))
 		cut.points <- cut
 	else if (all(names(cut) %in% levels(df$row)))
 		cut.points <- rep(cut, each=nlevels(df$column))
 	else if (all(names(cut) %in% levels(df$column)))
 		cut.points <- rep(cut, nlevels(df$row))
 	else
-		stop("cut must be null, a single number, or a named vector (well, row, or column)")
-	names(cut.points) <- levels(df$well)
+		stop("cut must be null, a single number, or a named vector (file, well, row, or column)")
+	names(cut.points) <- levels(group)
 
 	if (is.null(layout))
-		layout <- c(1, nlevels(df$well))
-	obj <- histogram(~ log2(val) | well, data = df,
+		layout <- c(1, nlevels(group))
+	obj <- histogram(~ log2(val) | group, data = df,
 		layout = layout, n=64, as.table=TRUE,
 		main = paste(levels(df$dname), collapse=" + "),
 		panel = function(x, ..., subscripts)
 		{
 			panel.histogram(x,  ...)
-			well <- unique(df$well[subscripts])
-			panel.abline(v=log2(cut.points[well]), col=2)
+			idx <- unique(group[subscripts])
+			panel.abline(v=log2(cut.points[idx]), col=2)
 		},
 		scales=list(y=list(relation="free", rot=0)), ...
 	)

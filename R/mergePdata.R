@@ -2,22 +2,26 @@
 # mergePdata
 #
 # Add phenotype data to image data obtained by parseImages()
-# phenoData must have at least "well", "moi", and should have "unit"
+# phenoData must have "moi", either "well" or "file"
 #
 #########################################################################################
 
 mergePdata <- function(phenoData, imageData)
 {
-# check arguments and harmonize well names
-	stopifnot("well" %in% names(imageData))
-	stopifnot("well" %in% names(phenoData))
+# determine data type, check arguments and harmonize well names
 	stopifnot("moi" %in% names(phenoData))
-	phenoData$well <- factor(well.info(phenoData$well)$well) # harmonize
-	stopifnot(levels(imageData$well) %in% levels(phenoData$well))
+# for separate images in folders (multi-well)
+	if ("well" %in% names(imageData)) {
+		stopifnot("well" %in% names(phenoData))
+		phenoData$well <- factor(well.info(phenoData$well)$well) # harmonize
+		stopifnot(levels(imageData$well) %in% levels(phenoData$well))
 
-# add row and column information to phenotype data
-	phenoData$column <- well.info(phenoData$well)$column
-	phenoData$row <- well.info(phenoData$well)$row
+	# add row and column information to phenotype data
+		phenoData$column <- well.info(phenoData$well)$column
+		phenoData$row <- well.info(phenoData$well)$row
+	}
+	else
+		stopifnot("file" %in% names(phenoData))
 
 # check value for unit and assign control wells
 	if (!"unit" %in% names(phenoData))
@@ -27,12 +31,15 @@ mergePdata <- function(phenoData, imageData)
 	phenoData$type <- type
 	
 # reorganize phenotype data
-	sel <- names(phenoData) %in% c("well", "column", "row", "unit", "type")
+	pdnames <- c("directory","file","well","frame","column","row","unit","type")
+	sel <- names(phenoData) %in% pdnames
 	phenoData <- cbind(phenoData[sel], phenoData[!sel])
 
 # remove variables in imageData that are already present in phenoData
 	keep <- names(imageData)[!names(imageData) %in% names(phenoData)]
-	imageData <- imageData[c("well", keep)]
+	special <- c("file", "well")
+	special <- special[special %in% names(imageData)]
+	imageData <- imageData[c(special, keep)]
 	res <- merge(phenoData, imageData)
 
 # convert strings to factors

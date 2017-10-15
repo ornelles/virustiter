@@ -37,7 +37,9 @@ score <- function(df, cut)
 		df$positive <- df$val > cut[df$row]
 	else if (all(names(cut) %in% levels(df$column)))
 		df$positive <- df$val > cut[df$column]
+	else if (all(names(cut) %in% levels(df$file)))
+		df$positive <- df$val > cut[df$file]
 	else
-		stop("cut must be a single value or a named vector (well, row, or column)")
+		stop("cut must be a single value or a named vector (file, well, row, or column)")
 	return(df)
 }

@@ -12,9 +12,9 @@
 
 getFit <- function(obj, by = c("sequential", "column", "row"))
 {
-	if (all(c("pos", "neg", "moi") %in% names(obj)))		# data.frame produced by tally()
+	if (all(c("pos", "neg", "moi") %in% names(obj)))	# data.frame produced by tally()
 		res <-  obj
-	else if (all(c("positive", "well", "moi") %in% names(obj)))	# data.frame from score()
+	else if (all(c("positive", "moi") %in% names(obj)))	# data.frame from score()
 		res <- tally(obj)
 	else
 		stop(deparse(substitute(obj)), " does not to have been produced by tally() or score()")
