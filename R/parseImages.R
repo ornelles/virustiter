@@ -15,8 +15,7 @@
 #	draw	draw colorMap of nuclei
 #	nx		nrows to be handed to tile()
 #
-# Returns invisible raw data with extracted well, row, column use mergeData to assign
-# additional information before handing to other functions
+# Returns raw data with extracted well, row, column. Use mergePdata before using further
 #
 #########################################################################################
 
@@ -25,7 +24,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 32, offset 
 {
 	library(EBImage)
 
-# working function to apply to paired dapi and fluorescent images
+# working function paired dapi and fluorescent image files in ff
 	.fun <- function(ff, k.upper, k.lower, width, offset, sigma, draw, nx) {
 		img <- readImage(ff)
 		dapi <- img[,,seq(1, dim(img)[3], 2)]
@@ -43,7 +42,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 32, offset 
 		column <- well.info(well)$column
 		row <- well.info(well)$row
 
-		fname <- paste(well, basename(ff)[seq(2, length(ff), 2)], sep="/")
+		fname <- paste(well, basename(ff)[seq(2, length(ff), 2)], sep = "/")
 
 		nframes <- dim(xw)[3]
 		area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
@@ -77,7 +76,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 32, offset 
 			ignore.case = TRUE)
 	g <- basename(dirname(ff))
 	fl <- split(ff, g)
-	bad <- which(lengths(fl)%%2 != 0)	# check for mismatch images
+	bad <- which(lengths(fl)%%2 != 0)	# check for mismatched files
 	if (length(bad))
 		stop("odd number of images in: ", paste(names(bad)))
 
