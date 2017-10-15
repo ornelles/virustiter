@@ -28,6 +28,9 @@ mergePdata <- function(phenoData, imageData)
 	sel <- names(phenoData) %in% c("well","column","row", "unit", "type")
 	phenoData <- cbind(phenoData[sel], phenoData[!sel])
 
+# remove variables already present in phenoData
+	keep <- names(imageData)[!names(imageData) %in% names(phenoData)]
+	imageData <- imageData[c("well", keep)]
 	res <- merge(phenoData, imageData)
 	sel <- sapply(res, is.character)
 	res[sel] <- lapply(res[sel], as.factor)
