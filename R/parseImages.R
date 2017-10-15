@@ -6,7 +6,7 @@
 # Merge this output with a phenotype data file to create a file of the same form.
 #
 # Arguments
-#	f		optional file under nested folders (a3/file001.tif)
+#	dnaFile	optional path to DAPI file under nested folders such as a3/file001.tif
 #	k.upper	multiplier for mad value cutoff for nuclear area: mean + k.upper*mad(area)
 #	k.lower	multiplier for mad value cutoff for nuclear area: mean - k.lower*mad(area)
 #	width	w and h parameters for thresh()
@@ -20,31 +20,30 @@
 #
 #########################################################################################
 
-parseImages <- function(f, k.upper=3, k.lower=1.2, width=32, offset=0.05, sigma=2,
-		draw=TRUE, nx=NULL)
+parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 32, offset = 0.05,
+		sigma = 2, draw = TRUE, nx = NULL)
 {
 	library(EBImage)
 
-# workhorse function to apply to a set of related files
+# working function to apply to paired dapi and fluorescent images
 	.fun <- function(ff, k.upper, k.lower, width, offset, sigma, draw, nx) {
+		img <- readImage(ff)
+		dapi <- img[,,seq(1, dim(img)[3], 2)]
+		flr <- img[,,seq(2, dim(img)[3], 2)]
 		if (is.null(nx))
-			nx <- ceiling(sqrt(length(ff)/2))
-		y <- readImage(ff[seq(2, length(ff), 2)])
-		x <- readImage(ff[seq(1, length(ff), 2)])
-		if (length(dim(x))==2)
-			dim(x) <- dim(y) <- c(dim(x), 1)	# create object with 3 dimensions
-		xb <- normalize(x)
+			nx <- ceiling(sqrt(dim(dapi)[3]))
+		xb <- normalize(dapi)
 		xb <- medianFilter(xb, sigma)
 		xb <- gblur(xb, sigma)
-		xb <- thresh2(xb, w=width, offset=offset)
+		xb <- thresh2(xb, w = width, offset = offset)
 		xb <- fillHull(xb)
 		xd <- distmap(xb)
 		xw <- watershed(xd)
-		well <- well.info(basename(dirname(ff[1])))$well	# harmonize well names
+		well <-  well.info(basename(dirname(ff)))$well[1]
 		column <- well.info(well)$column
 		row <- well.info(well)$row
 
-		fname <- paste(well, basename(ff)[seq(2,length(ff),2)], sep="/")
+		fname <- paste(well, basename(ff)[seq(2, length(ff), 2)], sep="/")
 
 		nframes <- dim(xw)[3]
 		area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
@@ -52,38 +51,43 @@ parseImages <- function(f, k.upper=3, k.lower=1.2, width=32, offset=0.05, sigma=
 		xmad <- mad(unlist(area))
 		small <- lapply(area, function(z) which(z < xbar - k.lower*xmad))
 		large <- lapply(area, function(z) which(z > xbar + k.upper*xmad))
-		xw <- rmObjects(xw, small)
+		xw <- rmObjects(xw, small, reenumerate = FALSE)
 		xw <- rmObjects(xw, large)
 		if (draw)
-			display(tile(colorLabels(xw),nx=nx,lwd=3,fg.col="white"), title=well)
+			display(tile(colorLabels(xw), nx = nx, lwd = 3, fg.col="white"), title = well)
 		res <- data.frame()
-		for (i in 1:nframes) {
+		for (i in seq_len(nframes)) {
 			area <- computeFeatures.shape(xw[,,i])[,1]
 			XY <- computeFeatures.moment(xw[,,i])[,1:2]
-			dna <- computeFeatures.basic(xw[,,i], x[,,i])[,1]
-			val <- computeFeatures.basic(xw[,,i], y[,,i])[,1]
-			res <- rbind(res,data.frame(well=well, column=column, row=row, file=fname[i],
-				xm=XY[,1], ym=XY[,2], area, dna, val))
+			dna <- computeFeatures.basic(xw[,,i], dapi[,,i])[,1]
+			val <- computeFeatures.basic(xw[,,i], flr[,,i])[,1]
+			res <- rbind(res, data.frame(well = well, column = column, row = row,
+				file = fname[i], xm = XY[,1], ym = XY[,2], area, dna, val))
 		}
 		rownames(res) <- NULL
 		return(res)
 	}
 
-# collect files and create groups
-	if (missing(f)) f <- file.choose()
-	path <- dirname(dirname(f))
+# extract list of paths to image pairs from dnaFile
+	if (missing(dnaFile))
+		dnaFile <- file.choose()
+	path <- dirname(dirname(dnaFile))
 	dname <- basename(path)
-	ff <- list.files(path, full=TRUE, recursive=TRUE, pattern="tif$", ignore.case = TRUE)
+	ff <- list.files(path, full = TRUE, recursive = TRUE, pattern = "tif$",
+			ignore.case = TRUE)
 	g <- basename(dirname(ff))
 	fl <- split(ff, g)
+	bad <- which(lengths(fl)%%2 != 0)	# check for mismatch images
+	if (length(bad))
+		stop("odd number of images in: ", paste(names(bad)))
 
-# apply the workhorse function to extract information
+# apply the working function to extract information
 	ret <- rep(list(NULL), length(fl))
 	if (!draw) pb <- txtProgressBar(min = 1, max = length(fl), style = 3)
 	for (i in seq_along(fl)) {
 		if (!draw) setTxtProgressBar(pb, i)
-		ret[[i]] <- .fun(fl[[i]], k.upper=k.upper, k.lower=k.lower,
-				width=width, offset=offset, sigma=sigma, draw=draw, nx=nx)
+		ret[[i]] <- .fun(fl[[i]], k.upper = k.upper, k.lower = k.lower,
+				width = width, offset = offset, sigma = sigma, draw = draw, nx = nx)
 	}
 	ret <- do.call(rbind, ret)
 	ret$dname <- factor(dname)

@@ -4,9 +4,9 @@
 usage <- function() {
 	txt <- c(
 	" Usage:",
-	"   df <- parseImages()   # analyze images with EBImage",
+	"   df <- parseImages() # analyze images with EBImage",
 	"      or",
-	"   df <- readIJResults()      # read data from Fluorescent Cell Count v6 (ImageJ)",
+	"   df <- readIJResults()   # read data from Fluorescent Cell Count v6 (ImageJ)",
 	"",
 	"   df  <- mergePdata(pd, df)  # optional merge with phenoData in 'pd'",
 	"   cut <- getCut(df)     # determine cutoff by control (or well, row, or column)",
