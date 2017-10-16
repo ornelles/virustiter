@@ -2,7 +2,7 @@
 # 
 # Calculate the likely cutoff value by Otsu's method for a robust mean and sd for a 
 # normal density in a mixture. If 'left', assumes background population lies to the left
-# of the normal mean.
+# of the normal mean. This function can be replaced with more sophisticated versions.
 #
 # returns single number 
 #

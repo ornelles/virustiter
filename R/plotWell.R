@@ -7,6 +7,8 @@
 #########################################################################################
 
 plotWell <- function(df, myWell=levels(df$well), cex=1, invert.y=TRUE, ...) {
+	if (!"well" %in% names(df))
+		stop("requires variable 'well' in ", deparse(substitute(df)))
 	library(lattice)
 	if (!"positive" %in% names(df)) df$positive <- FALSE
 	if (invert.y) df$ym <- -df$ym
