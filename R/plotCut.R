@@ -12,56 +12,59 @@
 # 
 #########################################################################################
 
-plotCut <- function(df, cut, by = c("well", "row", "column", "file"), param = "val",
+plotCut <- function(df, cut, by = c("default", "well", "file", "row", "column"),
 		smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE,
 		return.plot = FALSE, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotCut examples:",
-			'  plotCut(df, by = "well", val, smooth=1, mult=5, log=TRUE)',
+			'  plotCut(df, by = "well", smooth=1, mult=5, log=TRUE)',
 			'  plotCut(df) ## default values are same as above',
 			'  plotCut(df, cut = 0.002)  ## uses cutoff value of 0.002',
-			'  plotCut(df, groups=column, auto.key=T)')
+			'  plotCut(df, groups = column, auto.key = T)')
 		cat(usage, sep="\n")
 		return(invisible(NULL))
 	}
-
-# parse arguments and perform error checking
-	by <- match.arg(by)
-	param <- gsub("\\\"","", deparse(substitute(param)))
-	if (!param %in% names(df))
-		stop("'", param, "' not in data set")
-	if (!by %in% names(df))
-		stop("'", by, "' not in data set")
-
-	d.adj <- smooth	# to hand to density plot
-
 	library(lattice)
 	library(latticeExtra)
 
-# create title
-	if (is.null(main)) {
-		main.text <- paste(deparse(substitute(df)), "  smooth=", signif(smooth,2),
-			" mult=", signif(mult,2), sep="")
-		main <- list(main.text, cex=1, font=1)
+# parse arguments and perform error checking
+	by <- match.arg(by)
+	if (by == "default") {
+		if ("well" %in% names(df))
+			by <- "well"
+		else if ("file" %in% names(df))
+			by <- "file"
+		else
+			stop("'well' and 'file' not in data set")
 	}
+	else if (!by %in% names(df))
+		stop("'", by, "' not in data set")
+	d.adj <- smooth	# to hand to density plot
 
-# calculate background values and create strip labels 
+# calculate background cutoff value and create strip labels 
 	if (missing(cut))
-		cut <- do.call(getCut, list(df, by, param, mult, log))
+		cut <- do.call(getCut, list(df, by, "val", mult, log))
 	else {
 		labs <- as.character(unique(df[[by]]))
 		cut <- rep(cut, length.out = length(labs))
 		names(cut) <- labs
 	}
+
+# create plot title
+	if (is.null(main)) {
+		main.text <- paste(deparse(substitute(df)), "  smooth=", signif(smooth,2),
+			" mult=", signif(mult,2), sep="")
+		main <- list(main.text, cex=1, font=1)
+	}
 	strip.labels <- paste(names(cut), signif(cut, 2), sep=" at ")
-	form <- as.formula(paste("~", param, "|", as.factor(by)))
+	form <- as.formula(paste("~ val |", as.factor(by)))
 	xlist <- list()	# for log argument in scales
 	if (log == TRUE) {
 		xlist <- list(log = 10)
 		cut <- log10(cut)
 	}
-	obj <- densityplot(form, df,
+	obj <- densityplot(form, data = df,
 		scales = list(x=xlist, y=list(draw=FALSE, relation="free")), main = main,
 		panel = function(x, bgnd) panel.bgnd(x, bgnd = cut), as.table=as.table,
 		strip=strip.custom(factor.levels=strip.labels, par.strip.text=list(cex=0.9)),

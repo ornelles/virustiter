@@ -6,8 +6,10 @@
 #########################################################################################
 
 plotPlate <- function(df, cex=1/2, alpha=1/2, main, invert.y=TRUE, ... ) {
+	if (!"well" %in% names(df))
+		stop("requires variable 'well' in ", deparse(substitute(df)))
 	library(lattice)
-	stopifnot("well" %in% names(df))
+
 	n <- nlevels(df$well)
 	if (n > 96)							# 384-well plate
 		{rows <- 32; columns <- 24}

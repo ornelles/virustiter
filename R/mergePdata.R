@@ -10,12 +10,12 @@ mergePdata <- function(phenoData, imageData)
 {
 # determine data type, check arguments and harmonize well names
 	stopifnot("moi" %in% names(phenoData))
+
 # for separate images in folders (multi-well)
 	if ("well" %in% names(imageData)) {
 		stopifnot("well" %in% names(phenoData))
 		phenoData$well <- factor(well.info(phenoData$well)$well) # harmonize
 		stopifnot(levels(imageData$well) %in% levels(phenoData$well))
-
 	# add row and column information to phenotype data
 		phenoData$column <- well.info(phenoData$well)$column
 		phenoData$row <- well.info(phenoData$well)$row
@@ -29,22 +29,25 @@ mergePdata <- function(phenoData, imageData)
 	type <- rep("standard", nrow(phenoData))
 	type[phenoData$moi == 0] <- "control"
 	phenoData$type <- type
-	
-# reorganize phenotype data
-	pdnames <- c("directory","file","well","frame","column","row","unit","type")
-	sel <- names(phenoData) %in% pdnames
-	phenoData <- cbind(phenoData[sel], phenoData[!sel])
 
-# remove variables in imageData that are already present in phenoData
-	keep <- names(imageData)[!names(imageData) %in% names(phenoData)]
-	special <- c("file", "well")
-	special <- special[special %in% names(imageData)]
-	imageData <- imageData[c(special, keep)]
+# remove any variables in imageData that are present in phenoData EXCEPT
+# for variables used to merge data frames: 'file' and/or 'well'
+	vars <- names(imageData)[!names(imageData) %in% names(phenoData)]
+	if ("file" %in% names(imageData)) vars <- c(vars, "file")
+	if ("well" %in% names(imageData)) vars <- c(vars, "well")
+	vars <- unique(vars)
+	imageData <- imageData[vars]
 	res <- merge(phenoData, imageData)
 
 # convert strings to factors
 	sel <- sapply(res, is.character)
 	res[sel] <- lapply(res[sel], as.factor)
+
+# reorganize data
+	pdnames <- c("directory","file","column","row","well","frame","type","unit")
+	first <- pdnames[pdnames %in% names(res)]
+	last <- names(res)[!names(res) %in% pdnames]
+	res <- res[c(first, last)]
 
 # exclude unused levels (allows pd to hold information than required)
 	res <- droplevels(res)

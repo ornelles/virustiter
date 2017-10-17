@@ -4,50 +4,67 @@
 # display histogram for each well or file with lattice graphics with background cutoff
 # 'cut' value as a single value or named vector from getCut()
 #
+# if missing and 'positive' is present, the maximum value will be shown
+#
 #########################################################################################
-
-plotHist <- function(df, cut = NULL, layout = NULL, ...) {
+plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column"),
+		smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE, layout = NULL,
+		...)
+{
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
-			'  plotHist(df)      ## uses "positive" values in df',
-			'  plotHist(df, cut) ## where cut was from getCut()')
+			'  plotHist(df)      # calculates and plots default cut values in df',
+			'  plotHist(df, cut) # where cut was from getCut()')
 		cat(usage, sep="\n")
 		return(invisible(NULL))
 	}
 	library(lattice)
-# select well or file as grouping variable
-	if ("well" %in% names(df))
-		group <- df$well
-	else
-		group <- df$file
 
-	if (is.null(cut))					# use existing 'positive' assignment
-		cut.points <- with(df, tapply(val, list(positive, group), max))[1,]
-	else if (length(cut) == 1)			# single value
-		cut.points <- rep(cut, nlevels(group))
-	else if (all(names(cut) %in% levels(group)))
-		cut.points <- cut
-	else if (all(names(cut) %in% levels(df$row)))
-		cut.points <- rep(cut, each=nlevels(df$column))
-	else if (all(names(cut) %in% levels(df$column)))
-		cut.points <- rep(cut, nlevels(df$row))
-	else
-		stop("cut must be null, a single number, or a named vector (file, well, row, or column)")
-	names(cut.points) <- levels(group)
+# parse arguments and perform error checking
+	by <- match.arg(by)
+	if (by == "default") {
+		if ("well" %in% names(df))
+			by <- "well"
+		else if ("file" %in% names(df))
+			by <- "file"
+		else
+			stop("'well' and 'file' not in data set")
+	}
+	else if (!by %in% names(df))
+		stop("'", by, "' not in data set")
+	d.adj <- smooth	# to hand to density plot
 
+# calculate background cutoff value and create strip labels 
+	if (missing(cut))
+		cut <- do.call(getCut, list(df, by, "val", mult, log))
+	else {
+		labs <- as.character(unique(df[[by]]))
+		cut <- rep(cut, length.out = length(labs))
+		names(cut) <- labs
+	}
+
+# assemble lattice plot
 	if (is.null(layout))
-		layout <- c(1, nlevels(group))
-	obj <- histogram(~ log2(val) | group, data = df,
-		layout = layout, n=64, as.table=TRUE,
-		main = paste(levels(df$dname), collapse=" + "),
+		layout <- c(1, nlevels(df[[by]]))
+	if (is.null(main))
+		main <- paste(levels(df$directory), collapse=" + ")
+	xlist <- list()	# for log argument in scales
+	if (log == TRUE) {
+		xlist <- list(log = 10)
+		cut <- log10(cut)
+	}
+	form <- as.formula(paste("~ val |", by))
+	obj <- histogram(form, data = df, main = main,
+		layout = layout, n = 64, as.table = as.table,
 		panel = function(x, ..., subscripts)
 		{
 			panel.histogram(x,  ...)
-			idx <- unique(group[subscripts])
-			panel.abline(v=log2(cut.points[idx]), col=2)
+			idx <- unique(df[[by]][subscripts])
+			panel.abline(v = cut[idx], col = 2)
 		},
-		scales=list(y=list(relation="free", rot=0)), ...
-	)
+		scales = list(x = xlist, y = list(relation = "free", rot = 0)),
+		xscale.components = xscale.components.log10ticks,
+		...)
 	plot(obj)
 	invisible(obj)
 }

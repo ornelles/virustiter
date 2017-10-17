@@ -30,7 +30,7 @@ Example with images as individual files in folders:
   df <- parseImages(fimg)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
-  cut <- getCut(df)
+  cut <- getCut(df)  # this is not optimal, see analysis below
   df <- score(df, cut)
   res <- tally(df)
   fm <- getFit(res)
@@ -63,13 +63,25 @@ Supporting functions:
   plotFit(fm)     # plot fit(s) with calculated values using base graphics
   plotOneFit(fm)  # plot fit with options to adjust colors
   addOneFit(fm)   # add best-fit line to existing base graph
-  getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut values
+  getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut value(s)
   displayPairs(f, dna = TRUE) # display image pairs in directory containing 'f'
 ```
 Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
 ``` 
  fitAndPlot(res, by)")
 ```
+To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools (`plotCut()` and `plotHist()`) to evaluate the cutoff.
 
+For example, the sample data yields a non-optimal cutoff using default settings. The control values (moi of 0) are so tight that the default value of 5 for the 'mad' multiplier (`mult`) is too generous.
+
+The following shows a better initial selection followed by further exploration using values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the plot shows that the value with `mult` = 3 is more sensible.
+```
+  mm <- seq(2, 6, 0.25)
+  cuts <- getCut(df, mult = mm)
+  aic <- getAIC(df, cuts)
+  plot(mm, aic)	# by AIC, the best mult value is 3 or 5
+  plotHist(df, cuts[mm==3], main = sprintf("Cutoff = %0.4f", cuts[mm==3]))
+  plotHist(df, cuts[mm==5], main = sprintf("Cutoff = %0.4f", cuts[mm==5]))
+```  
 ## License
 GPL-3
