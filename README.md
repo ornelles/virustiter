@@ -36,7 +36,7 @@ Example with images as individual files in folders:
   fm <- getFit(res)
   plotFit(fm)
 ```
-Example with stacked images in a single fodler (repeat sample code above)
+Example with stacked images in a single folder (repeat sample code above)
 ```
   fimg <- system.file("extdata", "by_stack/file001.tif", package = "virustiter")
   fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
