@@ -19,6 +19,7 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		return(invisible(NULL))
 	}
 	library(lattice)
+	library(latticeExtra)
 
 # parse arguments and perform error checking
 	by <- match.arg(by)

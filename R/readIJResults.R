@@ -60,7 +60,7 @@ readIJResults <- function(f, SEP = NULL)
 	fname <- gsub("\\..*$", "", fname)	# file name without extension
 
 # assemble first part of data.frame
-	df <- data.frame(df[1], fname=fname, dname=dname, well=well, row=row,
+	df <- data.frame(df[1], fname=fname, directory=dname, well=well, row=row,
 			column=factor(column), df[-1], unit)
 
 # Extract x values from Image J results file and verify that each well is unique.

@@ -26,10 +26,10 @@ plotFit <-function(fm, by=c("none","column","row"), index=1, line.col=2, ...)
 		else
 			main.text <- ""
 
-		if (!("dname" %in% names(fm$data)))
+		if (!("directory" %in% names(fm$data)))
 			main <- paste(Sys.Date(), main.text)
 		else
-			main <- paste(fm$data$dname[1], main.text)
+			main <- paste(fm$data$directory[1], main.text)
 
 		res <- fm$data	# entire data.frame handed to glm()
 		unit <- levels(res$unit)[1]

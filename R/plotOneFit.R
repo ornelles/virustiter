@@ -23,10 +23,10 @@ plotOneFit <- function(fm, main=NULL, xlab=NULL, ylab=NULL,
 	else
 		main.text <- ""
 	if (is.null(main)){
-		if (!("dname" %in% names(fm$data)))
+		if (!("directory" %in% names(fm$data)))
 				main <- paste(Sys.Date(), main.text)
 		else
-				main <- paste(fm$data$dname[1], main.text)
+				main <- paste(fm$data$directory[1], main.text)
 	}
 
 	res <- fm$data  # entire data.frame handed to glm()
