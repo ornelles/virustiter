@@ -1,14 +1,14 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage` and `lattice` packages.
+This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and (possibly) `genefilter` packages.
 
 ## Overview
-This was developed to process multi-well plates. Most of the tools are structured for this purpose. Pairs of images are collected at different multiplicities of infection (moi): viral particles or infectious units or volume per cell. DNA (DAPI) images must always come before the  fluorescent viral image file. 
+This was developed to process multi-well plates. Most of the tools are structured for this purpose. Pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. The nuclear (DAPI) image file must always come before the corresponding viral antigen image file. 
 
-Pairs of images associated with each moi can be individual files in a single folder (file001.tif, file002.tif, etc.) or multi-layered tif files for each moi with the first image in each file being the DNA image. 
+Pairs of images associated with each moi can be individual files where each folder is named for the well such as a1/file001.tif, a2/file002.tif. Alternatively, the pairs of images can be a single multi-layered tif file for each moi where the first image in each pair file is the DNA image. 
 
 ## Installation
 
-Approximately: use `bioclite` to install `EBImage`. Then use  `devtools::install_github("ornelles/virustiter")`.
+**Not yet ready for installation.** The `EBImage` and `genefilter` packages will have to be installed with Bioclite. The CRAN package `latticeExtra` will need to be installed as well. After that, the contents can be cloned and "installed" locally from the local directory with   `devtools::load_all()`.
 
 ## Working notes
 Phenotype date should be a data frame with the following variables:
@@ -16,15 +16,15 @@ Phenotype date should be a data frame with the following variables:
   moi   numeric value indicating the multiplicity (units per cell)
   unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
 ```
-and then either `well` or `file`
+and also must include either `well` or `file`:
 ```
   well  character string indicated the well such as "A1" or "a01"
   file	character string identifying the file holding the layered TIF
 ```
 
-Example with images as individual files in folders:
+An example with images in individual files in folders is shown here. Note that any file in the subfolder can be used to point `parseImages()` to the collection of files.
 ```
-  fimg <- system.file("extdata", "by_folder/b1/file001.tif", package = "virustiter")
+  fimg <- system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
 
   df <- parseImages(fimg)
@@ -36,12 +36,12 @@ Example with images as individual files in folders:
   fm <- getFit(res)
   plotFit(fm)
 ```
-Example with stacked images in a single folder (repeat sample code above)
+An example with stacked images in a single folder is shown here. Repeat the above sample code using the new files.
 ```
   fimg <- system.file("extdata", "by_stack/file001.tif", package = "virustiter")
   fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
 ```
-Working functions:
+Typical workflow:
 ```
   df <- parseImages()   # read with EBImage
      or
@@ -70,11 +70,11 @@ Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
 ``` 
  fitAndPlot(res, by)")
 ```
-To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools (`plotCut()` and `plotHist()`) to evaluate the cutoff.
+To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools `plotCut()` and `plotHist()` to evaluate the choice of cutoff.
 
-For example, the sample data yields a non-optimal cutoff using default settings. The control values (moi of 0) are so tight that the default value of 5 for the 'mad' multiplier (`mult`) is too generous.
+The sample dat provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of 5 for the 'mad' multiplier (`mult`) is too generous.
 
-The following shows a better initial selection followed by further exploration using values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the plot shows that the value with `mult` = 3 is more sensible.
+The following shows a better initial selection followed by further exploration using values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist` show that the value with `mult` = 3 is more sensible.
 ```
   mm <- seq(2, 6, 0.25)
   cuts <- getCut(df, mult = mm)
