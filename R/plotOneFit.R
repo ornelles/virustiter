@@ -6,7 +6,7 @@
 
 plotOneFit <- function(fm, main=NULL, xlab=NULL, ylab=NULL,
 				pch.col="black", line.col="red", ref.col="blue", ...)
-{ 		# plot fit in glm fitted model
+{
 	moi <- exp(fm$model[[2]])                    # model data.frame holds values used for fit
 	y <- prop.table(fm$model[[1]],1)[,1]
 	cf <- getTiter(fm)

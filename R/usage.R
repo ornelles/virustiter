@@ -4,9 +4,11 @@
 usage <- function() {
 	txt <- c(
 	" Usage:",
-	"   df <- parseImages() # analyze images with EBImage",
-	"      or",
-	"   df <- readIJResults()   # read data from Fluorescent Cell Count v6 (ImageJ)",
+	"   df <- parseImages()   # read paired images with EBImage ...or...",
+	"   df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)",
+	"",
+	"   pd <- data.frame(well = levels(df$well), moi = moi, unit = unit) ...or...",
+	"   pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)",
 	"",
 	"   df  <- mergePdata(pd, df)  # merge with phenotype data in 'pd'",
 	"   cut <- getCut(df)     # determine cutoff by control (or well, row, or column)",
