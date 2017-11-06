@@ -14,7 +14,7 @@ usage <- function() {
 	"   cut <- getCut(df)     # determine cutoff by control (or well, row, or column)",
 	"   df  <- score(df, cut) # assign positive values from cutoff",
 	"   res <- tally(df)      # tally positives and negatives and return data.frame",
-	"   fm  <- getFit(obj)    # get model fit(s) from scored data (df) or from 'res'",
+	"   fm  <- getFit(res)    # get model fit(s) from either res or scored data frame",
 	"   cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI",
 	"", 
 	" Support:",
