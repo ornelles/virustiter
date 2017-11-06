@@ -27,6 +27,7 @@ usage <- function() {
 	"   addOneFit(fm)  # add best-fit line to existing base graph",
 	"   getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut values",
 	"	displayPairs(f, dna = TRUE) # display image pairs in directory with 'f'",
+	"   nucMask(dapi)   # extract nuclear mask from dapi image(s) or file(s)",
 	"",
 	" Wrapper to automatically process results from ImageJ 'Results.txt' file",
 	"   fitAndPlot(res, by)")
