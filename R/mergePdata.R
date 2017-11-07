@@ -44,7 +44,7 @@ mergePdata <- function(phenoData, imageData)
 	res[sel] <- lapply(res[sel], as.factor)
 
 # reorganize data
-	pdnames <- c("directory","file","column","row","well","frame","type","unit")
+	pdnames <- c("dir","file","column","row","well","frame","type","unit")
 	first <- pdnames[pdnames %in% names(res)]
 	last <- names(res)[!names(res) %in% pdnames]
 	res <- res[c(first, last)]

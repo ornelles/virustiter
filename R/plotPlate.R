@@ -35,10 +35,10 @@ plotPlate <- function(df, cex=1/2, alpha=1/2, main, invert.y=TRUE, ... ) {
 
 	skip <- ! levels(df$well) %in% unique(as.character(df$well))
 
-	if (missing(main) & !("directory" %in% names(df)))
+	if (missing(main) & !("dir" %in% names(df)))
 		main <- Sys.Date()
 	else
-		main <- df$directory[1]
+		main <- df$dir[1]
 
 	if (!"positive" %in% names(df)) df$positive <- FALSE
 	if (invert.y) df$ym <- -df$ym

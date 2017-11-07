@@ -48,7 +48,7 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 	if (is.null(layout))
 		layout <- c(1, nlevels(df[[by]]))
 	if (is.null(main))
-		main <- paste(levels(df$directory), collapse=" + ")
+		main <- paste(levels(df$dir), collapse=" + ")
 	xlist <- list()	# for log argument in scales
 	if (log == TRUE) {
 		xlist <- list(log = 10)

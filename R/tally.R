@@ -3,7 +3,7 @@
 #
 # tally positive and negative values data.frame from readIJResults() by well or file
 #
-# returns "result" data.frame with directory, well, moi, pos, neg and y and unit
+# returns "result" data.frame with dir, well, moi, pos, neg and y and unit
 #
 #########################################################################################
 
@@ -20,10 +20,10 @@ tally <- function(df)
 		group <- df$file
 
 # extract data frame name
-	if (!is.null(df$directory) & nlevels(df$directory)==1)
-		directory <- levels(df$directory)
+	if (!is.null(df$dir) & nlevels(df$dir)==1)
+		dir <- levels(df$dir)
 	else
-		directory <- "unknown"
+		dir <- "unknown"
 
 # tally positive and create results data.frame
 	pos <- tapply(df$positive==TRUE, group, sum)
@@ -35,11 +35,11 @@ tally <- function(df)
 		well <- names(pos)
 		row <- well.info(well)$row
 		column <- well.info(well)$column
-		res <- data.frame(directory, well, row, column, moi, unit, pos, neg, y)
+		res <- data.frame(dir, well, row, column, moi, unit, pos, neg, y)
 	}
 	else {
 		file <- names(pos)
-		res <- data.frame(directory, file, moi, unit, pos, neg, y)
+		res <- data.frame(dir, file, moi, unit, pos, neg, y)
 	}
 	rownames(res) <- NULL
 	return(res)
