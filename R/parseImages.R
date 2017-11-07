@@ -12,10 +12,13 @@
 #	display	display colorMap of nuclei via browser
 #	nx		nrows to be handed to tile()
 #	mask	if TRUE, the return value is a list of image data and nuclear masks
+#	ext		character string defining image file extensions "tif{1,2}$"	
 # Arguments passed to nucMask
-#	width	largest nuclear width used as w and h parameters for thresh2
+#	width	largest nuclear width used as width parameter for thresh2
 #	offset	offset parameter for thresh2, default of 0.05, use 0.01 for low contrast
-#	sigma	radius for medianFilter and gblur, default value of 2 for routine images
+#	size	radius for median filter (integer), 2 for routine images
+#	sigma	standard deviation for Gaussian blur, 2 for routine, 5 for finely detailed 
+#	gamma	exponent for gamma transformation (image^gamma)
 #
 # Returns 	either image image data including well, row, and column and 
 #			or a two-element list with value = data and mask = nuclear masks
@@ -25,7 +28,8 @@
 #########################################################################################
 
 parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
-	offset = 0.05, sigma = 2, display = TRUE, nx = NULL, mask = FALSE)
+	offset = 0.05, size = 2, sigma = 2, gamma = 1, display = TRUE, nx = NULL,
+	mask = FALSE, ext = "tif{1,2}$")
 {
 	library(EBImage)
 
@@ -34,6 +38,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	img <- suppressWarnings(readImage(dnaFile))
 	if (colorMode(img) != 0) stop("only grayscale images can be used")
 	mask <- as.logical(mask)
+	size <- as.integer(size)
 
 # determine if image files are a collection of folders or an image stack
 # based on dimensions of image in dnaFile
@@ -41,7 +46,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		path <- dirname(dirname(dnaFile))
 		dname <- basename(path)
 		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = "tif{1,2}$", ignore.case = TRUE)
+				pattern = ext, ignore.case = TRUE)
 		ffsplit <- split(ff, basename(dirname(ff)))
 		nff <- length(ffsplit)
 		bad <- which(lengths(ffsplit)%%2 != 0)	# mismatched files?
@@ -53,7 +58,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		path <- dirname(dnaFile)
 		dname <- basename(path)
 		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = "tif$", ignore.case = TRUE)
+				pattern = ext, ignore.case = TRUE)
 		ffsplit <- split(ff, basename(ff))
 		nff <- length(ff)
 		FUN <- .processByStack
@@ -95,16 +100,18 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	flr <- img[,,seq(2, dim(img)[3], 2)]
 	if (is.null(nx))
 		nx <- ceiling(sqrt(dim(dapi)[3]))
-	xw <- nucMask(dapi, sigma = sigma, width = width, offset = offset)
+	xw <- nucMask(dapi, width = width, offset = offset, size = size, sigma = sigma, gamma = gamma)
 
 # add well descriptors
 	well <-  well.info(basename(dirname(imageFiles)))$well[1]
 	column <- well.info(well)$column
 	row <- well.info(well)$row
 
+# extract file name and number of frames
 	fname <- paste(well, basename(imageFiles)[seq(2, length(imageFiles), 2)], sep = "/")
-
 	nframes <- dim(xw)[3]
+
+# remove small and large nuclei
 	area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
 	xbar <- mean(unlist(area))
 	xmad <- mad(unlist(area))
@@ -112,6 +119,8 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	large <- lapply(area, function(z) which(z > xbar + k.upper*xmad))
 	xw <- rmObjects(xw, small, reenumerate = FALSE)
 	xw <- rmObjects(xw, large)
+
+# assemble data
 	if (display)
 		display(tile(colorLabels(xw), nx = nx, lwd = 3, fg.col="white"), title = well)
 	res <- data.frame()
@@ -141,12 +150,13 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	flr <- img[,,seq(2, dim(img)[3], 2)]
 	if (is.null(nx))
 		nx <- ceiling(sqrt(dim(dapi)[3]))
-	xw <- nucMask(dapi, sigma = sigma, width = width, offset = offset)
+	xw <- nucMask(dapi, width = width, offset = offset, size = size, sigma = sigma, gamma = gamma)
 
 # extract file name and number of frames
 	fname <- basename(imageStack)
 	nframes <- dim(xw)[3]
 
+# remove small and large nuclei
 	area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
 	xbar <- mean(unlist(area))
 	xmad <- mad(unlist(area))
@@ -154,6 +164,8 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	large <- lapply(area, function(z) which(z > xbar + k.upper*xmad))
 	xw <- rmObjects(xw, small, reenumerate = FALSE)
 	xw <- rmObjects(xw, large)
+
+# assemble data
 	if (display)
 		display(tile(colorLabels(xw), nx = nx, lwd = 3, fg.col="white"), title = fname)
 	res <- data.frame()
