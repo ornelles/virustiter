@@ -70,8 +70,8 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	for (i in seq_along(ffsplit)) {
 		if (!display) setTxtProgressBar(pb, i)
 		ret[[i]] <- FUN(ffsplit[[i]], k.upper = k.upper, k.lower = k.lower,
-				width = width, offset = offset, sigma = sigma,
-				display = display, nx = nx, mask = mask)
+				width = width, offset = offset, size = size, sigma = sigma,
+				gamma = gamma, display = display, nx = nx, mask = mask)
 	}
 	if (mask == TRUE) {
 		value <- do.call(rbind, lapply(ret, "[[", 1))
@@ -93,7 +93,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 # process paired DAPI and fluorescent images in named files
 #
 .processByFolder <- function(imageFiles, k.upper, k.lower, width,
-		offset, sigma, display, nx, mask)
+		offset, size, sigma, gamma, display, nx, mask)
 {
 	img <- suppressWarnings(readImage(imageFiles))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]	# must have 3 dimensions
@@ -142,8 +142,8 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 #
 # process alternately stacked DAPI and fluorescent images in named file
 #
-.processByStack <- function(imageStack, k.upper, k.lower, width,
-		offset, sigma, display, nx, mask)
+.processByStack <- function(imageFiles, k.upper, k.lower, width,
+		offset, size, sigma, gamma, display, nx, mask)
 {
 	img <- suppressWarnings(readImage(imageStack))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]	# must have 3 dimensions
