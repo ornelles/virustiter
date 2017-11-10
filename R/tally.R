@@ -4,10 +4,11 @@
 # tally positive and negative values data.frame from readIJResults() by well or file
 #
 # returns "result" data.frame with dir, well, moi, pos, neg and y and unit
+# merges additional phenotype data in optional pd
 #
 #########################################################################################
 
-tally <- function(df)
+tally <- function(df, pd = NULL)
 {
 	stopifnot(c("positive", "moi") %in% names(df))
 	if (!any(c("well", "file") %in% names(df)))
@@ -41,6 +42,8 @@ tally <- function(df)
 		file <- names(pos)
 		res <- data.frame(dir, file, moi, unit, pos, neg, y)
 	}
+	if (!is.null(pd))
+		res <- mergePdata(pd, res)
 	rownames(res) <- NULL
 	return(res)
 }
