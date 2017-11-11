@@ -12,7 +12,7 @@
 #	display	display colorMap of nuclei via browser
 #	nx		nrows to be handed to tile()
 #	mask	if TRUE, the return value is a list of image data and nuclear masks
-#	ext		character string defining image file extensions "tif{1,2}$"	
+#	pat		grep pattern identifying image files, default is "tif{1,2}$"	
 # Arguments passed to nucMask
 #	width	largest nuclear width used as width parameter for thresh2
 #	offset	offset parameter for thresh2, default of 0.05, use 0.01 for low contrast
@@ -29,7 +29,7 @@
 
 parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	offset = 0.05, size = 2, sigma = 2, gamma = 1, display = TRUE, nx = NULL,
-	mask = FALSE, ext = "tif{1,2}$")
+	mask = FALSE, pat = "tif{1,2}$")
 {
 	library(EBImage)
 
@@ -46,7 +46,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		path <- dirname(dirname(dnaFile))
 		dname <- basename(path)
 		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = ext, ignore.case = TRUE)
+				pattern = pat, ignore.case = TRUE)
 		ffsplit <- split(ff, basename(dirname(ff)))
 		nff <- length(ffsplit)
 		bad <- which(lengths(ffsplit)%%2 != 0)	# mismatched files?
@@ -58,17 +58,21 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		path <- dirname(dnaFile)
 		dname <- basename(path)
 		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = ext, ignore.case = TRUE)
+				pattern = pat, ignore.case = TRUE)
 		ffsplit <- split(ff, basename(ff))
 		nff <- length(ff)
 		FUN <- .processByStack
 	}
 # apply the working function to extract information
 	ret <- rep(list(NULL), nff)
-	if (!display)
+	if (display == FALSE | length(ffsplit) < 2)
+		showProgress <- FALSE
+	else
+		showProgress <- TRUE
+	if (showProgress)
 		pb <- txtProgressBar(min = 1, max = length(ffsplit), style = 3)
 	for (i in seq_along(ffsplit)) {
-		if (!display) setTxtProgressBar(pb, i)
+		if (showProgress) setTxtProgressBar(pb, i)
 		ret[[i]] <- FUN(ffsplit[[i]], k.upper = k.upper, k.lower = k.lower,
 				width = width, offset = offset, size = size, sigma = sigma,
 				gamma = gamma, display = display, nx = nx, mask = mask)
@@ -86,7 +90,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		rownames(value) <- NULL
 		ans <- value
 	}
-	if (!display) close(pb)
+	if (showProgress) close(pb)
 	return(ans)
 }
 #
@@ -96,11 +100,17 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		offset, size, sigma, gamma, display, nx, mask)
 {
 	img <- suppressWarnings(readImage(imageFiles))
-	dapi <- img[,,seq(1, dim(img)[3], 2)]	# must have 3 dimensions
+	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
+	if (length(dim(dapi) == 2))	{			# must have 3 dimensions
+		dims <- dim(dapi)
+		dim(dapi) <- c(dims, 1)
+		dim(flr) <- c(dims, 1)
+	}
 	if (is.null(nx))
 		nx <- ceiling(sqrt(dim(dapi)[3]))
-	xw <- nucMask(dapi, width = width, offset = offset, size = size, sigma = sigma, gamma = gamma)
+	xw <- nucMask(dapi, width = width, offset = offset, size = size,
+			sigma = sigma, gamma = gamma)
 
 # add well descriptors
 	well <-  well.info(basename(dirname(imageFiles)))$well[1]
@@ -142,15 +152,21 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 #
 # process alternately stacked DAPI and fluorescent images in named file
 #
-.processByStack <- function(imageFiles, k.upper, k.lower, width,
+.processByStack <- function(imageStack, k.upper, k.lower, width,
 		offset, size, sigma, gamma, display, nx, mask)
 {
 	img <- suppressWarnings(readImage(imageStack))
-	dapi <- img[,,seq(1, dim(img)[3], 2)]	# must have 3 dimensions
+	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
+	if (length(dim(dapi) == 2))	{			# must have 3 dimensions
+		dims <- dim(dapi)
+		dim(dapi) <- c(dims, 1)
+		dim(flr) <- c(dims, 1)
+	}
 	if (is.null(nx))
 		nx <- ceiling(sqrt(dim(dapi)[3]))
-	xw <- nucMask(dapi, width = width, offset = offset, size = size, sigma = sigma, gamma = gamma)
+	xw <- nucMask(dapi, width = width, offset = offset, size = size,
+			sigma = sigma, gamma = gamma)
 
 # extract file name and number of frames
 	fname <- basename(imageStack)
