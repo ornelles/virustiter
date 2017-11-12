@@ -1,5 +1,5 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and (possibly) `genefilter` packages.
+This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (ideally overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and  `genefilter` packages.
 
 ## Overview
 This was developed to process multi-well plates. Most of the tools are structured for this purpose. Pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. The nuclear (DAPI) image file must always come before the corresponding viral antigen image file. 
@@ -22,7 +22,7 @@ and also must include either `well` or `file`:
   file	character string identifying the file holding the layered TIF
 ```
 
-An example with images in individual files in folders is shown here. Note that any file in the subfolder can be used to point `parseImages()` to the collection of files.
+An example with images in individual files in folders is shown here. Note that any file in the subfolder can be used to point `parseImages()` to the collection of files. This function will try to determine if this file is a multilayered tiff file or a single image in a collection of image files and process the files accordingly. 
 ```
   fimg <- system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
@@ -56,15 +56,18 @@ Typical workflow:
 ```
 Supporting functions:
 ```
-  plotCut(df)     # calculate and show cutoff values with densityplot 
-  plotPlate(df)   # plot plate showing positives
-  plotWell(df, well) # plot each file in a well showing positives and sizes
-  plotHist(df)    # histogram on well-by-well basis with optional cutoff values
-  plotFit(fm)     # plot fit(s) with calculated values using base graphics
-  plotOneFit(fm)  # plot fit with options to adjust colors
-  addOneFit(fm)   # add best-fit line to existing base graph
-  getAIC(df, cut, by)  #evaluate fitted model(s) from df at cut value(s)
-  displayPairs(f, dna = TRUE) # display image pairs in directory containing 'f'
+  plotCut(df)    # calculate and show cutoff values with densityplot 
+  plotHist(df)   # histogram of each well with optional cutoff values
+  plotPlate(df)  # lattice plot plate showing cell position and positives
+  plotWell(df, well) # plot each file in a well showing positives and cell size
+  plotFit(fm)    # plot fit(s) with calculated values using base graphics
+  plotOneFit(fm) # plot fit with options to adjust colors
+  addOneFit(fm)  # add best-fit line to existing base graph
+  getAIC(df, cut, by)  # evaluate fitted model(s) from df at cut values
+  displayPairs(f) # display one of paired images with nuclear mask
+  nucMask(dapi)   # extract nuclear mask from dapi image(s) or file(s)
+  p2p()           # interactively measure point-to-point distances
+  pnpoly(p, v)    # test if points in p are within polygon (v)
 ```
 Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
 ``` 
@@ -72,7 +75,7 @@ Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
 ```
 To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools `plotCut()` and `plotHist()` to evaluate the choice of cutoff.
 
-The sample dat provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of 5 for the 'mad' multiplier (`mult`) is too generous.
+The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
 
 The following shows a better initial selection followed by further exploration using values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist` show that the value with `mult` = 3 is more sensible.
 ```

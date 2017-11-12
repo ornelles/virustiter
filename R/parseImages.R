@@ -6,13 +6,14 @@
 # Merge this output with a phenotype data file to create a file of the same form.
 #
 # Arguments
-#	dnaFile	optional path to DAPI file under nested folders such as a3/file001.tif
+#	dnaFile	path to DAPI file under nested folders or multilayer tif (A1/file001.tif)
 #	k.upper	multiplier for mad value cutoff for nuclear area: mean + k.upper*mad(area)
 #	k.lower	multiplier for mad value cutoff for nuclear area: mean - k.lower*mad(area)
-#	display	display colorMap of nuclei via browser
-#	nx		nrows to be handed to tile()
-#	mask	if TRUE, the return value is a list of image data and nuclear masks
-#	pat		grep pattern identifying image files, default is "tif{1,2}$"	
+#	display	display color map of nuclear mask with browser
+#	mask	if TRUE, the return value is a named list with "data" and "mask"
+#			otherwise just the data frame of results are returned
+#	pattern	optional grep pattern to select image files
+#	type	type of image files as "tiff", "jpeg" or "png"	
 # Arguments passed to nucMask
 #	width	largest nuclear width used as width parameter for thresh2
 #	offset	offset parameter for thresh2, default of 0.05, use 0.01 for low contrast
@@ -20,95 +21,101 @@
 #	sigma	standard deviation for Gaussian blur, 2 for routine, 5 for finely detailed 
 #	gamma	exponent for gamma transformation (image^gamma)
 #
-# Returns 	either image image data including well, row, and column and 
-#			or a two-element list with value = data and mask = nuclear masks
+# Returns 	either parsed image data including well, row, and column and 
+#			or a two-element named list with data = parsed imaged data
+#			and mask = nuclear masks
 #
-# Use mergePdata on value before using further
+# Use mergePdata on data before proceeding further with virus titer
 #
 #########################################################################################
 
 parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
-	offset = 0.05, size = 2, sigma = 2, gamma = 1, display = TRUE, nx = NULL,
-	mask = FALSE, pat = "tif{1,2}$")
+	offset = 0.05, size = 2, sigma = 2, gamma = 1, display = TRUE,
+	mask = FALSE, type = "tiff", pattern = NULL)
 {
+# requires EBImage, ensure appropriate values for parameters 
 	library(EBImage)
-
-# examine dnaFile and confirm monochrome
-	if (missing(dnaFile)) dnaFile <- file.choose()
-	img <- suppressWarnings(readImage(dnaFile))
-	if (colorMode(img) != 0) stop("only grayscale images can be used")
 	mask <- as.logical(mask)
 	size <- as.integer(size)
 
-# determine if image files are a collection of folders or an image stack
-# based on dimensions of image in dnaFile
+# examine dnaFile and confirm that it is monochrome
+	img <- suppressWarnings(readImage(dnaFile))
+	if (colorMode(img) != 0) stop("only grayscale images can be used")
+
+# use the dimensions of image in dnaFile to determine if image files are a collection
+# of folders or an image stack
 	if (length(dim(img)) == 2 || dim(img)[3] == 1) { # folders
-		path <- dirname(dirname(dnaFile))
-		dname <- basename(path)
-		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = pat, ignore.case = TRUE)
+		FUN <- .processByFolder
+		dname <- basename(dirname(dirname(dnaFile)))
+		ff <- list.images(dnaFile, enclosing = 2, type = type, pattern = pattern)
 		ffsplit <- split(ff, basename(dirname(ff)))
 		nff <- length(ffsplit)
 		bad <- which(lengths(ffsplit)%%2 != 0)	# mismatched files?
 		if (length(bad))
 			stop("odd number of images in: ", paste(names(bad)))
-		FUN <- .processByFolder
 	}
 	else {  # image stacks
-		path <- dirname(dnaFile)
-		dname <- basename(path)
-		ff <- list.files(path, full = TRUE, recursive = TRUE,
-				pattern = pat, ignore.case = TRUE)
+		FUN <- .processByStack
+		dname <- basename(dirname(dnaFile))
+		ff <- list.images(dnaFile, enclosing = 1, type = type, pattern = pattern)
 		ffsplit <- split(ff, basename(ff))
 		nff <- length(ff)
-		FUN <- .processByStack
 	}
-# apply the working function to extract information
+# initialize variable to collect results, determine if progress bar is needed
 	ret <- rep(list(NULL), nff)
-	if (display == FALSE | length(ffsplit) < 2)
+	if (display == TRUE | length(ffsplit) < 2)
 		showProgress <- FALSE
-	else
-		showProgress <- TRUE
-	if (showProgress)
+	else {
 		pb <- txtProgressBar(min = 1, max = length(ffsplit), style = 3)
+		showProgress <- TRUE
+	}
+# apply the working function to extract information from each set of files
 	for (i in seq_along(ffsplit)) {
-		if (showProgress) setTxtProgressBar(pb, i)
+		if (showProgress)
+			setTxtProgressBar(pb, i)
 		ret[[i]] <- FUN(ffsplit[[i]], k.upper = k.upper, k.lower = k.lower,
 				width = width, offset = offset, size = size, sigma = sigma,
-				gamma = gamma, display = display, nx = nx, mask = mask)
+				gamma = gamma)
+		if (display) {
+			if ("well" %in% names(ret[[i]]$data))
+				title <- levels(ret[[i]]$data$well)[1]
+			else
+				title <- levels(ret[[i]]$data$file)[1]
+			nx <- ceiling(sqrt(dim(ret[[i]]$mask)[3]))
+			display(tile(colorLabels(ret[[i]]$mask), nx = nx, lwd = 3,
+					fg.col="white"), title = title)
+		}
 	}
+# FUN returns data and mask as a two-element list
+	value <- do.call(rbind, lapply(ret, "[[", 1))
+	value <- cbind(dir = factor(dname), value)
+	rownames(value) <- NULL
 	if (mask == TRUE) {
-		value <- do.call(rbind, lapply(ret, "[[", 1))
-		value <- cbind(dir = factor(dname), value)
-		rownames(value) <- NULL
 		nmask <- do.call(combine, lapply(ret, "[[", 2))
-		ans <- list(value = value, mask = nmask)
+		ans <- list(data = value, mask = nmask)
 	}
-	else {
-		value <- do.call(rbind, ret)
-		value <- cbind(dir = factor(dname), value)
-		rownames(value) <- NULL
+	else
 		ans <- value
-	}
-	if (showProgress) close(pb)
+	if (showProgress)
+		close(pb)
 	return(ans)
 }
 #
 # process paired DAPI and fluorescent images in named files
+# return data.frame as 'data' and nuclear mask as 'mask'
 #
 .processByFolder <- function(imageFiles, k.upper, k.lower, width,
-		offset, size, sigma, gamma, display, nx, mask)
+		offset, size, sigma, gamma)
 {
 	img <- suppressWarnings(readImage(imageFiles))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
-	if (length(dim(dapi) == 2))	{			# must have 3 dimensions
+
+	if (length(dim(dapi)) == 2)	{	# must have 3 dimensions
 		dims <- dim(dapi)
 		dim(dapi) <- c(dims, 1)
 		dim(flr) <- c(dims, 1)
 	}
-	if (is.null(nx))
-		nx <- ceiling(sqrt(dim(dapi)[3]))
 	xw <- nucMask(dapi, width = width, offset = offset, size = size,
 			sigma = sigma, gamma = gamma)
 
@@ -131,8 +138,6 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	xw <- rmObjects(xw, large)
 
 # assemble data
-	if (display)
-		display(tile(colorLabels(xw), nx = nx, lwd = 3, fg.col="white"), title = well)
 	res <- data.frame()
 	for (i in seq_len(nframes)) {
 		area <- computeFeatures.shape(xw[,,i])[,1]
@@ -140,31 +145,27 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		dna <- computeFeatures.basic(xw[,,i], dapi[,,i])[,1]
 		val <- computeFeatures.basic(xw[,,i], flr[,,i])[,1]
 		res <- rbind(res, data.frame(file = fname[i], well = well, column = column,
-			row = row, xm = XY[,1], ym = XY[,2], area, dna, val))
+				row = row, xm = XY[,1], ym = XY[,2], area, dna, val))
 	}
 	rownames(res) <- NULL
-	if (mask == TRUE)
-		return(list(value = res, mask = xw))
-	else
-		return(res)
+	return(list(data = res, mask = xw))
 }
 
 #
 # process alternately stacked DAPI and fluorescent images in named file
+# return data.frame as 'data' and nuclear mask as 'mask'
 #
 .processByStack <- function(imageStack, k.upper, k.lower, width,
-		offset, size, sigma, gamma, display, nx, mask)
+		offset, size, sigma, gamma)
 {
 	img <- suppressWarnings(readImage(imageStack))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
-	if (length(dim(dapi) == 2))	{			# must have 3 dimensions
+	if (length(dim(dapi)) == 2)	{	# must have 3 dimensions
 		dims <- dim(dapi)
 		dim(dapi) <- c(dims, 1)
 		dim(flr) <- c(dims, 1)
 	}
-	if (is.null(nx))
-		nx <- ceiling(sqrt(dim(dapi)[3]))
 	xw <- nucMask(dapi, width = width, offset = offset, size = size,
 			sigma = sigma, gamma = gamma)
 
@@ -182,8 +183,6 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 	xw <- rmObjects(xw, large)
 
 # assemble data
-	if (display)
-		display(tile(colorLabels(xw), nx = nx, lwd = 3, fg.col="white"), title = fname)
 	res <- data.frame()
 	for (i in seq_len(nframes)) {
 		area <- computeFeatures.shape(xw[,,i])[,1]
@@ -191,11 +190,8 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		dna <- computeFeatures.basic(xw[,,i], dapi[,,i])[,1]
 		val <- computeFeatures.basic(xw[,,i], flr[,,i])[,1]
 		res <- rbind(res, data.frame(file = fname, frame = i, 
-			xm = XY[,1], ym = XY[,2], area, dna, val))
+				xm = XY[,1], ym = XY[,2], area, dna, val))
 	}
 	rownames(res) <- NULL
-	if (mask == TRUE)
-		return(list(value = res, mask = xw))
-	else
-		return(res)
+	return(list(data = res, mask = xw))
 }

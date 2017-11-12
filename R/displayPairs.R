@@ -4,10 +4,16 @@
 # display fluorescent (or DAPI) files in directory with file named in 'f'
 #
 # Arguments
-# f			path to DAPI image in directory with paired images
-# dnaStain	if TRUE, add blue nuclei to image, else show 2nd as green
-# width, offset, sigma	paramaters for nucMask
-# col		overlay color for mask 
+#  f		DAPI file in directory with paired images
+#  dnaStain	if TRUE, show masks on blue nuclei otherwise show on 2nd image as green
+#  col		overlay color for mask
+#  opac		opacity for mask
+# Optional arguments passed to nuclearMask
+#  width	largest nuclear width used as width parameter for thresh2
+#  offset	offset parameter for thresh2, default of 0.05, use 0.01 for low contrast
+#  size		radius for median filter (integer), 2 for routine images
+#  sigma	standard deviation for Gaussian blur, 2 for routine, 5 for finely detailed 
+#  gamma	dapi^gamma transformation
 # ...	parameters passed to display
 #
 # Return
@@ -15,22 +21,24 @@
 #
 #########################################################################################
 
-displayPairs <- function(f, dnaStain = FALSE, width = 32,
-	offset = 0.05, sigma = 2, col = "lightyellow", ...)
+displayPairs <- function(f, dnaStain = FALSE, col = "yellow", opac = 0.5, type = "tiff",
+	width = NULL, offset = NULL, size = NULL, sigma = NULL, gamma = NULL, ...)
 {
 	if(require(EBImage) == FALSE)
 		stop("requires EBImage")
-	if (missing(f)) f <- file.choose()
-	path <- dirname(f)
-	ff <- list.files(path, pattern="tif$", full=TRUE, ignore.case = TRUE)
+	ff <- list.images(f, type = type, enclosing = 1)
+	maskArgs <- list(width=width, offset=offset, size=size, sigma=sigma, gamma=gamma)
+	maskArgs <- maskArgs[!sapply(maskArgs, is.null)]
 	x <- readImage(ff[seq(1, length(ff), 2)])
-	xw <- nucMask(x, width=width, offset=offset, sigma=sigma)
+	xw <- do.call(nucMask, c(list(x), maskArgs))
+	x <- normalize(x, separate = FALSE)
 	y <- readImage(ff[seq(2, length(ff), 2)])
+	y <- normalize(y, separate = FALSE)
 	if (dnaStain)
-		img <- rgbImage(blue = normalize(x, separate = FALSE))
+		img <- rgbImage(blue = x, green = 0.4 * x)
 	else
-		img <- rgbImage(green = normalize(y, separate = FALSE))
-	img <- paintObjects(xw, img, col = col)
-	display(img, title = basename(path), ...)
+		img <- rgbImage(green = y, red = 0.4 * y)
+	img <- paintObjects(xw, img, col = col, opac = opac)
+	display(img, title = basename(f), ...)
 	invisible(img)
 }
