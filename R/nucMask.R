@@ -28,13 +28,3 @@ nucMask <- function(dapi, width = 36, offset = 0.05, size = 2, sigma = 2, gamma 
 	x <- distmap(x)
 	return(watershed(x))
 }
-
-#
-# adaptive threshold using disc instead of box
-#
-thresh2 <- function(x, width, offset) {
-	r <- width - width%%2 + 1
-	f <- makeBrush(r, shape = "disc")
-	f <- f/sum(f)
-	return (x > (filter2(x, f) + offset))
-}
