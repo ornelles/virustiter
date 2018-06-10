@@ -7,18 +7,24 @@
 #
 # Arguments
 #	dnaFile	path to DAPI file under nested folders or multilayer tif (A1/file001.tif)
-#	k.upper	multiplier for mad value cutoff for nuclear area: mean + k.upper*mad(area)
-#	k.lower	multiplier for mad value cutoff for nuclear area: mean - k.lower*mad(area)
 #	display	display color map of nuclear mask with browser
 #	mask	if TRUE, the return value is a named list with "data" and "mask"
 #			otherwise just the data frame of results are returned
 #	pattern	optional grep pattern to select image files
 #	type	type of image files as "tiff", "jpeg" or "png"	
+# Arguments passed to trimMask
+#	cutoff	integer, upper and lower absolute cutoff values 
+#	k		real, upper and lower multiplier to determine cutoff values
+#			if cutoff is NULL from mean (xbar) and MAD (xmad) area
+#			lim <- c(xbar - k[1] * xmad, xbar + k[2] * xmad)
 # Arguments passed to nucMask
 #	width	largest nuclear width used as width parameter for thresh2
 #	offset	offset parameter for thresh2, default of 0.05, use 0.01 for low contrast
-#	size	radius for median filter (integer), 2 for routine images
-#	sigma	standard deviation for Gaussian blur, 2 for routine, 5 for finely detailed 
+#	size	integer, radius for median filter, 2 for routine images,
+#			0 to exclude medianFilter
+#	sigma	standard deviation for Gaussian blur, 2 for routine, 5 for finely detailed
+#	radius	radius for gblur, default of 2 * ceiling(3 * sigma) + 1
+#			use smaller numbers than default of 13 for smaller features
 #	gamma	exponent for gamma transformation (image^gamma)
 #
 # Returns 	either parsed image data including well, row, and column and 
@@ -29,9 +35,9 @@
 #
 #########################################################################################
 
-parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
-	offset = 0.05, size = 2, sigma = 2, gamma = 1, display = TRUE,
-	mask = FALSE, type = "tiff", pattern = NULL)
+parseImages <- function(dnaFile, cutoff = NULL, k = c(1.2, 3), width = 36,
+	offset = 0.05, size = 2, sigma = 2, radius =  2 * ceiling(3 * sigma) + 1,
+	gamma = 1, display = TRUE, mask = FALSE, type = "tiff", pattern = NULL)
 {
 # requires EBImage, ensure appropriate values for parameters 
 	library(EBImage)
@@ -61,6 +67,7 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		ffsplit <- split(ff, basename(ff))
 		nff <- length(ff)
 	}
+
 # initialize variable to collect results, determine if progress bar is needed
 	ret <- rep(list(NULL), nff)
 	if (display == TRUE | length(ffsplit) < 2)
@@ -69,13 +76,14 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 		pb <- txtProgressBar(min = 1, max = length(ffsplit), style = 3)
 		showProgress <- TRUE
 	}
+
 # apply the working function to extract information from each set of files
 	for (i in seq_along(ffsplit)) {
 		if (showProgress)
 			setTxtProgressBar(pb, i)
-		ret[[i]] <- FUN(ffsplit[[i]], k.upper = k.upper, k.lower = k.lower,
+		ret[[i]] <- FUN(ffsplit[[i]], cutoff = cutoff, k = k,
 				width = width, offset = offset, size = size, sigma = sigma,
-				gamma = gamma)
+				radius = radius, gamma = gamma)
 		if (display) {
 			if ("well" %in% names(ret[[i]]$data))
 				title <- levels(ret[[i]]$data$well)[1]
@@ -86,10 +94,14 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 					fg.col="white"), title = title)
 		}
 	}
-# FUN returns data and mask as a two-element list
+
+# FUN returned the data and mask as a two-element list
+# add directory information to data
 	value <- do.call(rbind, lapply(ret, "[[", 1))
 	value <- cbind(dir = factor(dname), value)
 	rownames(value) <- NULL
+
+# if required, convert the list of nuclear masks into a single object
 	if (mask == TRUE) {
 		nmask <- do.call(combine, lapply(ret, "[[", 2))
 		ans <- list(data = value, mask = nmask)
@@ -104,22 +116,27 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 # process paired DAPI and fluorescent images in named files
 # return data.frame as 'data' and nuclear mask as 'mask'
 #
-.processByFolder <- function(imageFiles, k.upper, k.lower, width,
-		offset, size, sigma, gamma)
+.processByFolder <- function(imageFiles, cutoff, k, width,
+		offset, size, sigma, radius, gamma)
 {
+# read image files
 	img <- suppressWarnings(readImage(imageFiles))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
 
-	if (length(dim(dapi)) == 2)	{	# must have 3 dimensions
+# ensure that image(s) have 3 dimenions
+	if (length(dim(dapi)) == 2)	{
 		dims <- dim(dapi)
 		dim(dapi) <- c(dims, 1)
 		dim(flr) <- c(dims, 1)
 	}
-	xw <- nucMask(dapi, width = width, offset = offset, size = size,
-			sigma = sigma, gamma = gamma)
 
-# add well descriptors
+# create nuclear mask, remove small and large nuclei
+	xw <- nucMask(dapi, width = width, offset = offset, size = size,
+			sigma = sigma, radius = radius, gamma = gamma)
+	xw <- trimMask(xw, cutoff = cutoff, k = k)
+
+# derive well descriptors
 	well <-  well.info(basename(dirname(imageFiles)))$well[1]
 	column <- well.info(well)$column
 	row <- well.info(well)$row
@@ -127,15 +144,6 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 # extract file name and number of frames
 	fname <- paste(well, basename(imageFiles)[seq(2, length(imageFiles), 2)], sep = "/")
 	nframes <- dim(xw)[3]
-
-# remove small and large nuclei
-	area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
-	xbar <- mean(unlist(area))
-	xmad <- mad(unlist(area))
-	small <- lapply(area, function(z) which(z < xbar - k.lower*xmad))
-	large <- lapply(area, function(z) which(z > xbar + k.upper*xmad))
-	xw <- rmObjects(xw, small, reenumerate = FALSE)
-	xw <- rmObjects(xw, large)
 
 # assemble data
 	res <- data.frame()
@@ -155,32 +163,29 @@ parseImages <- function(dnaFile, k.upper = 3, k.lower = 1.2, width = 36,
 # process alternately stacked DAPI and fluorescent images in named file
 # return data.frame as 'data' and nuclear mask as 'mask'
 #
-.processByStack <- function(imageStack, k.upper, k.lower, width,
-		offset, size, sigma, gamma)
+.processByStack <- function(imageStack, cutoff, k, width,
+		offset, size, sigma, radius, gamma)
 {
+# read image files
 	img <- suppressWarnings(readImage(imageStack))
 	dapi <- img[,,seq(1, dim(img)[3], 2)]
 	flr <- img[,,seq(2, dim(img)[3], 2)]
-	if (length(dim(dapi)) == 2)	{	# must have 3 dimensions
+
+# ensure that image(s) have 3 dimenions
+	if (length(dim(dapi)) == 2)	{
 		dims <- dim(dapi)
 		dim(dapi) <- c(dims, 1)
 		dim(flr) <- c(dims, 1)
 	}
+
+# create nuclear mask, remove small and large nuclei
 	xw <- nucMask(dapi, width = width, offset = offset, size = size,
-			sigma = sigma, gamma = gamma)
+			sigma = sigma, radius = radius, gamma = gamma)
+	xw <- trimMask(xw, cutoff = cutoff, k = k)
 
 # extract file name and number of frames
 	fname <- basename(imageStack)
 	nframes <- dim(xw)[3]
-
-# remove small and large nuclei
-	area <- lapply(1:nframes, function(i) computeFeatures.shape(xw[,,i])[,1])
-	xbar <- mean(unlist(area))
-	xmad <- mad(unlist(area))
-	small <- lapply(area, function(z) which(z < xbar - k.lower*xmad))
-	large <- lapply(area, function(z) which(z > xbar + k.upper*xmad))
-	xw <- rmObjects(xw, small, reenumerate = FALSE)
-	xw <- rmObjects(xw, large)
 
 # assemble data
 	res <- data.frame()
