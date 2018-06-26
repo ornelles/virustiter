@@ -25,13 +25,14 @@ nucMask <- function(dapi, width = 36, offset = 0.05, size = 2, sigma = 2,
 		x <- readImage(dapi)
 	else
 		x <- dapi
-	x <- x^gamma
+	if (gamma != 1)
+		x <- x^gamma
 	x <- normalize(x)
 	if (!is.null(size) && !is.na(size) && size != 0) {
 		size <- as.integer(size)
 		x <- medianFilter(x, size)
 	}
-	x <- gblur(x, sigma)
+	x <- gblur(x, sigma, radius)
 	x <- thresh2(x, width = width, offset = offset)
 	x <- fillHull(x)
 	x <- distmap(x)
