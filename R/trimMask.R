@@ -8,9 +8,10 @@
 #	k		real, upper and lower multiplier to determine cutoff values
 #			if cutoff is NULL from mean (xbar) and MAD (xmad) area
 #			cutoff <- c(xbar - k[1] * xmad, xbar + k[2] * xmad)
+#			reenumerate	logical, reenumerate before returning 
 #
 #########################################################################################
-trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3))
+trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
 {
 	require(EBImage)
 	dm <- dim(mask)
@@ -35,5 +36,7 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3))
 	mask <- rmObjects(mask, small, reenumerate = FALSE)
 	mask <- rmObjects(mask, large)
 	dim(mask) <- dm
+	if (reenumerate)
+		mask <- reenumerate(mask)
 	return(mask)
 }
