@@ -2,11 +2,11 @@
 # getCut
 #
 # derived from generic code to determine cut (background) values for 'param' (val) with
-# cut points from find.bgnd() by control wells (moi==0 or type=="control"), or for each
+# cut points from findBgnd() by control wells (moi==0 or type=="control"), or for each
 # file, well, row, or column in the data.frame
 #
 # Dependencies
-#   find.bgnd()	calculates likely cutoff point for background from density profile
+#   findBgnd()	calculates likely cutoff point for background from density profile
 #
 #########################################################################################
 
@@ -43,7 +43,7 @@ getCut <- function(df, by=c("control", "file", "well", "row", "column"),
 		temp <- df[c(by, param)]
 		names(temp) <- c("g", "y")
 	}
-	res <- aggregate(y ~ g, temp, function(v) find.bgnd(v, mult=mult, log=log))
+	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult=mult, log=log))
 	ret <- res$y
 	names(ret) <- if(by=="control") "control" else res$g
 	return(ret)

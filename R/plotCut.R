@@ -1,7 +1,7 @@
 #########################################################################################
 # plotCut
 # 
-# Use lattice densityplot() to determine and display background values with find.bgnd()
+# Use lattice densityplot() to determine and display background values with findBgnd()
 #
 # If cut is missing, it will be determined according to the 'by' parameter
 #
