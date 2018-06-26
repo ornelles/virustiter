@@ -8,7 +8,7 @@
 #	k		real, upper and lower multiplier to determine cutoff values
 #			if cutoff is NULL from mean (xbar) and MAD (xmad) area
 #			cutoff <- c(xbar - k[1] * xmad, xbar + k[2] * xmad)
-#			reenumerate	logical, reenumerate before returning 
+# reenumerate	logical, reenumerate objects before returning 
 #
 #########################################################################################
 trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
