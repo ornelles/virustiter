@@ -1,16 +1,44 @@
-#########################################################################################
-# trimMask
-#
-# remove small and large objects from mask
-#
-#	mask	mask object
-#	cutoff	integer, upper and lower absolute cutoff values 
-#	k		real, upper and lower multiplier to determine cutoff values
-#			if cutoff is NULL from mean (xbar) and MAD (xmad) area
-#			cutoff <- c(xbar - k[1] * xmad, xbar + k[2] * xmad)
-# reenumerate	logical, reenumerate objects before returning 
-#
-#########################################################################################
+#' Remove small and large objects from an object mask 
+#' 
+#' Remove objects with area outside of lower and upper cutoff values
+#' or by a lower and upper multiplier applied to the \code{mad} of the area. 
+#' 
+#' @param mask object mask with connected pixels having the same
+#' integer value
+#' @param cutoff optional integer value of length 2 specifying the lower 
+#' and upper absolute cutoff values
+#' @param k numeric value of length 2 specifying the lower and upper multiplier 
+#' to determine the cutoff from the \code{mean} and \code{mad} of the area
+#' @param reenumerate reenumerate the objects in the trimmed mask
+#' 
+#' @details
+#' 
+#' If \code{cutoff} is specified, objects smaller than \code{cutoff[1]} and 
+#' larger than \code{cutoff[2]} will be removed otherwise, objects smaller 
+#' than \code{mean(area) - k[1]*mad(area)} and larger than \code{mean(area)+ 
+#' k[2]*mad(area)} will be removed. The mask will be reenumerated if that 
+#' parameter is \code{TRUE}. 
+#' 
+#' @return
+#'
+#' Object mask with small and large objects removed.
+#'
+#' @examples
+#' 
+#' x <- readImage(system.file("extdata", "by_stack/file001.tif",
+#'	package = "virustiter"))
+#' xb <- normalize(gblur(x, 2))
+#' xt <- thresh(xb)
+#' xm <- bwlabel(xt)
+#' xm2 <- trimMask(xm)
+#' xm3 <- trimMask(xm, cutoff = c(1, 20))
+#' xm4 <- trimMask(xm, cutoff = c(100, 250))
+#' plot(combine(xm, xm2, xm3, xm4), all = TRUE)
+#'
+#' @import EBImage
+#' 
+#' @export
+
 trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
 {
 	require(EBImage)

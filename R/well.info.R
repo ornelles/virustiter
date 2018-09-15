@@ -1,22 +1,59 @@
-#########################################################################################
-# well.info
-#
-# support function to parse character vector into numeric prefix, well, row and column,
-# return as a list with well reformatted according to sprintf format in "format".
-#
-#########################################################################################
+#' Extract prefix, row and column from well label
+#' 
+#' Create a uniform representation for a well with an optional 
+#' prefix. 
+#' 
+#' @param w name of the well (coerced as a character)
+#' @param format \code{sprintf} format for the column portion as
+#' a character vector
+#' @param upper use upper case if \code{TRUE}
+#' 
+#' @details 
+#' 
+#' Parse the value in \code{w} into an optional arbitrary prefix followed by a 
+#' single character for the well, followed by the column number formatted
+#' as per \code{format}. The code will fail if the row value is not one of the 26
+#' letters or if the column number is not in the range of 1 to 384. 
+#' 
+#' @return 
+#' 
+#' A named list of length four:
+#' \itemize{
+#' 	\item prefix, the optional prefix
+#' 	\item well, uniform character representation of the well
+#' 	\item row, single character for the row
+#' 	\item column, column number as an integer
+#' }
+#' 
+#' @examples
+#' well.info("2a6") # default settings
+#' well.info("2a6", format = "%d", upper = TRUE)
+#' well.info("b92", format = "%05d")
+#' 
+#' @export
+#' 
+well.info <- function(w, format = "%02d", upper = TRUE)
+{
+# coerce to character
+	w <- as.character(w)
 
-well.info <- function(v, format="%02d") {
-	v <- tolower(as.character(v))
-	vv <- strsplit(v, "[[:alpha:]]+")					# separate prefix from column
-	row <- gsub("[[:digit:]]", "", v)					# keep only letters
-	column <- as.numeric(sapply(vv, function(x) x[2]))	# keep only numbers
-	prefix <- sapply(vv, function(x) x[1])
-	if (!all(row %in% letters[1:26]))
+# extract optional prefix as everything but last letter followed by digits
+	prefix <- sapply(strsplit(w, "[[:alpha:]][[:digit:]]+$"), "[", 1)
+
+# extract well, row and column
+	ww <- sub(".*([[:alpha:]][[:digit:]]+$)", "\\1", w)
+	ww <- toupper(as.character(ww))
+	row <- substr(ww, 1, 1)	# row must be first position
+	column <- substr(ww, 2, 12) # column must be 2nd position to end
+	column <- as.integer(column)
+
+# error checking
+	if (!all(row %in% LETTERS[1:26]))
 		stop("bad row value")
 	if (any(column < 1 | column > 384))
 		stop("bad column value")
-	well <- paste(row, sprintf(format, column), sep="")
-	return(list(prefix = prefix, well = well, row = row,
-				column = as.character(column)))
+	if (upper == FALSE)
+		row <- tolower(row)
+	well <- paste(row, sprintf(format, column), sep = "")
+	return(list(prefix = prefix, well = well, row = row, column = column))
 }
