@@ -1,12 +1,11 @@
-#' Extract prefix, row and column from well label
+#' Extract Prefix, Row and Column from Well Label
 #' 
 #' Create a uniform representation for a well with an optional 
 #' prefix. 
 #' 
-#' @param w name of the well (coerced as a character)
-#' @param format \code{sprintf} format for the column portion as
-#' a character vector
-#' @param upper use upper case if \code{TRUE}
+#' @param w Name of the well (coerced as a character).
+#' @param format Character string as \code{sprintf} format for the column portion.
+#' @param upper \code{logical} value to use upper case when \code{TRUE}.
 #' 
 #' @details 
 #' 

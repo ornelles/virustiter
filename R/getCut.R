@@ -1,23 +1,51 @@
-#########################################################################################
-# getCut
-#
-# derived from generic code to determine cut (background) values for 'param' (val) with
-# cut points from findBgnd() by control wells (moi==0 or type=="control"), or for each
-# file, well, row, or column in the data.frame
-#
-# Dependencies
-#   findBgnd()	calculates likely cutoff point for background from density profile
-#
-#########################################################################################
-
-getCut <- function(df, by=c("control", "file", "well", "row", "column"),
-		param = val, mult = 5, log = TRUE)
+#' Determine Cutoff Value between Positive and Negative
+#'
+#' Determine the cutoff value between "positive" and "negative" values in
+#' argument \code{param}. The background values are specified by \code{by} as
+#' control values or by row, column or file.  
+#'
+#' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
+#' @param by Character string identifying the group in which to seek cutoff
+#' values \code{("control", "file", "well", "row" or "column")}.
+#' @param param Variable name as character string in \code{df} to evaluate, 
+#' typically \code{"y"}.
+#' @param mult Muliplier constant passed to \code{findBgnd()}.
+#' @param log \code{logical} flag passed to \code{findBgnd()} to use
+#' log-transformed values.
+#'
+#' @details
+#'
+#' The cutoff value between positive and negative values in 
+#' \code{param} will be determined according to \code{by}. If this
+#' value is "control", all values identified as 
+#' \code{type == "control"} or with \code{x == 0} will be considered to be 
+#' background. Otherwise, a cutoff will be determined by Otsu's method
+#' for the groups identified identified in \code{by} ("file", "well",
+#' "column" or "row"). The cutoff value will be determined by the logic
+#' in \code{findBgnd()}.
+#' 
+#' The annotated data frame must have the variable identified in 
+#' \code{param} and a variable named \code{x} as well as 
+#' \code{file, well, row} or 
+#' \code{column} as appropriate. 
+#' 
+#'
+#' @return
+#'
+#' A named numeric vector of cutoff values.
+#'
+#' @import EBImage
+#'
+#' @export
+#'
+getCut <- function(df, by = c("control", "file", "well", "row", "column"),
+	param = "y", mult = 5, log = TRUE)
 {
 	if (missing(df)) {
 		usage <- c("getCut examples:",
-			'  getCut(df, "control", val, mult=5, log=TRUE)',
+			'  getCut(df, by = "control", param = "y", mult = 5, log = TRUE)',
 			'  getCut(df) # same as above',
-			'  getCut(df, "row", mult=3, log=FALSE)')
+			'  getCut(df, "row", mult = 3, log = FALSE)')
 		cat(usage, sep="\n")
 		return(invisible(NULL))
 	}
@@ -26,25 +54,24 @@ getCut <- function(df, by=c("control", "file", "well", "row", "column"),
 
 # parse arguments and perform error checking
 	by <- match.arg(by)
-	param <- gsub("\\\"","", deparse(substitute(param)))
 	if (!param %in% names(df))
-		stop("'", param, "' not in data set")
+		stop("'", param, "' not in data frame")
 
 # create local copy of relevant data
-	if (by == "control") {				# special case of by "control"
-		if (any(df$type=="control"))
-			temp <- data.frame(g=TRUE, y=subset(df, type=="control")[[param]])
-		else if (any(df$moi==0))
-			temp <- data.frame(g=TRUE, y=subset(df, moi==0)[[param]])
+	if (by == "control") { # special case of by "control"
+		if (any(df$type == "control"))
+			temp <- data.frame(g = TRUE, y = subset(df, type == "control")[[param]])
+		else if (any(df$x == 0))
+			temp <- data.frame(g = TRUE, y = subset(df, x == 0)[[param]])
 		else
-			stop('require type=="control" or moi values of 0 to use by="control" option')
+			stop('require type == "control" or x values of 0 to use by = "control" option')
 	}
 	else {
 		temp <- df[c(by, param)]
 		names(temp) <- c("g", "y")
 	}
-	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult=mult, log=log))
+	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult = mult, log = log))
 	ret <- res$y
-	names(ret) <- if(by=="control") "control" else res$g
+	names(ret) <- if(by == "control") "control" else res$g
 	return(ret)
 }

@@ -1,6 +1,17 @@
-#
-# p2p interactively measure point to point distance on an image (plot)
-#
+#' Interactively Measure Point-to-Point Distances
+#' 
+#' Use the \code{locator} function in base graphics to interactively
+#' measure distances between pairs of points on an existing image.
+#' End the interaction pressing <Esc> \emph{or} control-clicking.
+#' 
+#' @param n	Maximum number of pairs to measure, integer.
+#' @param col,type,pch Values handed to \code{locator()}.
+#' @param ... Additional values handed to \code{locator()}.
+#' 
+#' @return
+#' 
+#' Distances between points with locator in pixels.
+#' 
 p2p <- function(n = 512, col = "magenta", type = "o", pch = 3, ...)
 {
 	ans <- numeric()

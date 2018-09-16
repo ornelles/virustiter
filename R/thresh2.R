@@ -1,13 +1,13 @@
-#' Adaptive threshold with a moving disc window via \code{filter2}
+#' Adaptive Threshold with a Moving Disc Window
 #' 
 #' Threshold an image using a disc rather than rectangle.
 #' 
-#' @param x \code{Image} object or array
-#' @param width half-width of the moving disc window
-#' @param offset Thresholding value from the averaged value
+#' @param x \code{Image} object or array.
+#' @param width Half-width of the moving disc window.
+#' @param offset Thresholding value from the averaged value.
 #' @param boundary Behavior at image border, where default is to extend the 
 #' image beyond the bordersk, which is different from the default for
-#' \code{filter2}
+#' \code{filter2}.
 #' 
 #' @details
 #' 
