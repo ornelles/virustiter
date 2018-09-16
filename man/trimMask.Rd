@@ -2,40 +2,40 @@
 % Please edit documentation in R/trimMask.R
 \name{trimMask}
 \alias{trimMask}
-\title{Remove small and large objects from an object mask}
+\title{Remove Objects by Size}
 \usage{
 trimMask(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
 }
 \arguments{
-\item{mask}{object mask with connected pixels having the same
-integer value}
+\item{mask}{Object mask with connected pixels having the same
+integer value.}
 
-\item{cutoff}{optional integer value of length 2 specifying the lower 
-and upper absolute cutoff values}
+\item{cutoff}{Optional integer value of length 2 specifying the lower 
+and upper absolute cutoff values in pixels.}
 
-\item{k}{numeric value of length 2 specifying the lower and upper multiplier 
-to determine the cutoff from the \code{mean} and \code{mad} of the area}
+\item{k}{Numeric value of length 2 specifying the lower and upper multiplier 
+to determine the cutoff from the \code{mean} and \code{mad} of the area.}
 
-\item{reenumerate}{reenumerate the objects in the trimmed mask}
+\item{reenumerate}{Re-enumerate the objects in the trimmed mask.}
 }
 \value{
 Object mask with small and large objects removed.
 }
 \description{
-Remove objects with area outside of lower and upper cutoff values
-or by a lower and upper multiplier applied to the \code{mad} of the area.
+Remove objects from an integer Image mask with areas outside of lower
+and upper cutoff values or by a lower and upper multiplier applied to
+the \code{mad} of the area.
 }
 \details{
 If \code{cutoff} is specified, objects smaller than \code{cutoff[1]} and 
-larger than \code{cutoff[2]} will be removed otherwise, objects smaller 
+larger than \code{cutoff[2]} will be removed. Otherwise, objects smaller 
 than \code{mean(area) - k[1]*mad(area)} and larger than \code{mean(area)+ 
 k[2]*mad(area)} will be removed. The mask will be reenumerated if that 
 parameter is \code{TRUE}.
 }
 \examples{
 
-x <- readImage(system.file("extdata", "by_stack/file001.tif",
-package = "virustiter"))
+x <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
 xb <- normalize(gblur(x, 2))
 xt <- thresh(xb)
 xm <- bwlabel(xt)

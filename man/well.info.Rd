@@ -2,17 +2,16 @@
 % Please edit documentation in R/well.info.R
 \name{well.info}
 \alias{well.info}
-\title{Extract prefix, row and column from well label}
+\title{Extract Prefix, Row and Column from Well Label}
 \usage{
 well.info(w, format = "\%02d", upper = TRUE)
 }
 \arguments{
-\item{w}{name of the well (coerced as a character)}
+\item{w}{Name of the well (coerced as a character).}
 
-\item{format}{\code{sprintf} format for the column portion as
-a character vector}
+\item{format}{Character string as \code{sprintf} format for the column portion.}
 
-\item{upper}{use upper case if \code{TRUE}}
+\item{upper}{\code{logical} value to use upper case when \code{TRUE}.}
 }
 \value{
 A named list of length four:

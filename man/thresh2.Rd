@@ -2,20 +2,20 @@
 % Please edit documentation in R/thresh2.R
 \name{thresh2}
 \alias{thresh2}
-\title{Adaptive threshold with a moving disc window via \code{filter2}}
+\title{Adaptive Threshold with a Moving Disc Window}
 \usage{
 thresh2(x, width, offset, boundary = c("replicate", "circular"))
 }
 \arguments{
-\item{x}{\code{Image} object or array}
+\item{x}{\code{Image} object or array.}
 
-\item{width}{half-width of the moving disc window}
+\item{width}{Half-width of the moving disc window.}
 
-\item{offset}{Thresholding value from the averaged value}
+\item{offset}{Thresholding value from the averaged value.}
 
 \item{boundary}{Behavior at image border, where default is to extend the 
 image beyond the bordersk, which is different from the default for
-\code{filter2}}
+\code{filter2}.}
 }
 \description{
 Threshold an image using a disc rather than rectangle.
@@ -26,8 +26,7 @@ algorithm using a moving disc.
 }
 \examples{
 
-x <- readImage(system.file("extdata", "by_stack/file001.tif",
-	package = "virustiter"))
+x <- readImage(system.file("extdata", "by_stack/file001.tif", package = "virustiter"))
 xb <- normalize(gblur(x, 2))
 xt <- thresh2(xb, width = 12)
 plot(combine(xb, xt), all = TRUE)
