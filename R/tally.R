@@ -1,50 +1,101 @@
-#########################################################################################
-# tally
-#
-# tally positive and negative values data.frame from readIJResults() by well or file
-#
-# returns "result" data.frame with dir, well, moi, pos, neg and y and unit
-# merges additional phenotype data in optional pd
-#
-#########################################################################################
-
-tally <- function(df, pd = NULL)
+#' Tally Positive Fluorescent Values
+#'
+#' Tally positive and negative values from from data.frame generated
+#' by \code{parseImages()} by either "well" or "file" representing each
+#' value of multiplicity.
+#'
+#' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
+#' @param pd Optional phenotype \code{data.frame} to add to results.
+#' @param param Variable name as character string in \code{df} to evaluate, 
+#'   typically \code{"mfi"}.
+#' @param moi Character string identifying the independent value, typically
+#'   the multiplicity of infection or \code{"moi"}.
+#'
+#' @details
+#'
+#' The variable named \code{positive} will be tallied for each level of
+#' "file" or "well" in the argument \code{df}. The dependent variable is
+#' expected to by "moi" or "x". 
+#'
+#' @return
+#'
+#' A \code{data.frame} of tallied values with (optional) additional information
+#' provided by \code{pd}. 
+#'
+#' @examples
+#' # Sample data by folder
+#'   f <- system.file("extdata", "by_folder", package = "virustiter")
+#'   pd <- read.csv(system.file("extdata", "by_folder/phenoData.csv", package = "virustiter"))
+#'   v <- parseImages(f)
+#'   v <- mergePdata(pd, v)
+#'   v <- score(v)
+#'   tally(v)
+#'
+#' @import
+#' EBImage
+#' genefilter
+#'
+#' @export
+#'  
+tally <- function(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
 {
-	stopifnot(c("positive", "moi") %in% names(df))
-	if (!any(c("well", "file") %in% names(df)))
-		stop("requires 'well' or 'file' in data")
+	if(!"positive" %in% names(df))
+		stop("tally requires the logical variable 'positive' in 'df'")
+	if (!param %in% names(df))
+		stop(deparse(substitute(param)), " is missing from 'df'")
 
-# select well or file as grouping variable
-	if ("well" %in% names(df))
-		group <- df$well
+# determine if "moi" or "x" is available
+	if ("moi" %in% names(df))
+		moi <- "moi"
+	else if ("x" %in% names(df))
+		moi <- "x"
 	else
-		group <- df$file
+		stop("'df' must have a variable named 'moi' or 'x'")
+
+# assign grouping variable
+	if (all(c("well", "file") %in% names(df)))
+		stop("'df' must have EITHER a factor named 'well' OR a factor named 'file'")
+	if ("well" %in% names(df))
+		by = "well"
+	else if("file" %in% names(df))
+		by = "file"
+	else
+		stop("'df' must have a factor named 'well' or 'file'")
+	group <- df[[by]]
 
 # extract data frame name
-	if (!is.null(df$dir) & nlevels(df$dir)==1)
-		dir <- levels(df$dir)
+	if (by == "well")
+		dir <- dirname(levels(df$directory))[1]
 	else
+		dir <- levels(df$directory)[1]
+	if (is.null(dir))
 		dir <- "unknown"
 
-# tally positive and create results data.frame
-	pos <- tapply(df$positive==TRUE, group, sum)
-	neg <- tapply(df$positive==FALSE, group, sum)
-	y <- pos/(pos + neg)
-	moi <- sapply(names(pos),function(v) df$moi[group==v][1])
+# record unit of measure
 	unit <- df$unit[1]
-	if ("well" %in% names(df)) {
+	if (is.null(unit))
+		unit <- "unknown"
+
+# tally positive and create results data.frame
+	pos <- tapply(df$positive == TRUE, group, sum)
+	neg <- tapply(df$positive == FALSE, group, sum)
+	y <- pos/(pos + neg)
+	x <- sapply(names(pos), function(v) df[[moi]][group == v][1])
+	if (by == "well") {
 		well <- names(pos)
 		row <- well.info(well)$row
 		column <- well.info(well)$column
-		res <- data.frame(dir, well, row, column, moi, unit, pos, neg, y)
+		res <- data.frame(dir, well, row, column, x, unit, pos, neg, y)
+		names(res)[5] <- moi
 	}
-	else {
-		file <- names(pos)
-		res <- data.frame(dir, file, moi, unit, pos, neg, y)
+	else if (by == "file") {
+		res <- data.frame(dir, file = names(pos), x, unit, pos, neg, y)
+		names(res)[5] <- moi
 	}
+	else 
+		res <- data.frame(dir, group = names(pos), x, unit, pos, neg, y)
 	if (!is.null(pd))
 		res <- mergePdata(pd, res)
 	rownames(res) <- NULL
 	return(res)
 }
-

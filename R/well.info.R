@@ -54,5 +54,6 @@ well.info <- function(w, format = "%02d", upper = TRUE)
 	if (upper == FALSE)
 		row <- tolower(row)
 	well <- paste(row, sprintf(format, column), sep = "")
+	column <- factor(column, levels = 1:max(column))
 	return(list(prefix = prefix, well = well, row = row, column = column))
 }

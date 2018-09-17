@@ -6,7 +6,7 @@
 #' @param width Half-width of the moving disc window.
 #' @param offset Thresholding value from the averaged value.
 #' @param boundary Behavior at image border, where default is to extend the 
-#' image beyond the bordersk, which is different from the default for
+#' image beyond the borders, which differs from the default for
 #' \code{filter2}.
 #' 
 #' @details

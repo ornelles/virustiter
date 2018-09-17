@@ -2,7 +2,7 @@
 ## Redefine variable names
 ##
 
-y - fluorescence (signal) intensity replacing "val" or "value"
+mfi - fluorescence (signal) intensity replacing "val" or "value"
 
 x - the dependent value to be used for Poisson fitting, typically this is the multiplicity of infection, volume, or particle number replacing "moi".
 
@@ -36,20 +36,20 @@ getAIC.R
 getFit.R
 getTiter.R
 list.images.R
-mergePdata.R
+* mergePdata.R
 * nucMask.R
 * p2p.R
-parseImages.R
+* parseImages.R
 plotCut.R
 plotFit.R
 plotHist.R
 plotOneFit.R
 plotPlate.R
 plotWell.R
-pnpoly.R
+* pnpoly.R
 readIJResults.R
-score.R
-tally.R
+* score.R
+* tally.R
 * thresh2.R
 * trimMask.R
 usage.R
@@ -59,7 +59,18 @@ usage.R
 ## revise parseImages
 ##
 
-add numeric variable of length 3 to specify order of files 'select'
+remove option to return mask
+
+add image file management interface to permit single function to read and parse
+	ensure that grouping variable is either well or file
+
+change 'val' to 'mfi'
+
+change 'file' to 'filename'
+
+change 'dir' to 'path'xyplo
+
+add numeric variable of length 3 to specify order of files 'which.images'
 where select = c(dna = 1, val = 2, n = 2)
 	c(1,2,2) for typical DAPI/FITC
 	c(2,1,2) for reversed DAPI/FITC

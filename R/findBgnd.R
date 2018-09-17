@@ -28,7 +28,7 @@
 #' 
 #' @import
 #' EBImage
-#' genfilter
+#' genefilter
 #' 
 #' @examples
 #' x <- c(rnorm(1000), rnorm(500, mean = 3))

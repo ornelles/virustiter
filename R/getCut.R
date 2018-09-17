@@ -6,12 +6,12 @@
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
 #' @param by Character string identifying the group in which to seek cutoff
-#' values \code{("control", "file", "well", "row" or "column")}.
+#'   values \code{("control", "file", "well", "row" or "column")}.
 #' @param param Variable name as character string in \code{df} to evaluate, 
-#' typically \code{"y"}.
+#'   typically \code{"y"}.
 #' @param mult Muliplier constant passed to \code{findBgnd()}.
 #' @param log \code{logical} flag passed to \code{findBgnd()} to use
-#' log-transformed values.
+#'   log-transformed values.
 #'
 #' @details
 #'
@@ -25,28 +25,36 @@
 #' in \code{findBgnd()}.
 #' 
 #' The annotated data frame must have the variable identified in 
-#' \code{param} and a variable named \code{x} as well as 
-#' \code{file, well, row} or 
-#' \code{column} as appropriate. 
-#' 
+#' \code{param} and a variable named \code{x} as well as an appropriate
+#' grouping value: either \code{file, well, row} or \code{column}
+#' as required. 
 #'
 #' @return
 #'
 #' A named numeric vector of cutoff values.
+#'
+#' @examples
+#' # Subset of data by_stack
+#'   f <- system.file("extdata", "by_stack/file005.tif", package = "virustiter")
+#'   file.copy(f, tempdir(), overwrite = TRUE) # need files to reside in directory
+#'   v <- parseImages(tempdir(), pattern = "file005")
+#'
+#' # Get cutoff for grouping value of "file"
+#'   getCut(v, by = "file")
 #'
 #' @import EBImage
 #'
 #' @export
 #'
 getCut <- function(df, by = c("control", "file", "well", "row", "column"),
-	param = "y", mult = 5, log = TRUE)
+	param = "mfi", mult = 5, log = TRUE)
 {
 	if (missing(df)) {
 		usage <- c("getCut examples:",
-			'  getCut(df, by = "control", param = "y", mult = 5, log = TRUE)',
+			'  getCut(df, by = "control", param = "mfi", mult = 5, log = TRUE)',
 			'  getCut(df) # same as above',
 			'  getCut(df, "row", mult = 3, log = FALSE)')
-		cat(usage, sep="\n")
+		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
 	if (!is.data.frame(df))

@@ -1,11 +1,32 @@
-#
-# point inclusion in polygon test (by W. Randolph Franklin)
-#
-# points - points to be tested as a form appropriate for xy.coords 
-# vertices - points that define the vertices of the polygon,
-#	also processed by xy.coords where order defines the polygon and the
-#	first and last points are connected
-#
+#' Point Inclusion in Polygon Test
+#'
+#' Point inclusion test by
+#' \href{https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html}{W. Randolph Franklin}
+#' to test for inclusion of
+#' a set of points within a polygon defined by a set of vertices.
+#'
+#' @param points Points to be tested as any form appropriate for
+#'   \code{xy.coords()}.
+#' @param vertices Points that define the vertices of the polygon, also
+#'   processed by \code{xy.coords()} where the order defines the polygon
+#'   and the first and last points are connected.
+#'
+#' @return
+#'
+#' Logical vector indicating whether each point lies in (\code{TRUE})
+#' or out (\code{FALSE}) of the polygon. 
+#' 
+#' @examples
+#' vv <- list(x = c(4.7, 3.8, 2, 3.6, 6.9, 6.9),
+#'   y = c(9, 5.8, 4.7, 2.1, 4.2, 7.5))
+#' pp <- list(x = c(3.3, 6, 3.2, 4.9),
+#'   y = c(4.4, 4.6, 7.2, 6.9))
+#' plot(1:10, 1:10, type = "n")
+#' polygon(vv)
+#' text(pp$x, pp$y, 1:4, col = 2)
+#' data.frame(point = 1:4, inside = pnpoly(pp, vv))
+#' @export
+#'
 pnpoly <- function(points, vertices)
 {
 	pp <- xy.coords(points)

@@ -5,7 +5,7 @@
 \title{Generate Nuclear Mask from DNA Image}
 \usage{
 nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
-  radius = 2 * ceiling(3 * sigma) + 1, gamma = 1)
+  radius = NULL, gamma = 1)
 }
 \arguments{
 \item{dna}{Fluorescent DNA image \emph{or} character vector representing
@@ -14,44 +14,45 @@ path(s) to DNA image file(s).}
 \item{width}{Largest nuclear width (diameter) used as width parameter
 for \code{thresh2}.}
 
-\item{offset}{Offset parameter for \code{thresh2}. Use default of 0.05
-for typical images, 0.01 for low contrast images.}
+\item{offset}{Offset parameter for \code{thresh2}. Use 0.05
+for typical images, use 0.01 for low contrast images.}
 
-\item{size}{Radius for \code{medianFilter}, integer. Use 2 for routine
-images, 0 to skip \code{medianFilter}.}
+\item{size}{Radius for \code{medianFilter}, integer. Use 2 for typical
+images, use 0 to skip \code{medianFilter}.}
 
-\item{sigma}{Standard deviation for \code{gblur}, 2 for routine,
-5 for finely detailed.}
+\item{sigma}{Standard deviation for \code{gblur}, use 2 for typical
+images, use 5 for finely detailed images.}
 
-\item{radius}{Radius for code{gblur}, default of 2 * ceiling(3 * sigma)
-+ 1 for typical imagers, numbers smaller than default of 13 for
-smaller features.}
+\item{radius}{Radius for \code{gblur}, use default of 2 * ceiling(3 * sigma)
++ 1 for typical images, use numbers smaller than the default of 13 for
+images with smaller nuclei.}
 
 \item{gamma}{Exponent for \code{DNA^gamma} transformation.}
 }
 \value{
-A single object holding an integer Image mask for each DNA image.
+A single object holding an integer \code{Image} mask for each DNA image.
 }
 \description{
-Generate and return an integer Image mask from a fluorescent DNA image
+Generate and return an integer \code{Image} mask from a fluorescent DNA image
 such as one obtained by DAPI staining.
 }
 \details{
 Generate an integer object mask representing segmented nuclei. The
 argument can be either a monochrome nuclear fluorescent image of one
-or more dimensions or a character vector of path(s) to such images.
+or more dimensions \emph{or} a character vector of path(s) to such images.
 
 Optimal conditions may need to be found by empirically adjusting the
 arguments, especially \code{width} and \code{offset}.
 
-The image or images will be processed sequentially by (1) gamma
-transformation, (2) normalization, (3) \code{medianFilter()} with
-\code{size} (if non-zero), (4) \code{gblur()} with \code{sigma} and 
-\code{radius}, (5) \code{thresh2()} with \code{width} and \code{offset},
-(6) \code{fillHull()}, (7) \code{distmap()} and (8) \code{watershed()}.
+The image or images will be processed sequentially by (1) an optional gamma 
+transformation, (2) normalization, (3) \code{medianFilter()} with argument 
+\code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
+\code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
+\code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()} 
+and (8) \code{watershed()}.
 }
 \examples{
-xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif", package = "virustiter"))
+xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
 max(xm) # total number of nuclei
 plot(colorLabels(xm))
 

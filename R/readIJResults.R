@@ -14,7 +14,7 @@
 #	SEP			character used to separate directory and filename in ImageJ results file
 #
 # Dependencies
-#	well.info()	parses well information
+#	well.info()	parses well.information
 #
 # Returns invisible raw data with extracted well, row, column, and positive (as FALSE)
 #

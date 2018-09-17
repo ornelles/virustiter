@@ -24,7 +24,7 @@ and also must include either `well` or `file`:
 
 An example with images in individual files in folders is shown here. Note that any file in the subfolder can be used to point `parseImages()` to the collection of files. This function will try to determine if this file is a multilayered tiff file or a single image in a collection of image files and process the files accordingly. 
 ```
-  fimg <- system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter")
+  fimg <- system.file("extdata", "by_folder", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
 
   df <- parseImages(fimg)
@@ -38,7 +38,7 @@ An example with images in individual files in folders is shown here. Note that a
 ```
 An example with stacked images in a single folder is shown here. Repeat the above sample code using the new files.
 ```
-  fimg <- system.file("extdata", "by_stack/file001.tif", package = "virustiter")
+  fimg <- system.file("extdata", "by_stack", package = "virustiter")
   fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
 ```
 Typical workflow:

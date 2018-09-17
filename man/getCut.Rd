@@ -4,8 +4,8 @@
 \alias{getCut}
 \title{Determine Cutoff Value between Positive and Negative}
 \usage{
-getCut(df, by = c("control", "file", "well", "row", "column"), param = "y",
-  mult = 5, log = TRUE)
+getCut(df, by = c("control", "file", "well", "row", "column"),
+  param = "mfi", mult = 5, log = TRUE)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
@@ -40,7 +40,17 @@ for the groups identified identified in \code{by} ("file", "well",
 in \code{findBgnd()}.
 
 The annotated data frame must have the variable identified in 
-\code{param} and a variable named \code{x} as well as 
-\code{file, well, row} or 
-\code{column} as appropriate.
+\code{param} and a variable named \code{x} as well as an appropriate
+grouping value: either \code{file, well, row} or \code{column}
+as required.
+}
+\examples{
+# Subset of data by_stack
+  f <- system.file("extdata", "by_stack/file005.tif", package = "virustiter")
+  file.copy(f, tempdir(), overwrite = TRUE) # need files to reside in directory
+  v <- parseImages(tempdir(), pattern = "file005")
+
+# Get cutoff for grouping value of "file"
+  getCut(v, by = "file")
+
 }

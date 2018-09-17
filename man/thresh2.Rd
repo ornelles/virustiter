@@ -14,7 +14,7 @@ thresh2(x, width, offset, boundary = c("replicate", "circular"))
 \item{offset}{Thresholding value from the averaged value.}
 
 \item{boundary}{Behavior at image border, where default is to extend the 
-image beyond the bordersk, which is different from the default for
+image beyond the borders, which differs from the default for
 \code{filter2}.}
 }
 \description{
