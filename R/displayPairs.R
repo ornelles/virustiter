@@ -26,7 +26,7 @@ displayPairs <- function(f, dnaStain = FALSE, col = "yellow", opac = 0.5, type =
 {
 	if(require(EBImage) == FALSE)
 		stop("requires EBImage")
-	ff <- list.images(f, type = type, enclosing = 1)
+	ff <- list.images(dirname(f), type = type)
 	maskArgs <- list(width=width, offset=offset, size=size, sigma=sigma, gamma=gamma)
 	maskArgs <- maskArgs[!sapply(maskArgs, is.null)]
 	x <- readImage(ff[seq(1, length(ff), 2)])

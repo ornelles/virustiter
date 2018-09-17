@@ -1,14 +1,32 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (ideally overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and  `genefilter` packages.
+This is a suite of tools in R to determine viral titers from fluorescent micrograph pairs where the first of each pair is an (ideally overexposed) DNA image and the second a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and `genefilter` packages.
 
 ## Overview
-This was developed to process fluorescent virus titers performed in multi-well plates. Most of the tools are structured for this purpose. Pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. The nuclear (DAPI) image file must always come before the corresponding viral antigen image file. 
+This was developed to process fluorescent virus titers performed in multi-well plates. Most of the tools are structured for this purpose. Pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. Although the nuclear (DAPI) image file is expected to come before the corresponding viral antigen image file, this can be adjusted.
 
-Pairs of images associated with each moi can be individual files in a single directory where each directory is named for the well such as a1, a2, etc. and the files within are identified as a1/file001.tif, a1/file002.tif, etc. Alternatively, the pairs of images can be a single multi-layered tif file for each moi where the first image in each pair file is the DNA image. 
+Pairs of images associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified as A1/file001.tif, A1/file002.tif, etc. Alternatively, the pairs of images can be part of a single multi-layered tiff file for each moi where each set of images includes the DNA and viral antigen image files.
+
+Data about the images are provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis. 
 
 ## Installation
+This is an early release that can be installed from github. 
 
-**This is NOT yet ready for installation.** The `EBImage` and `genefilter` packages will have to be installed with Bioclite. The CRAN package `latticeExtra` will need to be installed as well. After that, the contents can be cloned and "installed" locally from the local directory with   `devtools::load_all()`.
+First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
+```
+source("https://bioconductor.org/biocLite.R")
+biocLite("EBImage")
+biocLite("genefilter")
+```
+Second, the `devtools` and possibly `latticeExtra` packages need to be installed.
+```
+install.packages("devtools")
+install.packages("latticeExtra")
+```
+Finally, the `virustiter` package can be installed from GitHub.
+```
+library(devtools)
+install_github("ornelles/virustiter")
+```
 
 ## Working notes
 Phenotype date should be a data frame with the following variables:

@@ -21,7 +21,7 @@ the major axis of all nuclei will be used.}
 
 \item{lambda}{A numeric value used by \code{propagate()} determining 
 the trade-off between the Euclidean distance in the image plane and the 
-contribution of the gradient. See \code{\link{propagate()}} for details.}
+contribution of the gradient. See \code{\link[EBImage]{propagate}} for details.}
 }
 \value{
 An \code{Image} object produced by \code{propagate()} containing the labeled
@@ -30,7 +30,7 @@ objects (cells).
 \description{
 Define boundaries between adjacent cells (regions) from a
 nuclear mask and optional cellular mask with the
-\code{\link{propagate()}} function.
+\code{\link[EBImage]{propagate}}.
 }
 \details{
 Create a mask to define cellular boundaries from a nuclear mask in 
