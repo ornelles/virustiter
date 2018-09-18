@@ -71,7 +71,7 @@ plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column")
 	if (missing(cut))
 		cut <- do.call(getCut, list(df, by, param, mult, log))
 	else {
-		labs <- as.character(unique(df[[by]]))
+		labs <- as.character(levels(df[[by]]))
 		cut <- rep(cut, length.out = length(labs))
 		names(cut) <- labs
 	}
@@ -85,7 +85,7 @@ plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column")
 
 # adjust strip labels to show cutoff
 	strip.labels <- paste(names(cut), signif(cut, 2), sep = " at ")
-	form <- as.formula(paste("~", param, "|", as.factor(by)))
+	form <- as.formula(paste("~", param, "|", by))
 	xlist <- list()	# for log argument in scales
 	if (log == TRUE) {
 		xlist <- list(log = 10)
