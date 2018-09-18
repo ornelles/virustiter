@@ -8,8 +8,8 @@ nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
   radius = NULL, gamma = 1)
 }
 \arguments{
-\item{dna}{Fluorescent DNA image \emph{or} character vector representing
-path(s) to DNA image file(s).}
+\item{dna}{Fluorescent DNA \code{Image} object \emph{or} a character
+vector representing path(s) to DNA image file(s).}
 
 \item{width}{Largest nuclear width (diameter) used as width parameter
 for \code{thresh2}.}

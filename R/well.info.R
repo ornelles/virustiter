@@ -21,7 +21,7 @@
 #' 	\item prefix, the optional prefix
 #' 	\item well, uniform character representation of the well
 #' 	\item row, single character for the row
-#' 	\item column, column number as an integer
+#' 	\item column, column number as a factor
 #' }
 #' 
 #' @examples

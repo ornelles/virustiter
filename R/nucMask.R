@@ -3,8 +3,8 @@
 #' Generate and return an integer \code{Image} mask from a fluorescent DNA image
 #' such as one obtained by DAPI staining. 
 #'
-#' @param dna Fluorescent DNA image \emph{or} character vector representing
-#'   path(s) to DNA image file(s).
+#' @param dna Fluorescent DNA \code{Image} object \emph{or} a character
+#'   vector representing path(s) to DNA image file(s).
 #' @param width Largest nuclear width (diameter) used as width parameter
 #'   for \code{thresh2}.
 #' @param offset Offset parameter for \code{thresh2}. Use 0.05

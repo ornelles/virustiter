@@ -17,7 +17,7 @@ Voronoi segmentation.}
 
 \item{brush}{Size of the brush size to expand the nuclear mask as an 
 odd number of pixels. If this value is \code{NULL}, the mean value of 
-the major axis of all nuclei will be used.}
+the semi-major axis of all nuclei will be used.}
 
 \item{lambda}{A numeric value used by \code{propagate()} determining 
 the trade-off between the Euclidean distance in the image plane and the 
@@ -30,15 +30,15 @@ objects (cells).
 \description{
 Define boundaries between adjacent cells (regions) from a
 nuclear mask and optional cellular mask with the
-\code{\link[EBImage]{propagate}}.
+\code{\link[EBImage]{propagate}} function.
 }
 \details{
-Create a mask to define cellular boundaries from a nuclear mask in 
-\code{nmask} and an optional cytoplasmic mask \code{cmask}. If 
-\code{cmask} is \code{NULL}, the nuclear mask will be dilated with a
-disc-shaped brush of size equal to \code{brush} or, if \code{brush} is
-\code{NULL}, the mean semi-major axis of the nuclei.
-If \code{cmask} is not \code{NULL}, this must be a binary mask defining
+A mask to define \emph{approximate} cellular boundaries will be created
+from a nuclear mask in \code{nmask} and an optional cytoplasmic
+mask \code{cmask}. If \code{cmask} is \code{NULL}, the nuclear mask will 
+be dilated with a disc-shaped brush of size equal to \code{brush} or, if
+\code{brush} is \code{NULL}, the average semi-major axis of all nuclei.
+If \code{cmask} is not \code{NULL}, \code{cmask} must be a binary mask defining
 the limits for the Voronoi segmentation based on seeds provided by
 \code{nmask}. Such a binary mask can be created from a non-specific
 cytoplasmic stain such as actin or a diffuse membrane stain.
