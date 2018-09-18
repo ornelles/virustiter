@@ -74,7 +74,7 @@ Typical workflow:
 ```
 Supporting functions:
 ```
-   plotDems(df)        # calculate and show cutoff values with densityplot 
+   plotDens(df)        # calculate and show cutoff values with densityplot 
    plotHist(df)        # histogram of each well with optional cutoff values
    plotPlate(df)       # plot plate showing positives
    plotWell(df, well)  # plot each file in a well showing positives and sizes
@@ -87,10 +87,6 @@ Supporting functions:
    cellMask(mask)      # expand a nuclear mask into a cell mask
    p2p()               # interactively measure point-to-point distances
    pnpoly(p, v)        # test if points in p are within polygon (v)
-```
-Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
-``` 
- fitAndPlot(res, by)")
 ```
 To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools `plotCut()` and `plotHist()` to evaluate the choice of cutoff.
 
