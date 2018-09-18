@@ -16,10 +16,10 @@
 #' 
 #' @examples
 #' 
-#' x <- readImage(system.file("extdata", "by_stack/file001.tif", package = "virustiter"))
-#' xb <- normalize(gblur(x, 2))
-#' xt <- thresh2(xb, width = 12)
-#' plot(combine(xb, xt), all = TRUE)
+#'   x <- readImage(system.file("extdata", "by_stack/file001.tif", package = "virustiter"))
+#'   xb <- normalize(gblur(x, 2))
+#'   xt <- thresh2(xb, width = 12)
+#'   plot(combine(xb, xt), all = TRUE)
 #' 
 #' @import EBImage
 #' 

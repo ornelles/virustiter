@@ -14,8 +14,8 @@
 #' Character vector of selected image filenames.
 #'
 #' @examples
-#' path.by.folder <- system.file("extdata", "by_folder", package = "virustiter")
-#' list.images(path.by.folder, pattern = "002")
+#'   path.by.folder <- system.file("extdata", "by_folder", package = "virustiter")
+#'   list.images(path.by.folder, pattern = "002")
 #'
 #' @export
 #' 

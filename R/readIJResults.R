@@ -1,25 +1,25 @@
-#########################################################################################
-# readIJResults
-#
-# read data from ImageJ results file and extract infection parameters into a data.frame
-# This program expects output from the ImageJ code "Multiwell Fluorescent Cell Count
-# Expected values from ImageJ are: Area, Mean gray value, Center of Mass, Display label,
-# and Inverted Y coordinates. Label must be of the form "xnn/filename" where xnn is the well
-# such as "A01" or "b2". The ImageJ results file should have the multiplicity as an x value
-# and a unit indicator (unit) coded as 1, 2, 3 or 4 for
-# "VP per cell", "IU per cell", "ul per cell", "ml per cell"
-#
-# Arguments
-#	f			optional ImageJ results text file
-#	SEP			character used to separate directory and filename in ImageJ results file
-#
-# Dependencies
-#	well.info()	parses well.information
-#
-# Returns invisible raw data with extracted well, row, column, and positive (as FALSE)
-#
-#########################################################################################
-
+#' Read Results from ImageJ Multiwell "Fluorescent Cell Count"
+#'
+#' Legacy code to read results from ImageJ code that performs the work now done in
+#' \code{parseImages}. 
+#'
+#' @param f	Path to ImageJ results file, single character vector.
+#' @param SEP Character used to separate directory and filename in ImageJ
+#'   results file.
+#'
+#' @details
+#'
+#' Not recommended to use this any more. It has not been well maintained
+#' since early 2016. At last incarnation, this program expects variables
+#' from ImageJ as "Area", "Mean gray value", "Center of Mass", "Display
+#' label", and "Inverted Y coordinates". "Label" must be of the form
+#' "xnn/filename" where xnn is the well such as "A01" or "b2". The ImageJ
+#' results file should have the multiplicity as an x or moi value and a
+#' unit indicator (unit) coded as 1, 2, 3 or 4 for "VP per cell", "IU per
+#' cell", "ul per cell", "ml per cell".
+#'
+#' @export
+#'
 readIJResults <- function(f, SEP = NULL)
 {
 # coded vector of units from ImageJ, note that the "per well" units were
@@ -28,15 +28,13 @@ readIJResults <- function(f, SEP = NULL)
 	unitList <- c("VP", "IU", "ul", "ml")	# used in "1 IU = 2.5 VP, etc.
 
 # read data from ImageJ results file and adjust ImageJ names
-	if (missing(f))
-		f <- file.choose()
 	if (is.null(SEP))
 		SEP <- .Platform$file.sep
-	df <- read.table(f, header=TRUE)
+	df <- read.table(f, header = TRUE)
 	names(df) <- tolower(names(df))
-	sel <- which(names(df)=="mean")
-	names(df)[sel] <- "val"
-	sel <- which(names(df)=="label")
+	sel <- which(names(df) == "mean")
+	names(df)[sel] <- "mfi"
+	sel <- which(names(df) == "label")
 	names(df)[sel] <- "file"
 
 
@@ -60,25 +58,29 @@ readIJResults <- function(f, SEP = NULL)
 	fname <- gsub("\\..*$", "", fname)	# file name without extension
 
 # assemble first part of data.frame
-	df <- data.frame(df[1], fname=fname, dir=dname, well=well, row=row,
-			column=factor(column), df[-1], unit)
+	df <- data.frame(df[1], fname = fname, dir = dname, well = well,
+		row = row, column = factor(column), df[-1], unit)
 
-# Extract x values from Image J results file and verify that each well is unique.
-	if (!("x" %in% names(df)))
-		stop("The ImageJ results file must have 'x' values")
-	xx <- with(df, tapply(x, well, unique))		# xx holds an array of x values
+# Extract x/moi values from Image J results file and
+# verify that each well is unique.
+	if (!(any(c("x", "moi") %in% names(df))))
+		stop("The ImageJ results file must have 'x' or 'moi' values")
+	if ("x" %in% names(df))
+		xx <- with(df, tapply(x, well, unique))		# xx holds an array of x values
+	else # "moi" %in% names(df)
+		xx <- with(df, tapply(moi, well, unique))		# xx holds an array of x values
 	tally <- sapply(xx, length)					# count unique 'x' values
 	if (length(tally) == 1)
-		warning("only a single x value was found: ", xx[1])
+		warning("only a single x/moi value was found: ", xx[1])
 	if(!all(tally == 1))
-		warning("multiple x values found: ", names(which(tally > 1)))
+		warning("multiple x/moi values found: ", names(which(tally > 1)))
 
 # assign type to each well as standard or control if x==0
 	type <- rep("standard", nrow(df))
-	control.wells <- names(which(xx==0))
+	control.wells <- names(which(xx == 0))
 	type[df$well %in% control.wells] <- "control"
 
-# assemble and return data.frame, change "mean" to "val"
-	df <- data.frame(df, type=type)
+# assemble and return data.frame, changed "mean" to "mfi"
+	df <- data.frame(df, type = type)
 	return(df)
 }

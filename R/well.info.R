@@ -25,9 +25,9 @@
 #' }
 #' 
 #' @examples
-#' well.info("2a6") # default settings
-#' well.info("2a6", format = "%d", upper = TRUE)
-#' well.info("b92", format = "%05d")
+#'   well.info("2a6") # default settings
+#'   well.info("2a6", format = "%d", upper = TRUE)
+#'   well.info("b92", format = "%05d")
 #' 
 #' @export
 #' 

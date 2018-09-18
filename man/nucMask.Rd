@@ -52,8 +52,8 @@ transformation, (2) normalization, (3) \code{medianFilter()} with argument
 and (8) \code{watershed()}.
 }
 \examples{
-xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
-max(xm) # total number of nuclei
-plot(colorLabels(xm))
+  xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
+  max(xm) # total number of nuclei
+  plot(colorLabels(xm))
 
 }

@@ -31,10 +31,10 @@
 #' genefilter
 #' 
 #' @examples
-#' x <- c(rnorm(1000), rnorm(500, mean = 3))
-#' findBgnd(x, mult = 0, log = FALSE)
-#' plot(density(x))
-#' abline(v = findBgnd(x, mult = 2, log = FALSE))
+#'   x <- c(rnorm(1000), rnorm(500, mean = 3))
+#'   findBgnd(x, mult = 0, log = FALSE)
+#'   plot(density(x))
+#'   abline(v = findBgnd(x, mult = 2, log = FALSE))
 #'
 #' @export
 #' 

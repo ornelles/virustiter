@@ -39,9 +39,9 @@
 #' A single object holding an integer \code{Image} mask for each DNA image.
 #'
 #' @examples
-#' xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
-#' max(xm) # total number of nuclei
-#' plot(colorLabels(xm))
+#'   xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
+#'   max(xm) # total number of nuclei
+#'   plot(colorLabels(xm))
 #'
 #' @import EBImage
 #'

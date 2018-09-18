@@ -33,8 +33,8 @@ as per \code{format}. The code will fail if the row value is not one of the 26
 letters or if the column number is not in the range of 1 to 384.
 }
 \examples{
-well.info("2a6") # default settings
-well.info("2a6", format = "\%d", upper = TRUE)
-well.info("b92", format = "\%05d")
+  well.info("2a6") # default settings
+  well.info("2a6", format = "\%d", upper = TRUE)
+  well.info("b92", format = "\%05d")
 
 }

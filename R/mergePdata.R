@@ -10,7 +10,7 @@
 #'
 #' @details
 #'
-#' This function performs a data.frame merge with additional checks.
+#' This function performs a \code{data.frame} merge with additional checks.
 #'
 #' @return
 #'

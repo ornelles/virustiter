@@ -40,14 +40,14 @@
 #' objects (cells). 
 #'
 #' @examples
-#' x <- readImage(system.file("extdata", "by_folder/b2/file001.tif", package = "virustiter"))
-#' y <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
-#' nm <- nucMask(x)
-#' cm <- cellMask(nm)
-#' img <- rgbImage(red = normalize(y) * 0.8, green = normalize(y) * 0.2)
-#' img <- paintObjects(nm, img, col = "yellow")
-#' img <- paintObjects(cm, img, col = "green")
-#' plot(img)
+#'   x <- readImage(system.file("extdata", "by_folder/b2/file001.tif", package = "virustiter"))
+#'   y <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
+#'   nm <- nucMask(x)
+#'   cm <- cellMask(nm)
+#'   img <- rgbImage(red = normalize(y) * 0.8, green = normalize(y) * 0.2)
+#'   img <- paintObjects(nm, img, col = "yellow")
+#'   img <- paintObjects(cm, img, col = "green")
+#'   plot(img)
 #'
 #' @import EBImage
 #'

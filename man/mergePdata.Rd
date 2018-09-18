@@ -23,5 +23,5 @@ and additional data provided in \code{phenoData}.
 Merge "phenotype" data describing the samples in an image data.frame.
 }
 \details{
-This function performs a data.frame merge with additional checks.
+This function performs a \code{data.frame} merge with additional checks.
 }

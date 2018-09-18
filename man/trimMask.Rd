@@ -35,13 +35,13 @@ parameter is \code{TRUE}.
 }
 \examples{
 
-x <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
-xb <- normalize(gblur(x, 2))
-xt <- thresh(xb)
-xm <- bwlabel(xt)
-xm2 <- trimMask(xm)
-xm3 <- trimMask(xm, cutoff = c(1, 20))
-xm4 <- trimMask(xm, cutoff = c(100, 250))
-plot(combine(xm, xm2, xm3, xm4), all = TRUE)
+  x <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
+  xb <- normalize(gblur(x, 2))
+  xt <- thresh(xb)
+  xm <- bwlabel(xt)
+  xm2 <- trimMask(xm)
+  xm3 <- trimMask(xm, cutoff = c(1, 20))
+  xm4 <- trimMask(xm, cutoff = c(100, 250))
+  plot(combine(xm, xm2, xm3, xm4), all = TRUE)
 
 }

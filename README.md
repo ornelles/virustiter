@@ -6,10 +6,10 @@ This was developed to process fluorescent virus titers performed in multi-well p
 
 Pairs of images associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified as A1/file001.tif, A1/file002.tif, etc. Alternatively, the pairs of images can be part of a single multi-layered tiff file for each moi where each set of images includes the DNA and viral antigen image files.
 
-Data about the images are provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis. 
+Additional information about the experiment is provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis. 
 
 ## Installation
-This is an early release that can be installed from github. 
+This is the first release as a packag that can be installed from github. A few steps are probably required. 
 
 First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
@@ -31,7 +31,7 @@ install_github("ornelles/virustiter")
 ## Working notes
 Phenotype date should be a data frame with the following variables:
 ```
-  moi   numeric value indicating the multiplicity (units per cell)
+  moi   (or 'x') numeric value indicating the multiplicity (units per cell)
   unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
 ```
 and also must include either `well` or `file`:
@@ -61,31 +61,32 @@ An example with stacked images in a single folder is shown here. Repeat the abov
 ```
 Typical workflow:
 ```
-  df <- parseImages()   # read with EBImage
-     or
-  df <- readData()      # read data from Fluorescent Cell Count v6 (ImageJ)
-
-  df  <- mergePdata(pd, df)  # optional merge with phenoData in 'pd'
-  cut <- getCut(df)     # determine cutoff by control (or well, row, or column)
-  df  <- score(df, cut) # assign positive values from cutoff
-  res <- tally(df)      # tally positives and negatives and return data.frame
-  fm  <- getFit(obj)    # get model fit(s) from scored data frame (df) or from 'res'
-  cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI
+   df <- parseImages()   # read paired images with EBImage ...or...
+   df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)
+   pd <- data.frame(well = levels(df$well), moi = moi, unit = unit) ...or...
+   pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)
+   df  <- mergePdata(pd, df) # merge with phenotype data in 'pd'
+   cut <- getCut(df)     # determine cutoff by control (or well, row, or column)
+   df  <- score(df, cut) # assign positive values from cutoff
+   res <- tally(df)      # tally positives and negatives and return data.frame
+   fm  <- getFit(res)    # get model fit(s) from either res or scored data frame
+   cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI
 ```
 Supporting functions:
 ```
-  plotCut(df)    # calculate and show cutoff values with densityplot 
-  plotHist(df)   # histogram of each well with optional cutoff values
-  plotPlate(df)  # lattice plot plate showing cell position and positives
-  plotWell(df, well) # plot each file in a well showing positives and cell size
-  plotFit(fm)    # plot fit(s) with calculated values using base graphics
-  plotOneFit(fm) # plot fit with options to adjust colors
-  addOneFit(fm)  # add best-fit line to existing base graph
-  getAIC(df, cut, by)  # evaluate fitted model(s) from df at cut values
-  displayPairs(f) # display one of paired images with nuclear mask
-  nucMask(dapi)   # extract nuclear mask from dapi image(s) or file(s)
-  p2p()           # interactively measure point-to-point distances
-  pnpoly(p, v)    # test if points in p are within polygon (v)
+   plotDems(df)        # calculate and show cutoff values with densityplot 
+   plotHist(df)        # histogram of each well with optional cutoff values
+   plotPlate(df)       # plot plate showing positives
+   plotWell(df, well)  # plot each file in a well showing positives and sizes
+   plotFit(fm)         # plot fit(s) with calculated values using base graphics
+   plotOneFit(fm)      # plot fit with options to adjust colors
+   addOneFit(fm)       # add best-fit line to existing base graph
+   getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
+   nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
+   trimMask(mask)      # remove objects based on size from mask
+   cellMask(mask)      # expand a nuclear mask into a cell mask
+   p2p()               # interactively measure point-to-point distances
+   pnpoly(p, v)        # test if points in p are within polygon (v)
 ```
 Wrapper to automatically process results data frame or ImageJ 'Results.txt' file
 ``` 

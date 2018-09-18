@@ -25,12 +25,13 @@ to test for inclusion of
 a set of points within a polygon defined by a set of vertices.
 }
 \examples{
-vv <- list(x = c(4.7, 3.8, 2, 3.6, 6.9, 6.9),
-  y = c(9, 5.8, 4.7, 2.1, 4.2, 7.5))
-pp <- list(x = c(3.3, 6, 3.2, 4.9),
-  y = c(4.4, 4.6, 7.2, 6.9))
-plot(1:10, 1:10, type = "n")
-polygon(vv)
-text(pp$x, pp$y, 1:4, col = 2)
-data.frame(point = 1:4, inside = pnpoly(pp, vv))
+  vv <- list(x = c(4.7, 3.8, 2, 3.6, 6.9, 6.9),
+    y = c(9, 5.8, 4.7, 2.1, 4.2, 7.5))
+  pp <- list(x = c(3.3, 6, 3.2, 4.9),
+    y = c(4.4, 4.6, 7.2, 6.9))
+  plot(1:10, 1:10, type = "n")
+  polygon(vv)
+  text(pp$x, pp$y, 1:4, col = 2)
+  data.frame(point = 1:4, inside = pnpoly(pp, vv))
+
 }

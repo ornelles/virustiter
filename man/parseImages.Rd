@@ -93,7 +93,7 @@ specified by the argument \code{which.images}.
   path.by.folder <- system.file("extdata", "by_folder", package = "virustiter")
   df.by.folder <- parseImages(path.by.folder)
   head(df.by.folder)[-1] # drop potentially log directory name
-
+#
   path.by.stack <- system.file("extdata", "by_stack", package = "virustiter")
   df.by.stack <- parseImages(path.by.stack)
   head(df.by.stack)[-1] # drop potentially log directory name
