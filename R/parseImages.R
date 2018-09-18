@@ -172,11 +172,13 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # extract dna images
 	dnaImages <- lapply(img, function(x, first = n_dna, by = n_field) {
 		N <- dim(x)[3]
+		if (N <= 1) stop("UNEXPECTED image dimension in dnaImages") 
 		x[,,seq(first, N, by)]})
 
 # extract mfi images
 	mfiImages <- lapply(img, function(x, first = n_mfi, by = n_field) {
 		N <- dim(x)[3]
+		if (N <= 1) stop("UNEXPECTED image dimension in mfiImages") 
 		x[,,seq(first, N, by)]})
 
 # initialize variable to collect results, initialize progress bar
@@ -187,15 +189,18 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	if (showProgress)
 		pb <- txtProgressBar(min = 1, max = nff, style = 3)
 
+################################################################################
+#
 # process each group of files in turn
-	for (idx in seq_along(ffsplit)) {
+#
+	for (IDX in seq_along(ffsplit)) {
 		if (showProgress)
-			setTxtProgressBar(pb, idx)
+			setTxtProgressBar(pb, IDX)
 
 	# create mask with any additional arguments in args.nucMask
 		arg.list <- as.list(args(nucMask))
 		arg.list <- arg.list[names(arg.list) != ""] # drop NULL values
-		arg.list$dna <- dnaImages[[idx]]
+		arg.list$dna <- dnaImages[[IDX]]
 		nms <- names(args.nucMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
@@ -220,16 +225,23 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 		else
 			cmask <- nmask
 
-	# measure and assemble data for the group indexed by 'idx'
+	# ensure that images have three dimensions
+		myDna <- dnaImages[[IDX]]
+		myMfi <- mfiImages[[IDX]]
+		dm <- dim(nmask)
+		if (length(dm) == 2)
+			 dim(myDna) <- dim(myMfi) <- dim(cmask) <- dim(nmask) <- c(dm, 1)
 		nframes <- dim(nmask)[3]
+
+	# measure and assemble data for the group indexed by 'IDX'
 		res <- data.frame()
 		for (i in seq_len(nframes)) {
 			area <- computeFeatures.shape(cmask[,,i])[,1]
 			XY <- computeFeatures.moment(nmask[,,i])[,1:2]
-			dna <- computeFeatures.basic(nmask[,,i], dnaImages[[idx]][,,i])[,1]
-			mfi <- computeFeatures.basic(cmask[,,i], mfiImages[[idx]][,,i])[,1]
+			dna <- computeFeatures.basic(nmask[,,i], myDna[,,i])[,1]
+			mfi <- computeFeatures.basic(cmask[,,i], myMfi[,,i])[,1]
 			if (imageType == "byWell") {
-				ww <- names(ffsplit)[idx]
+				ww <- names(ffsplit)[IDX]
 				res <- rbind(res, data.frame(directory = paste(path, ww, sep = "/"),
 					well = well.info(ww)$well, row = well.info(ww)$row,
 					column = well.info(ww)$column, frame = i,
@@ -237,12 +249,16 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 			}
 			else # imageType == "byStack"
 				res <- rbind(res, data.frame(directory = path,
-					file = names(ffsplit)[idx], frame = i, xm = XY[,1], ym = XY[,2],
+					file = names(ffsplit)[IDX], frame = i, xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
 		}
 		rownames(res) <- NULL
-		ret[[idx]] <- res
+		ret[[IDX]] <- res
 	}
+#
+# done with processing each group of files
+#
+################################################################################
 
 # compile and return collected data
 	ans <- do.call(rbind, ret)
