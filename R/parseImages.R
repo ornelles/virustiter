@@ -31,7 +31,7 @@
 #' viral titers from fluorescent micrograph pairs. Typically, the first of each pair
 #' is a DNA image and the second a fluorescent image of the viral target.
 #' target signal. Because individual cells are identified by the nuclear stain, it
-#' is \strong{very} beneficial to collect overexposed DNA images.
+#' \emph{may} be beneficial to collect overexposed DNA images.
 #'
 #' This function was developed to process fluorescent virus titers
 #' performed in multi-well plates and is designed to parse pairs of images

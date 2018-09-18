@@ -55,6 +55,10 @@
 #'
 cellMask <- function(nmask, cmask = NULL, brush = NULL, lambda = 1e-4)
 {
+# require nmask to be integer mask
+	if (!is.integer(imageData(nmask)))
+		stop("'", deparse(substitute(nmask)), "' is not an integer Image mask")
+
 # ensure three-dimensions present
 	dm <- dim(nmask)
 	if (length(dm) == 2)
@@ -71,6 +75,8 @@ cellMask <- function(nmask, cmask = NULL, brush = NULL, lambda = 1e-4)
 	}
 
 # ensure that cmask is appropriate
+	if (!is.integer(imageData(cmask)))
+		stop("'", deparse(substitute(cmask)), "' is not a binary or integer Image mask")
 	if (length(dim(cmask)) == 2)
 		dim(cmask) <- c(dim(cmask), 1)
 	if (!identical(dim(cmask), dim(nmask)))
