@@ -32,7 +32,7 @@ plotPlate <- function(df, cex = 1/2, alpha = 1/2, main = NULL, invert.y = TRUE, 
 	if ("well" %in% names(df)) {
 		byWell <- TRUE
 		n <- nlevels(df$well)
-		if (n > 96)	{rows <- 32; columns <- 24}     # 384-well plate
+		if (n > 96)	{rows <- 16; columns <- 24}     # 384-well plate
 		else if (n > 48) {rows <- 8; columns <- 12} # 96-well plate
 		else if (n > 24) {rows <- 6; columns <- 8}  # 48-well plate
 		else if (n > 12) {rows <- 4; columns <- 6}  # 24-well plate
@@ -40,9 +40,14 @@ plotPlate <- function(df, cex = 1/2, alpha = 1/2, main = NULL, invert.y = TRUE, 
 		else if (n == 6) {rows <- 2; columns <- 3}  # 6-well plate
 		else {rows <- 1; columns <- n}              # fewer than 6
 
-	# ensure that well names are harmonized
+	# create "fully populated" factor for well
+		ww <- expand.grid(seq_len(columns), LETTERS[seq_len(rows)])
+		ww <- apply(ww, 1, function(x) sprintf("%s%d",
+			as.character(x[2]), as.numeric(x[1])))
+			
+	# ensure that well names are harmonized with full range of levels
 		df$well <- well.info(df$well)$well
-		df$well <- factor(df$well, levels = unique(df$well))	# revise levels
+		df$well <- factor(df$well, levels = well.info(ww)$well)
 		skip <- !levels(df$well) %in% unique(as.character(df$well))
 	}
 # else process by file
