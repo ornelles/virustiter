@@ -55,14 +55,14 @@ plotOneFit <- function(fm, main = NULL, xlab = NULL, ylab = NULL,
 	xlo <- with(res, min(moi[moi > 0]))
 	xhi <- with(res, max(moi))
 	xp <- exp(seq(log(xlo), log(xhi), length = 101))
-	yp <- predict(fm, data.frame(moi = xp), type = "response")
+	yp <- predict(fm, data.frame(x = xp), type = "response")
 	xpp <- cf[1]
 	ypp <- 1-exp(-1)
 	if (is.null(xlab)) xlab <- paste("\n", "One IU = ", txt, sep = "")
 	if (is.null(ylab)) ylab <- "Infected fraction"
 
-	plot(y ~ moi, subset = moi>0, log = "x", las = 1, ylim = c(0,1),
+	plot(y ~ moi, subset = moi > 0, log = "x", las = 1, ylim = c(0,1),
 		xlab = xlab, ylab = ylab, main = main, col = pch.col, ...)
 	lines(xp, yp, col = line.col)
-	lines(c(xlo,xpp,xpp),c(ypp,ypp,-0.02), lty = 2, col = ref.col)
+	lines(c(xlo,xpp,xpp), c(ypp,ypp,-0.02), lty = 2, col = ref.col)
 }

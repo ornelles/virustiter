@@ -25,7 +25,7 @@
 getAIC <- function(df, cut, by = c("sequential", "column", "row"))
 {
 	if (!is.data.frame(df))
-		stop(deparse("'", substitute(df)), "' must be a data frame processed by score()")	
+		stop("'", deparse(substitute(df)), "' must be a data frame processed by score()")	
 	by <- match.arg(by)
 	dfList <- lapply(cut, function(x) score(df, x))
 	fmList <- lapply(dfList, function(x) getFit(x, by = by))
