@@ -3,9 +3,9 @@
 #' Prepare a diagnostic plot of viral titer GLM fit.
 #'
 #' @param fm Fitted model or list of fitted models from \code{getFit()}.
-#' @param line.col Color for best-fit line (appropriate for \code{par("col")}.
+#' @param line.col Color for best-fit line appropriate for \code{par("col")}.
 #' @param main List or character vectors appropriate for the plot title
-#'   of the same length as \{fm}. If \code{NULL}, the current date will
+#'   of the same length as \code{fm}. If \code{NULL}, the current date will
 #'   be used. 
 #'
 #' @details

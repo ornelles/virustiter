@@ -4,24 +4,23 @@
 \alias{plotFit}
 \title{Plot Titer Fit from GLM Model}
 \usage{
-plotFit(fm, by = c("none", "column", "row"), line.col = 2, ...)
+plotFit(fm, line.col = 2, main = NULL)
 }
 \arguments{
 \item{fm}{Fitted model or list of fitted models from \code{getFit()}.}
 
-\item{by}{Character vector indicating that fits are organized as a
-single fit ("none") or by "column" or "row".}
+\item{line.col}{Color for best-fit line appropriate for \code{par("col")}.}
 
-\item{line.col}{Color for best-fit line (appropriate for \code{par("col")}.}
-
-\item{...}{Additional arguments passed to \code{plot()}.}
+\item{main}{List or character vectors appropriate for the plot title
+of the same length as \code{fm}. If \code{NULL}, the current date will
+be used.}
 }
 \value{
 No value is returned. This function is called for the side-effect of 
 producing a plot (or plots).
 }
 \description{
-Prepare a diagnositc plot by column, row, or none.
+Prepare a diagnostic plot of viral titer GLM fit.
 }
 \details{
 Base graphics are used to prepare the plot where the first argument is

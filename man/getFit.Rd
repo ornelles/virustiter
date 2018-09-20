@@ -34,6 +34,8 @@ The argument \code{obj} must be produced either by \code{tally()} or by
 assumed to have been produced by \code{score} and the function
 \code{tally} will be called before proceeding. If variables named "pos"
 and "neg" are present, the data are assumed to be the product of
-\code{tally}. In both cases, the data must have a variable named "moi"
-or "x" representing the multiplicity of infection.
+\code{tally}. In the case of a data frame produced by \code{score}, the
+data must have a variable named "moi" or "x" representing the multiplicity
+of infection. Data produced by \code{tally} will always have a variable
+named "x" representing the multiplicity.
 }
