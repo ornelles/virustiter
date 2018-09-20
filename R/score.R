@@ -7,8 +7,8 @@
 #'   \code{readIJResults()} and appropriate grouping variable.
 #' @param cut A numeric vector of length one or a named numeric vector for
 #'   each level of the grouping variable \code{well, row, column, or file}. If
-#'   missing, the function \code{getCut} will be called with default parameters
-#'   to determine the cutoff.
+#'   missing, the function \code{getCut} will be called with parameters
+#'   provided in \code{...} (if any) to determine the cutoff.
 #' @param param A character string identifying the variable to be scored.
 #' @param ... Additional arguments for \code{getCut()} such as \code{by}.
 #'
@@ -42,9 +42,8 @@ score <- function(df, cut = NULL, param = "mfi", ...)
   if (missing(df)) {
     usage <- c("score examples:",
       '  score(df, cut)         ## cut holds cutoff values',
-      '  score(df, by = "well") ## cutoff values by wells',
       '  score(df, 123)         ## single value used as cutoff')
-    cat(usage, sep="\n")
+    cat(usage, sep = "\n")
     return(invisible(NULL))
   }
   stopifnot(param %in% names(df))

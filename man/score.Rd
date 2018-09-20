@@ -12,8 +12,8 @@ score(df, cut = NULL, param = "mfi", ...)
 
 \item{cut}{A numeric vector of length one or a named numeric vector for
 each level of the grouping variable \code{well, row, column, or file}. If
-missing, the function \code{getCut} will be called with default parameters
-to determine the cutoff.}
+missing, the function \code{getCut} will be called with parameters
+provided in \code{...} (if any) to determine the cutoff.}
 
 \item{param}{A character string identifying the variable to be scored.}
 

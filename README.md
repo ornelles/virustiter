@@ -34,7 +34,7 @@ Phenotype date should be a data frame with the following variables:
   moi   (or 'x') numeric value indicating the multiplicity (units per cell)
   unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
 ```
-and also must include either `well` or `file`:
+and must include either `well` or `file`:
 ```
   well  character string indicated the well such as "A1" or "a01"
   file	character string identifying the file holding the layered TIF
@@ -44,7 +44,7 @@ An example with images in individual files in folders is shown here. Note that a
 ```
   fimg <- system.file("extdata", "by_folder", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
-
+  
   df <- parseImages(fimg)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
@@ -74,6 +74,7 @@ Typical workflow:
 ```
 Supporting functions:
 ```
+   checkImages(path)   # check (and display) paired images 
    plotDens(df)        # calculate and show cutoff values with densityplot 
    plotHist(df)        # histogram of each well with optional cutoff values
    plotPlate(df)       # plot plate showing positives

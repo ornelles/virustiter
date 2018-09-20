@@ -51,9 +51,11 @@
 tally <- function(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
 {
 	if(!"positive" %in% names(df))
-		stop("tally requires the logical variable 'positive' in 'df'")
+		stop("\ntally() requires the logical variable 'positive'.",
+			"\nPerhaps score() needs to be called on '", deparse(substitute(df)),
+			"' first?")
 	if (!param %in% names(df))
-		stop(deparse(substitute(param)), " is missing from 'df'")
+		stop("'", deparse(substitute(param)), "' is missing from 'df'")
 
 # determine if "moi" or "x" is available
 	moi <- match.arg(moi)

@@ -25,6 +25,7 @@ usage <- function() {
 	"   cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI",
 	"", 
 	" Support:",
+	"   checkImages(path)   # check (and display) paired images", 
 	"   plotDens(df)        # calculate and show cutoff values with densityplot ",
 	"   plotHist(df)        # histogram of each well with optional cutoff values",
 	"   plotPlate(df)       # plot plate showing positives",
