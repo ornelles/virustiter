@@ -5,11 +5,12 @@
 #' value of multiplicity.
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
-#' @param pd Optional phenotype \code{data.frame} to add to results.
+#' @param moi Character string identifying the independent value. If missing,
+#'   variables named \code{"moi"} and \code{"x"} will be sought and used. Note
+#'   that in the returned value, this variable will be named \code{"x"}.
 #' @param param Variable name as character string in \code{df} to evaluate, 
 #'   typically \code{"mfi"}.
-#' @param moi Character string identifying the independent value, typically
-#'   the multiplicity of infection named \code{moi} of \code{x}.
+#' @param pd Optional phenotype \code{data.frame} to add to results.
 #'
 #' @details
 #'
@@ -48,7 +49,7 @@
 #'
 #' @export
 #'  
-tally <- function(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
+tally <- function(df, moi, param = "mfi", pd = NULL)
 {
 	if(!"positive" %in% names(df))
 		stop("\ntally() requires the logical variable 'positive'.",
@@ -57,10 +58,19 @@ tally <- function(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
 	if (!param %in% names(df))
 		stop("'", deparse(substitute(param)), "' is missing from 'df'")
 
-# determine if "moi" or "x" is available
-	moi <- match.arg(moi)
-	if (!moi %in% names(df))
-		stop("'df' does not have a variable named '", deparse(substitute(moi)), "'")
+# determine if the value for moi is present or seek "moi" or "x"
+	if (missing(moi)) {
+		if ("moi" %in% names(df))
+			{moi <- "moi"; message('Using variable named "moi" for multiplicity')}
+		else if ("x" %in% names(df))
+			{moi <- "x"; message('Using variable named "x" for multiplicity')}
+		else
+			stop('Unable to identify suitable value for "moi" in ',
+				"'", deparse(substitute(df)), "'")
+	}
+	else if (!moi %in% names(df))
+		stop("'", deparse(substitute(df)), "' does not have a variable named ",
+			deparse(substitute(moi)))
 
 # assign grouping variable
 	if (all(c("well", "file") %in% names(df)))
@@ -70,7 +80,7 @@ tally <- function(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
 	else if("file" %in% names(df))
 		by = "file"
 	else
-		stop("'df' must have a factor named 'well' or 'file'")
+		stop("'df' must have a factor variable named 'well' or 'file'")
 	group <- df[[by]]
 
 # extract data frame name

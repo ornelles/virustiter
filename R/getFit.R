@@ -35,6 +35,8 @@
 #'
 getFit <- function(obj, by = c("sequential", "column", "row"))
 {
+	if (missing(obj))
+		stop("getFit requires a data.frame from tally() or score()")
 	if (all(c("pos", "neg") %in% names(obj)))	# data.frame produced by tally()
 		res <- obj
 	else if ("positive" %in% names(obj))	# data.frame from score()

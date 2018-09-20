@@ -4,18 +4,19 @@
 \alias{tally}
 \title{Tally Positive Fluorescent Values}
 \usage{
-tally(df, pd = NULL, param = "mfi", moi = c("x", "moi"))
+tally(df, moi, param = "mfi", pd = NULL)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
 
-\item{pd}{Optional phenotype \code{data.frame} to add to results.}
+\item{moi}{Character string identifying the independent value. If missing,
+variables named \code{"moi"} and \code{"x"} will be sought and used. Note
+that in the returned value, this variable will be named \code{"x"}.}
 
 \item{param}{Variable name as character string in \code{df} to evaluate, 
 typically \code{"mfi"}.}
 
-\item{moi}{Character string identifying the independent value, typically
-the multiplicity of infection named \code{moi} of \code{x}.}
+\item{pd}{Optional phenotype \code{data.frame} to add to results.}
 }
 \value{
 A \code{data.frame} of tallied values for each level of the grouping
