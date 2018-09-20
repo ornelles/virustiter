@@ -5,7 +5,7 @@
 \title{Show Paired Microscopic Images}
 \usage{
 showImages(path, type = "tiff", which.images = c(1, 2, 2), pattern = NULL,
-  method = c("raster", "browser"))
+  method = c("none", "raster", "browser"))
 }
 \arguments{
 \item{path}{A character vector of directory with either multilayer tiff
@@ -16,19 +16,20 @@ paired images per well.}
 ("tif", "tiff", "jpeg", "jpg" or "png".)}
 
 \item{which.images}{An integer of length 2 or 3. The first two numbers indicate
-the relative position of the DNA image and the targetin each field. The optional
+the relative position of the DNA image and the target in each field. The optional
 third number specifies the total number of images for each field. A value of
-c(1, 2) indicates DNA first and target second. A value of c(2, 1) indicates that
-the order is target first and DNA image second. A value of c(1, 2, 3)
-indicates a DNA image, a target image, and a third (ignored) image such as a
-phase contrast image or second fluorescent color in each set.}
+\code{c(1, 2)} indicates DNA first and target second. A value of \code{c(2, 1)}
+indicates that the order is target first and DNA image second. A value of
+\code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
+image such as a phase contrast image or second fluorescent color in each set.}
 
 \item{pattern}{Optional grep pattern as character string used by \code{list.files()}
 to select image files.}
 
 \item{method}{Character string specifying the method of displaying images.
-Default of \code{"browser"} using web browser, \cdoe{"raster"} uses R
-raster graphics.}
+Default of \code{"none"} simply summarizes the images. A value of \code{"raster"}
+uses R raster graphics and \code{"browser"} attempts to use a browser,
+which currently fails with EBImage...}
 }
 \value{
 This function is called to display subsets of normalized image
@@ -37,7 +38,7 @@ images. The last group of images displayed is invisibly returned.
 }
 \description{
 Show paired DNA and a fluorescent images
-from paired images using the same selection as \code{parseImages()}.
+using the same selection criteria provided to \code{parseImages()}.
 }
 \details{
 Images specified in \code{path} will be read, normalized and displayed

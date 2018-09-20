@@ -1,7 +1,7 @@
 #' Show Paired Microscopic Images
 #'
 #' Show paired DNA and a fluorescent images
-#' from paired images using the same selection as \code{parseImages()}.
+#' using the same selection criteria provided to \code{parseImages()}.
 #'
 #' @param path A character vector of directory with either multilayer tiff
 #'   image files \emph{or} subdirectories identified by well with separate,
@@ -9,17 +9,18 @@
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
 #' @param which.images An integer of length 2 or 3. The first two numbers indicate
-#'   the relative position of the DNA image and the targetin each field. The optional
+#'   the relative position of the DNA image and the target in each field. The optional
 #'   third number specifies the total number of images for each field. A value of
-#'   c(1, 2) indicates DNA first and target second. A value of c(2, 1) indicates that
-#'   the order is target first and DNA image second. A value of c(1, 2, 3)
-#'   indicates a DNA image, a target image, and a third (ignored) image such as a
-#'   phase contrast image or second fluorescent color in each set.
+#'   \code{c(1, 2)} indicates DNA first and target second. A value of \code{c(2, 1)}
+#'   indicates that the order is target first and DNA image second. A value of
+#'   \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
+#'   image such as a phase contrast image or second fluorescent color in each set.
 #' @param pattern Optional grep pattern as character string used by \code{list.files()}
 #'   to select image files.
 #' @param method Character string specifying the method of displaying images.
-#'   Default of \code{"browser"} using web browser, \cdoe{"raster"} uses R
-#'   raster graphics.
+#'   Default of \code{"none"} simply summarizes the images. A value of \code{"raster"}
+#'   uses R raster graphics and \code{"browser"} attempts to use a browser,
+#'   which currently fails with EBImage...
 #'
 #' @details
 #'
@@ -61,7 +62,7 @@
 #' @export
 #'
 showImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
-	pattern = NULL, method = c("raster", "browser"))
+	pattern = NULL, method = c("none", "raster", "browser"))
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
@@ -81,9 +82,9 @@ showImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # method
 	method <- match.arg(method)
 	if (method == "browser") {
-		message("currently unable to use browsers in EBImage code...")
-		message("output switched to 'raster'")
-		message("use 'par(ask = TRUE)' to view images one-by-one")
+		message("Currently the display with browser seems to fail in EBImage")
+		message("The value has been changed to 'raster'.")
+		message("Use 'par(ask = TRUE)' to view images one-by-one")
 		method <- "raster"
 	}
 
@@ -161,6 +162,7 @@ showImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 
 # process each group of files in turn
 	for (IDX in seq_along(ffsplit)) {
+		message(sprintf("%4d: ", IDX), "  ", names(ffsplit)[IDX])
 		myDna <- normalize(dnaImages[[IDX]])
 		myMfi <- normalize(mfiImages[[IDX]])
 		n <- dim(myDna)[3]
@@ -168,8 +170,10 @@ showImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 			n <- 1
 		i <- c(rbind(seq_len(n), n + seq_len(n)))
 		img <- combine(myDna, myMfi)[,,i]
-		display(tile(img, nx = 2), all = TRUE, method = method,
-			title = names(ffsplit)[IDX])
+		if (method != "none")
+			display(tile(img, nx = 2), all = TRUE, method = method,
+				title = names(ffsplit)[IDX])
 	}
+	message("Done")
 	invisible(img)
 }
