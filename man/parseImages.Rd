@@ -6,7 +6,7 @@
 \usage{
 parseImages(path, type = "tiff", which.images = c(1, 2, 2),
   pattern = NULL, args.nucMask = NULL, args.trimMask = NULL,
-  cellMask.flag = FALSE)
+  cellMask.flag = FALSE, equalize = FALSE)
 }
 \arguments{
 \item{path}{A character vector of directory with either multilayer tiff
@@ -35,6 +35,10 @@ to select image files.}
 \item{cellMask.flag}{If this \code{logical} value is \code{TRUE}, the default
 nuclear mask will be used to generate a mask with \code{cellMask()}. This
 "cellular" mask will be used to measure fluorescence in the target image.}
+
+\item{equalize}{If this \code{logical} value is \code{TRUE}, the fluorescent
+target images will be equalized by subtracting the median value after
+applying a median filter and Gaussian blur}
 }
 \value{
 A data.frame of processed image data. \strong{All} data.frames will have the
@@ -78,7 +82,7 @@ performed in multi-well plates and is designed to parse pairs of images
 collected at different multiplicities of infection or moi. This
 information (moi) is expressed as virions (VP) \emph{or} infectious
 units (IU) \emph{or} volume (ml, ul, nl) per cell and is added to the
-data generated with this funciton with the \code{mergePdata()} function.
+data generated with this function with the \code{mergePdata()} function.
 The nuclear (typically DAPI) image file is expected to precede the
 corresponding viral antigen image file but this order can be changed with
 the \code{which.images} argument.
@@ -93,6 +97,13 @@ can be in upper or lower case and can contain leading zeros such as
 Alternatively, each group of images associated with a given moi can be
 a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
+
+If the fluorescent images have variable backgrounds or significant noise,
+the argument \code{equalize} can be set to \code{TRUE} to smooth the
+images by sequentially \emph{modifying the values in each} image with a
+median filter of radius 2, a Gaussian blur of radius 2 followed by
+subtracting the median value for each image and adding an offset of 0.05.
+This may add significantly more processing time.
 }
 \examples{
 # Note that execution of these examples can be rather slow...

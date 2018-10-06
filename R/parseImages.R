@@ -23,6 +23,9 @@
 #' @param cellMask.flag If this \code{logical} value is \code{TRUE}, the default
 #'   nuclear mask will be used to generate a mask with \code{cellMask()}. This
 #'   "cellular" mask will be used to measure fluorescence in the target image.
+#' @param equalize If this \code{logical} value is \code{TRUE}, the fluorescent
+#'   target images will be equalized by subtracting the median value after
+#'   applying a median filter and Gaussian blur
 #'
 #' @details
 #'
@@ -38,7 +41,7 @@
 #' collected at different multiplicities of infection or moi. This
 #' information (moi) is expressed as virions (VP) \emph{or} infectious
 #' units (IU) \emph{or} volume (ml, ul, nl) per cell and is added to the
-#' data generated with this funciton with the \code{mergePdata()} function.
+#' data generated with this function with the \code{mergePdata()} function.
 #' The nuclear (typically DAPI) image file is expected to precede the
 #' corresponding viral antigen image file but this order can be changed with
 #' the \code{which.images} argument.
@@ -53,6 +56,13 @@
 #' Alternatively, each group of images associated with a given moi can be
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
+#'
+#' If the fluorescent images have variable backgrounds or significant noise,
+#' the argument \code{equalize} can be set to \code{TRUE} to smooth the
+#' images by sequentially \emph{modifying the values in each} image with a
+#' median filter of radius 2, a Gaussian blur of radius 2 followed by
+#' subtracting the median value for each image and adding an offset of 0.05.
+#' This may add significantly more processing time.
 #'
 #' @return
 #'
@@ -102,7 +112,7 @@
 #'
 parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	pattern = NULL, args.nucMask = NULL, args.trimMask = NULL,
-	cellMask.flag = FALSE)
+	cellMask.flag = FALSE, equalize = FALSE)
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
@@ -112,12 +122,16 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	path <- path[1]
 	if (file.info(path)$isdir == FALSE)
 		stop("The value in 'path' is not a directory.")
+
 	if (length(which.images) == 2)
 			which.images <- c(which.images, max(which.images))
 	if (length(which.images) != 3)
 		stop("'which.images' must be an integer vector of length 2 or 3")
 	if (which.images[3] != max(which.images))
 		stop("the third value in 'which.images' must be the largest")
+
+# Evaluate and read image data 
+	message("Evaluating images...", appendLF = FALSE)
 
 # extract paths to image files
 	ff <- list.images(path = path, type = type, pattern = pattern)
@@ -140,7 +154,7 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 		filename <- field1
 	}
 	else
-		stop("unable to use mixture of image files in ", path, '"')
+		stop("\nunable to use mixture of image files in ", path, '"')
 
 # split image paths into related groups (by well or by file)
 	if (imageType == "byWell")
@@ -148,7 +162,7 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	else if (imageType == "byStack")
 		ffsplit <- split(ff, filename)
 	else
-		stop("unexpected value for 'imageType'")
+		stop("\nunexpected value for 'imageType'")
 
 # read all images as a list and coerce to grayscale with a warning
 	img <- lapply(ffsplit, function(f) suppressWarnings(readImage(f)))
@@ -165,27 +179,47 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # are total images in each group sensible?
 	n <- sapply(img, function(x) dim(x)[3])
 	bad <- which(n %% n_field != 0)
-	if (length(bad))
-		stop("The number of images in ", paste(names(img)[bad], collapse = ", "),
+	if (length(bad > 1))
+		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
 			" are not multiples of ", n_field)
+	else if (length(bad == 1))
+		stop("\nThe number of images in ", names(img)[bad],
+			" is not a multiple of ", n_field)
 
 # extract dna images
 	dnaImages <- lapply(img, function(x, first = n_dna, by = n_field) {
 		N <- dim(x)[3]
-		if (N <= 1) stop("UNEXPECTED image dimension in dnaImages") 
-		x[,,seq(first, N, by)]})
+		if (N <= 1) stop("\nUNEXPECTED image dimension in dnaImages") 
+		x[,,seq(first, N, by), drop = FALSE]})
 
 # extract mfi images
 	mfiImages <- lapply(img, function(x, first = n_mfi, by = n_field) {
 		N <- dim(x)[3]
-		if (N <= 1) stop("UNEXPECTED image dimension in mfiImages") 
-		x[,,seq(first, N, by)]})
+		if (N <= 1) stop("\nUNEXPECTED image dimension in mfiImages") 
+		x[,,seq(first, N, by), drop = FALSE]})
+	message("done")	# evaluating images
+
+# option to smooth and equalize mfi images
+	if (equalize == TRUE) {
+		message("Equalizing target images...", appendLF = FALSE)
+		mfiImages <- lapply(mfiImages, medianFilter, 2)
+		mfiImages <- lapply(mfiImages, gblur, 2)
+		bgnd <- lapply(mfiImages, function(v) apply(v, 3, median))
+		for(i in seq_along(mfiImages)) {
+			z <- Image(rep(bgnd[[i]], each = prod(dim(mfiImages[[i]])[1:2])),
+					dim = dim(mfiImages[[i]]))
+			mfiImages[[i]] <- mfiImages[[i]] - z + 0.05
+			mfiImages[[i]][mfiImages[[i]] < 0] <- 0
+		}
+		message("done")
+	}
 
 # initialize variable to collect results, initialize progress bar
 	nff <- length(ffsplit)
 	ret <- rep(list(NULL), nff)
 	showProgress <- ifelse(nff > 2, TRUE, FALSE)
 
+	message("Processing groups of images")
 	if (showProgress)
 		pb <- txtProgressBar(min = 1, max = nff, style = 3)
 
@@ -265,5 +299,6 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	rownames(ans) <- NULL
 	if (showProgress)
 		close(pb)
+	message("done")
 	return(ans)
 }
