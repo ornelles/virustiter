@@ -27,9 +27,15 @@
 #'
 thresh2 <- function(x, width, offset, boundary = c("replicate", "circular"))
 {
+# adjust for arguments of dim(x)[3] == 1
+	dm <- dim(x)
+	if (dm[3] == 1)
+	dim(x) <- dm[1:2]
 	boundary <- match.arg(boundary)
 	r <- width - width%%2 + 1
 	f <- makeBrush(r, shape = "disc")
 	f <- f/sum(f)
-	return (x > (filter2(x, f, boundary) + offset))
+	x <- x > (filter2(x, f, boundary) + offset)
+	dim(x) <- dm
+	return(x)
 }

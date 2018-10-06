@@ -67,5 +67,7 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 	x <- thresh2(x, width = width, offset = offset)
 	x <- fillHull(x)
 	x <- distmap(x)
+	if (length(dim(x)) == 2)
+		dim(x) <- c(dim(x), 1)
 	return(watershed(x))
 }
