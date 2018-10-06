@@ -10,6 +10,7 @@
 #' Display an entire plate with lattice graphics grouped by well or file.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
+#' @param size Number of wells for plate, if \code{NULL}, the size will be guessed.
 #' @param cex Numeric value as factor by which to expand the plot symbol.
 #' @param alpha Transparency factor applied to plotting symbols.
 #' @param main Optional character string to serve as plot title.
@@ -20,18 +21,25 @@
 #'
 #' @return
 #'
-#' The plot is returned as an invisible \code{lattice} object.
+#' The plot is generated and returned as an invisible \code{lattice} object.
 #'
 #' @export
 #'
-plotPlate <- function(df, cex = 1/2, alpha = 1/2, main = NULL, invert.y = TRUE, ...)
+plotPlate <- function(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
+	invert.y = TRUE, ...)
 {
 	require(lattice)
 
 # default to well first
 	if ("well" %in% names(df)) {
 		byWell <- TRUE
-		n <- nlevels(df$well)
+		if (is.null(size))
+			n <- nlevels(df$well)
+		else {
+			if (size < 1 | size > 384)
+				stop("'size' must be between 1 and 384")
+			n <- as.integer(size)
+		}
 		if (n > 96)	{rows <- 16; columns <- 24}     # 384-well plate
 		else if (n > 48) {rows <- 8; columns <- 12} # 96-well plate
 		else if (n > 24) {rows <- 6; columns <- 8}  # 48-well plate
@@ -67,7 +75,6 @@ plotPlate <- function(df, cex = 1/2, alpha = 1/2, main = NULL, invert.y = TRUE, 
 		df$positive <- FALSE
 	if (invert.y)
 		df$ym <- -df$ym
-
 	if (byWell == TRUE) {
 		obj <- xyplot(ym ~ xm | well, data = df, groups = positive, cex = cex,
 			alpha = alpha, as.table = TRUE, aspect = "iso", layout = c(columns,rows),

@@ -4,10 +4,13 @@
 \alias{plotPlate}
 \title{Plot Results of an Entire Plate by Well or File}
 \usage{
-plotPlate(df, cex = 1/2, alpha = 1/2, main = NULL, invert.y = TRUE, ...)
+plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
+  invert.y = TRUE, ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
+
+\item{size}{Number of wells for plate, if \code{NULL}, the size will be guessed."}
 
 \item{cex}{Numeric value as factor by which to expand the plot symbol.}
 
