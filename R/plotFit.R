@@ -45,8 +45,8 @@ plotFit <-function(fm, line.col = 2, main = NULL)
 		unit <- levels(res$unit)[1]
 		txt <- sprintf("%0.3g %s (95%% CI:%0.3g-%0.3g) ", cf[1], unit, cf[2], cf[3])
 
-		xlo <- with(res, min(moi[moi > 0]))
-		xhi <- with(res, max(moi))
+		xlo <- min(moi[moi > 0])
+		xhi <- max(moi)
 		xp <- exp(seq(log(xlo), log(xhi), length = 101))
 		yp <- predict(fm, data.frame(x = xp), type = "response")
 		xpp <- cf[1]

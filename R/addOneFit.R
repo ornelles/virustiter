@@ -34,10 +34,10 @@ addOneFit <- function(fm, line.col=4, ref.col=4, pch.col=line.col, ...) {
 	res <- fm$data  # entire data.frame handed to glm()
 	cf <- getTiter(fm)
 
-	xlo <- with(res, min(moi[moi > 0]))
-	xhi <- with(res, max(moi))
+	xlo <- min(moi[moi > 0])
+	xhi <- max(moi)
 	xp <- exp(seq(log(xlo), log(xhi), length=101))
-	yp <- predict(fm, data.frame(moi=xp), type="response")
+	yp <- predict(fm, data.frame(x = xp), type="response")
 	xpp <- cf[1]
 	ypp <- 1 - exp(-1)
 
