@@ -8,7 +8,7 @@ Image sets associated with each moi can occur as either files in a single direct
 
 Additional information about the experiment is provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis.
 
-See the help function for `parseImages` for 
+Individual nuclei are identified in each nuclear image file and used to generate a mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated. See the help function for `parseImages` for additional details on the options to optimize detection. 
 
 ## Installation
 This is the first release as a package that can be installed from github. A few steps are probably required. 
@@ -95,7 +95,7 @@ Supporting functions include these as well as others:
    p2p()               # interactively measure point-to-point distances
    pnpoly(p, v)        # test if points in p are within polygon (v)
 ```
-To optimize the fit, the cutoff value needs to be tuned with parameters handed to `getCut()` as well as those initially used such as `width` in  `parseImages()`. Use the graphing tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff.
+Often the cutoff value needs to be optimized with parameters provided to `getCut()` as well as those initially used such as `width` in `parseImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff values.
 
 The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
 
@@ -105,8 +105,8 @@ The following code demonstrates one method of exploring values near the optimal 
   cuts <- getCut(df, mult = mm)
   aic <- getAIC(df, cuts)
   plot(mm, aic)	# by AIC, the best mult value is 3 or 5
-  plotHist(df, cuts[mm==3], main = sprintf("Cutoff = %0.4f", cuts[mm==3]))
-  plotHist(df, cuts[mm==5], main = sprintf("Cutoff = %0.4f", cuts[mm==5]))
+  plotHist(df, cuts[mm == 3], main = sprintf("Cutoff = %0.4f", cuts[mm==3]))
+  plotHist(df, cuts[mm == 5], main = sprintf("Cutoff = %0.4f", cuts[mm==5]))
 ```  
 ## License
 GPL-3
