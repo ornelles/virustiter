@@ -61,12 +61,12 @@ tally <- function(df, moi, param = "mfi", pd = NULL)
 # determine if the value for moi is present or seek "moi" or "x"
 	if (missing(moi)) {
 		if ("moi" %in% names(df))
-			{moi <- "moi"; message('Using variable named "moi" for multiplicity')}
+			moi <- "moi"
 		else if ("x" %in% names(df))
-			{moi <- "x"; message('Using variable named "x" for multiplicity')}
+			moi <- "x"
 		else
-			stop('Unable to identify suitable value for "moi" in ',
-				"'", deparse(substitute(df)), "'")
+			stop('A variable named "moi" or "x" must be present in ',
+				"'", deparse(substitute(df)), "'", " if not provided for 'moi'")
 	}
 	else if (!moi %in% names(df))
 		stop("'", deparse(substitute(df)), "' does not have a variable named ",
