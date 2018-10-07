@@ -3,7 +3,7 @@
 #' Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
 #'
 #' @param fm Fitted model or list of fitted models from \code{getFit()}.
-#' @param main,xlab,ylab,pch.col Parameters passed to \code{plot}.
+#' @param main,xlab,ylab,pch.col,ylim Parameters passed to \code{plot}.
 #' @param line.col Color for best-fit line (appropriate for \code{par("col")}.
 #' param ref.col Color for reference lines identifying key Poisson points.
 #' @param by Character vector indicating that fits are organized as a
@@ -23,7 +23,7 @@
 #'
 #' @export
 #'  
-plotOneFit <- function(fm, main = NULL, xlab = NULL, ylab = NULL,
+plotOneFit <- function(fm, main = NULL, xlab = NULL, ylab = NULL, ylim = NULL,
 				pch.col = "black", line.col = "red", ref.col = "blue", ...)
 {
 	moi <- exp(fm$model[[2]])      # model data.frame holds values used for fit
@@ -60,8 +60,9 @@ plotOneFit <- function(fm, main = NULL, xlab = NULL, ylab = NULL,
 	ypp <- 1-exp(-1)
 	if (is.null(xlab)) xlab <- paste("\n", "One IU = ", txt, sep = "")
 	if (is.null(ylab)) ylab <- "Infected fraction"
+	if (is.null(ylim)) ylim <- c(0, 1)
 
-	plot(y ~ moi, subset = moi > 0, log = "x", las = 1, ylim = c(0,1),
+	plot(y ~ moi, subset = moi > 0, log = "x", las = 1, ylim = ylim,
 		xlab = xlab, ylab = ylab, main = main, col = pch.col, ...)
 	lines(xp, yp, col = line.col)
 	lines(c(xlo,xpp,xpp), c(ypp,ypp,-0.02), lty = 2, col = ref.col)
