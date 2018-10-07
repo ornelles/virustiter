@@ -62,10 +62,14 @@ An example with stacked images in a single folder is shown here. Repeat the abov
 ```
 Typical workflow:
 ```
-   df <- parseImages()   # read paired images with EBImage ...or...
+   df <- parseImages()   # read paired images with EBImage
+   ...or...
    df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)
-   pd <- data.frame(well = levels(df$well), moi = moi, unit = unit) ...or...
+
+   pd <- data.frame(well = well.info(levels(df$well), moi = moi, unit = unit)
+   ...or...
    pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)
+
    df  <- mergePdata(pd, df) # merge with phenotype data in 'pd'
    cut <- getCut(df)     # determine cutoff by control (or well, row, or column)
    df  <- score(df, cut) # assign positive values from cutoff
@@ -81,8 +85,8 @@ Supporting functions include these as well as others:
    plotPlate(df)       # plot plate showing positives
    plotWell(df, well)  # plot each file in a given well showing positives and size
    plotFit(fm)         # plot fit(s) with calculated values using base graphics
-   plotOneFit(fm)      # plot fit with options to adjust colors
-   addOneFit(fm)       # add best-fit line to existing base graph
+   plotOneFit(fm)      # plot fit with more options to adjust colors
+   addOneFit(fm)       # add another best-fit line and points to existing plot
    getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
    nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
    trimMask(mask)      # remove objects based on size from mask
@@ -95,7 +99,7 @@ To optimize the fit, the cutoff value needs to be tuned with parameters handed t
 
 The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
 
-The following shows a better initial selection followed by further exploration using values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist` show that the value with `mult` = 3 is more sensible.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist` show that the value with `mult` = 3 is more sensible.
 ```
   mm <- seq(2, 6, 0.25)
   cuts <- getCut(df, mult = mm)
