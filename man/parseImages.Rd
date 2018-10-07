@@ -38,7 +38,7 @@ nuclear mask will be used to generate a mask with \code{cellMask()}. This
 
 \item{equalize}{If this \code{logical} value is \code{TRUE}, the fluorescent
 target images will be equalized by subtracting the median value after
-applying a median filter and Gaussian blur}
+applying a median filter and gaussian blur using the function \code{bnormalize}.}
 }
 \value{
 A data.frame of processed image data. \strong{All} data.frames will have the
@@ -72,22 +72,23 @@ target image for individual cells from paired images.
 \details{
 This is the core function that reads and parses image data in a suite of tools
 implemented with \code{\link{EBImage}} which has been developed to determine
-viral titers from fluorescent micrograph pairs. Typically, the first of each pair
+viral titers from sets of fluorescent micrographs. Typically, the images are
+acquired as paired images where the first of each pair
 is a DNA image and the second a fluorescent image of the viral target.
-target signal. Because individual cells are identified by the nuclear stain, it
+Because individual cells are identified by the nuclear stain, it
 \emph{may} be beneficial to collect overexposed DNA images.
 
 This function was developed to process fluorescent virus titers
-performed in multi-well plates and is designed to parse pairs of images
-collected at different multiplicities of infection or moi. This
-information (moi) is expressed as virions (VP) \emph{or} infectious
+performed in multi-well plates and is designed to parse images
+collected at different multiplicities of infection or moi. The
+moi is expressed as virions (VP) \emph{or} infectious
 units (IU) \emph{or} volume (ml, ul, nl) per cell and is added to the
-data generated with this function with the \code{mergePdata()} function.
+data results of this function with the \code{mergePdata} function.
 The nuclear (typically DAPI) image file is expected to precede the
 corresponding viral antigen image file but this order can be changed with
 the \code{which.images} argument.
 
-Pairs of images associated with each moi can be individual files in a
+Images associated with each moi can be individual files in a
 single directory where each directory is named for the well such as
 \code{A1}, \code{A2}, etc. and the files within are identified as
 \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
@@ -101,7 +102,7 @@ specified by the argument \code{which.images}.
 If the fluorescent images have variable backgrounds or significant noise,
 the argument \code{equalize} can be set to \code{TRUE} to smooth the
 images by sequentially \emph{modifying the values in each} image with a
-median filter of radius 2, a Gaussian blur of radius 2 followed by
+median filter of radius 2, a gaussian blur of radius 2 followed by
 subtracting the median value for each image and adding an offset of 0.05.
 This may add significantly more processing time.
 }
