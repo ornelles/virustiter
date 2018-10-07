@@ -10,7 +10,7 @@ plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
 
-\item{size}{Number of wells for plate, if \code{NULL}, the size will be guessed."}
+\item{size}{Number of wells for plate, if \code{NULL}, the size will be guessed.}
 
 \item{cex}{Numeric value as factor by which to expand the plot symbol.}
 
@@ -23,7 +23,7 @@ plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 \item{...}{Additional arguments handed to \code{xyplot} including subset.}
 }
 \value{
-The plot is returned as an invisible \code{lattice} object.
+The plot is generated and returned as an invisible \code{lattice} object.
 }
 \description{
 Display an entire plate with lattice graphics grouped by well or file.
