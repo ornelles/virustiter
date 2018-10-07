@@ -6,12 +6,12 @@ This was developed to process fluorescent virus titers performed in multi-well p
 
 Image sets associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified sequentially as A1/file001.tif, A1/file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered tiff file for each moi where each set of images includes the DNA and viral antigen image files.
 
-Additional information about the experiment is provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis.
+Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis.
 
-Individual nuclei are identified in each nuclear image file and used to generate a mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated. See the help function for `parseImages` for additional details on the options to optimize detection. 
+Individual nuclei are identified in each nuclear image file and used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages` for additional details on the options to optimize detection. 
 
 ## Installation
-This is the first release as a package that can be installed from github. A few steps are probably required. 
+This is provided as an early release of a package that can be installed from github. A few steps are probably required to install and use it.
 
 First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
@@ -19,7 +19,7 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("EBImage")
 biocLite("genefilter")
 ```
-Second, the `devtools` and possibly `latticeExtra` packages need to be installed.
+Second, the `devtools` and `latticeExtra` packages need to be installed.
 ```
 install.packages("devtools")
 install.packages("latticeExtra")
@@ -36,17 +36,17 @@ Phenotype date should be a data frame with the following variables:
   moi   (or 'x') numeric value indicating the multiplicity (units per cell)
   unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
 ```
-and must include either `well` or `file`:
+and must include *either* `well` or `file` but not both:
 ```
   well  character string indicated the well such as "A1" or "a01"
   file	character string identifying the file holding the layered TIF
 ```
-An example with images in individual files in folders is shown here. `parseImages(path)` will examine the files in its `path` argument to determine if the files are multilayered tiff files or additional folders with individual image files and process the files accordingly. 
+An example with images in individual files in folders is shown here. `parseImages(path)` will examine the folder specified by `path` in order to determine if it contains multi-layered tiff files or additional folders with individual image files and process the files accordingly. 
 ```
-  fimg <- system.file("extdata", "by_folder", package = "virustiter")
+  path <- system.file("extdata", "by_folder", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
   
-  df <- parseImages(fimg)
+  df <- parseImages(path)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
   cut <- getCut(df)  # this is not optimal, see analysis below
@@ -57,7 +57,7 @@ An example with images in individual files in folders is shown here. `parseImage
 ```
 An example with stacked images in a single folder is shown here. Repeat the above sample code using the new files.
 ```
-  fimg <- system.file("extdata", "by_stack", package = "virustiter")
+  path <- system.file("extdata", "by_stack", package = "virustiter")
   fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
 ```
 Typical workflow:
@@ -79,14 +79,14 @@ Typical workflow:
 ```
 Supporting functions include these as well as others:
 ```
-   checkImages(path)   # check (and display) paired images in path
-   plotDens(df)        # calculate and show cutoff values with densityplot 
-   plotHist(df)        # histogram of each well with optional cutoff values
-   plotPlate(df)       # plot plate showing positives
-   plotWell(df, well)  # plot each file in a given well showing positives and size
+   checkImages(path)   # check (and optionally display) paired images
+   plotDens(df)        # show cutoff values with densityplot 
+   plotHist(df)        # show cutoff values with histogram
+   plotPlate(df)       # plot entire plate showing positives
+   plotWell(df, well)  # plot a schematic of each image in a given well(s) or file(s)
    plotFit(fm)         # plot fit(s) with calculated values using base graphics
    plotOneFit(fm)      # plot fit with more options to adjust colors
-   addOneFit(fm)       # add another best-fit line and points to existing plot
+   addOneFit(fm)       # add another best-fit line and points to an existing plot
    getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
    nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
    trimMask(mask)      # remove objects based on size from mask
