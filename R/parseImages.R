@@ -23,8 +23,8 @@
 #' @param cellMask.flag If this \code{logical} value is \code{TRUE}, the default
 #'   nuclear mask will be used to generate a mask with \code{cellMask()}. This
 #'   "cellular" mask will be used to measure fluorescence in the target image.
-#' @param equalize *If the fluorescent target images have more background
-#'   pixels than foreground pixels* and if the background varies signficantly
+#' @param equalize \emph{If the fluorescent target images have more background
+#'   pixels than foreground pixels} and if the background varies significantly
 #'   from image to image, this {logical} parameter can be set to
 #'   \code{TRUE} in order to equalized the fluorescent images by subtracting the
 #'   median value after applying a median filter and gaussian blur using the
@@ -61,16 +61,16 @@
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
 #'
-#' \strong{If} the fluorescent images have \emph{more} background pixels
+#' If the fluorescent images have \emph{more} background pixels
 #' than foreground
-#' pixels and \strong{if} the images have background values that vary from image
+#' pixels and if the images have background values that vary from image
 #' to image or have significant noise, the argument \code{equalize} can be set
 #' to \code{TRUE} to smooth the images by sequentially
 #' \emph{modifying the values in each} image with a
 #' median filter of radius 2, a gaussian blur of radius 2 followed by
 #' subtracting the median value for each image and adding an offset of 0.05.
 #' \emph{This cannot be used for a data set that has images with a large fraction
-#' of positive cells such as the example data set.}
+#' of positive cells, such as the example data set.}
 #'
 #' @return
 #'
@@ -92,7 +92,7 @@
 #'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
 #'   \item{\code{column}}{Column number as a factor.}
 #' }
-#' While results from data organized as \strong{stacks} (multi-layered
+#' while results from data organized as \strong{stacks} (multi-layered
 #' tiff files) will include:
 #' \describe{
 #'   \item{\code{file}}{The file name as a factor.}
