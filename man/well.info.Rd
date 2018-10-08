@@ -14,9 +14,9 @@ well.info(w, format = "\%02d", upper = TRUE)
 \item{upper}{\code{logical} value to use upper case when \code{TRUE}.}
 }
 \value{
-A named list of length four:
+A named list of length three or four:
 \itemize{
-	\item prefix, the optional prefix
+	\item prefix, the prefix if present; otherwise this is not returned
 	\item well, uniform character representation of the well
 	\item row, single character for the row
 	\item column, column number as a factor

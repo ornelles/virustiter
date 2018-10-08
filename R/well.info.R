@@ -16,9 +16,9 @@
 #' 
 #' @return 
 #' 
-#' A named list of length four:
+#' A named list of length three or four:
 #' \itemize{
-#' 	\item prefix, the optional prefix
+#' 	\item prefix, the prefix if present; otherwise this is not returned
 #' 	\item well, uniform character representation of the well
 #' 	\item row, single character for the row
 #' 	\item column, column number as a factor
@@ -55,5 +55,9 @@ well.info <- function(w, format = "%02d", upper = TRUE)
 		row <- tolower(row)
 	well <- paste(row, sprintf(format, column), sep = "")
 	column <- factor(column, levels = 1:max(column))
-	return(list(prefix = prefix, well = well, row = row, column = column))
+	if (all(prefix == ""))
+		ans <- list(well = well, row = row, column = column)
+	else
+		ans <- list(prefix = prefix, well = well, row = row, column = column)
+	return(ans)
 }
