@@ -11,7 +11,7 @@ Additional information about the experiment must be provided in a "phenotype" da
 Individual nuclei are identified in each nuclear image file and used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages` for additional details on the options to optimize detection. 
 
 ## Installation
-This is provided as an early release of a package that can be installed from github. A few steps are probably required to install and use it.
+This is provided as an early release of a package that can be installed from github. A few steps are necessary to install it and related packages before use.
 
 First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
@@ -66,7 +66,7 @@ Typical workflow:
    ...or...
    df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)
 
-   pd <- data.frame(well = well.info(levels(df$well), moi = moi, unit = unit)
+   pd <- data.frame(well = well.info(levels(df$well)), moi = moi, unit = unit)
    ...or...
    pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)
 
