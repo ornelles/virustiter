@@ -61,15 +61,16 @@
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
 #'
-#' **If** the fluorescent images have *more* background pixels than foreground
-#' pixels and **if** the images have background values that vary from image
+#' \strong{If} the fluorescent images have \emph{more} background pixels
+#' than foreground
+#' pixels and \strong{if} the images have background values that vary from image
 #' to image or have significant noise, the argument \code{equalize} can be set
 #' to \code{TRUE} to smooth the images by sequentially
 #' \emph{modifying the values in each} image with a
 #' median filter of radius 2, a gaussian blur of radius 2 followed by
 #' subtracting the median value for each image and adding an offset of 0.05.
-#' *This cannot be used for a data set that has images with a large fraction
-#' of positive cells such as the example data set.*
+#' \emph{This cannot be used for a data set that has images with a large fraction
+#' of positive cells such as the example data set.}
 #'
 #' @return
 #'
