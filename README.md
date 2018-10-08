@@ -4,7 +4,7 @@ This is a suite of tools in R to determine viral titers from fluorescent microgr
 ## Overview
 This was developed to process fluorescent virus titers performed in multi-well plates. Most of the tools are structured for this purpose. Typically, pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. Although the nuclear (DAPI) image file is expected to come before the corresponding viral antigen image file, different orders can be accommodated.
 
-Image sets associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified sequentially as A1/file001.tif, A1/file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered tiff file for each moi where each set of images includes the DNA and viral antigen image files.
+Image sets associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
 
 Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis.
 
@@ -33,13 +33,13 @@ install_github("ornelles/virustiter")
 ## Working notes
 Phenotype date should be a data frame with the following variables:
 ```
-  moi   (or 'x') numeric value indicating the multiplicity (units per cell)
-  unit  character string indicating the unit per cell as "VP "IU "ul or "ml"
+  moi   A numeric value, which can be named 'x', indicating the multiplicity
+  unit  A character string identifying the units per cell as "VP "IU "ul or "ml"
 ```
-and must include *either* `well` or `file` but not both:
+and must include *either* `well` *or* `file` but *not* both:
 ```
-  well  character string indicated the well such as "A1" or "a01"
-  file	character string identifying the file holding the layered TIF
+  well  A character string indicated the well such as "A1" or "a01" or "a0001"
+  file	The filename as a character string of the multi-layered TIFF file
 ```
 An example with images in individual files in folders is shown here. `parseImages(path)` will examine the folder specified by `path` in order to determine if it contains multi-layered tiff files or additional folders with individual image files and process the files accordingly. 
 ```
