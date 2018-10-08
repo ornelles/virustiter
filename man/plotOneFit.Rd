@@ -4,13 +4,13 @@
 \alias{plotOneFit}
 \title{Plot One Titer Fit with more Options}
 \usage{
-plotOneFit(fm, main = NULL, xlab = NULL, ylab = NULL, pch.col = "black",
-  line.col = "red", ref.col = "blue", ...)
+plotOneFit(fm, main = NULL, xlab = NULL, ylab = NULL, ylim = NULL,
+  pch.col = "black", line.col = "red", ref.col = "blue", ...)
 }
 \arguments{
 \item{fm}{Fitted model or list of fitted models from \code{getFit()}.}
 
-\item{main, xlab, ylab, pch.col}{Parameters passed to \code{plot}.}
+\item{main, xlab, ylab, pch.col, ylim}{Parameters passed to \code{plot}.}
 
 \item{line.col}{Color for best-fit line (appropriate for \code{par("col")}.
 param ref.col Color for reference lines identifying key Poisson points.}
