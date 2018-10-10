@@ -1,14 +1,14 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is an (ideally overexposed) DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and `genefilter` packages.
+This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and `genefilter` packages.
 
 ## Overview
-This was developed to process fluorescent virus titers performed in multi-well plates. Most of the tools are structured for this purpose. Typically, pairs of images are collected at different multiplicities of infection or moi expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl, etc.) per cell. Although the nuclear (DAPI) image file is expected to come before the corresponding viral antigen image file, different orders can be accommodated.
+This tools in this package are largely structured to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl) per cell. Although the nuclear (DAPI) image file is expected to come before the corresponding viral antigen image file, different orders can be accommodated.
 
-Image sets associated with each moi can occur as either files in a single directory where each directory is named for the well such as A1, A2, etc. and the files within are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
+Image sets associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
 
-Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the multiplicity and unit of measure (viral particle, ml, ul, etc.). These data are merged with the image data for further analysis.
+Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the moi and unit of measure (as VP,  ml, ul, nl, etc). These data are merged with the image data for further analysis.
 
-Individual nuclei are identified in each nuclear image file and used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages` for additional details on the options to optimize detection. 
+Individual cells are identified by the nuclear stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages()` for more details and additional options to optimize detection. 
 
 ## Installation
 This is provided as an early release of a package that can be installed from github. A few steps are necessary to install it and related packages before use.
@@ -36,7 +36,7 @@ Phenotype date should be a data frame with the following variables:
   moi   A numeric value, which can be named 'x', indicating the multiplicity
   unit  A character string identifying the units per cell as "VP "IU "ul or "ml"
 ```
-and must include *either* `well` *or* `file` but *not* both:
+and must include *either* `well` *or* `file` *but not both*:
 ```
   well  A character string indicated the well such as "A1" or "a01" or "a0001"
   file	The filename as a character string of the multi-layered TIFF file
@@ -49,7 +49,7 @@ An example with images in individual files in folders is shown here. `parseImage
   df <- parseImages(path)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
-  cut <- getCut(df)  # this is not optimal, see analysis below
+  cut <- getCut(df)  # this is less than optimal, see the analysis below
   df <- score(df, cut)
   res <- tally(df)
   fm <- getFit(res)
@@ -89,8 +89,8 @@ Supporting functions include these as well as others:
    addOneFit(fm)       # add another best-fit line and points to an existing plot
    getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
    nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
-   trimMask(mask)      # remove objects based on size from mask
-   cellMask(mask)      # expand a nuclear mask into a cell mask
+   trimMask(mask)      # remove objects based on size from image mask
+   cellMask(mask)      # expand a nuclear mask into a cell image mask
    bnormalize(img)     # normalize images to a common background value
    p2p()               # interactively measure point-to-point distances
    pnpoly(p, v)        # test if points in p are within polygon (v)
@@ -99,7 +99,7 @@ Often the cutoff value needs to be optimized with parameters provided to `getCut
 
 The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
 
-The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist` show that the value with `mult` = 3 is more sensible.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist()` show that the value with `mult` = 3 is more sensible.
 ```
   mm <- seq(2, 6, 0.25)
   cuts <- getCut(df, mult = mm)

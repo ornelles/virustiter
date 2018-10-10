@@ -138,9 +138,12 @@ checkImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # are total images in each group sensible?
 	n <- sapply(img, function(x) dim(x)[3])
 	bad <- which(n %% n_field != 0)
-	if (length(bad))
-		stop("The number of images in ", paste(names(img)[bad], collapse = ", "),
+	if (length(bad > 1))
+		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
 			" are not multiples of ", n_field)
+	else if (length(bad == 1))
+		stop("\nThe number of images in ",
+			" is not a multiple of ", n_field)
 
 # extract dna images and adjust to 3 dimensions
 	dnaImages <- lapply(img, function(x, first = n_dna, by = n_field) {
