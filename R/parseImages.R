@@ -148,7 +148,7 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	spl <- strsplit(ff, "/")
 	field1 <- sapply(spl, tail, 1)
 	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	sel <- grepl("^[[:alpha:]][[:digit:]]+$", field2) # test for well pattern
+	sel <- grepl("[[:alpha:]][[:digit:]]+$", field2) # test for well pattern
 
 # assign variables to direct processing
 	if (all(sel)) {
@@ -277,6 +277,7 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 			if (imageType == "byWell") {
 				ww <- names(ffsplit)[IDX]
 				res <- rbind(res, data.frame(directory = paste(path, ww, sep = "/"),
+					prefix = well.info(ww)$prefix,
 					well = well.info(ww)$well, row = well.info(ww)$row,
 					column = well.info(ww)$column, frame = i,
 					xm = XY[,1], ym = XY[,2], area, dna, mfi))

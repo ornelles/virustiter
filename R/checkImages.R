@@ -98,7 +98,7 @@ checkImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	spl <- strsplit(ff, "/")
 	field1 <- sapply(spl, tail, 1)
 	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	sel <- grepl("^[[:alpha:]][[:digit:]]+$", field2) # test for well pattern
+	sel <- grepl("[[:alpha:]][[:digit:]]+$", field2) # test for well pattern
 
 # assign variables to direct processing
 	if (all(sel)) {
