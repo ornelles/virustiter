@@ -125,12 +125,19 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
-	if (length(path) > 1)
-		warning("only the first value in 'path' will be used")
-	path <- path[1]
-	if (file.info(path)$isdir == FALSE)
-		stop("The value in 'path' is not a directory.")
 
+# are all files or directories found in 'path' argument legitimate?
+	if (!all(file.exists(path)))
+		stop("not all files named in ", deparse(substitute(path)), " exist")
+
+	if (all(file.info(path)$isdir))
+		ff <- list.images(path = path, type = type, pattern = pattern)
+	else if (all(!file.info(path)$isdir))
+		ff <- path
+	else
+		stop("unable to use files/path in ", deparse(substitute(path)))
+
+# check on arguments
 	if (length(which.images) == 2)
 			which.images <- c(which.images, max(which.images))
 	if (length(which.images) != 3)
@@ -140,9 +147,6 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 
 # Evaluate and read image data 
 	message("Evaluating images...", appendLF = FALSE)
-
-# extract paths to image files
-	ff <- list.images(path = path, type = type, pattern = pattern)
 
 # extract fields to determine if images are organized by well or stack
 	spl <- strsplit(ff, "/")
@@ -277,7 +281,6 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 			if (imageType == "byWell") {
 				ww <- names(ffsplit)[IDX]
 				res <- rbind(res, data.frame(directory = paste(path, ww, sep = "/"),
-					prefix = well.info(ww)$prefix,
 					well = well.info(ww)$well, row = well.info(ww)$row,
 					column = well.info(ww)$column, frame = i,
 					xm = XY[,1], ym = XY[,2], area, dna, mfi))
