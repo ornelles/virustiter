@@ -6,7 +6,7 @@
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
 #' @param by Character string identifying the group in which to seek cutoff
-#'   values \code{("control", "file", "well", "row" or "column")}.
+#'   values, typically in \code{("control", "file", "well", "row" or "column")}.
 #' @param param Variable name as character string in \code{df} to evaluate, 
 #'   typically \code{"y"}.
 #' @param mult Muliplier constant passed to \code{findBgnd()}.
@@ -60,11 +60,20 @@ getCut <- function(df, by = c("control", "file", "well", "row", "column"),
 	if (!is.data.frame(df))
 		stop(deparse(substitute(df)), " must be a data.frame")
 
-# parse arguments and perform error checking
-	by <- match.arg(by)
-	if (!param %in% names(df))
-		stop("'", param, "' not in data frame")
+# parse 'by' argument
+	byChoices <- c("control", "file", "well", "row", "column")
+	sel <- pmatch(by[1], byChoices)
+	if (!is.na(sel))
+		by <- byChoices[sel]
+	else if (!by %in% names(df)) {
+		by <- match.arg(by)
+		stop("'", by, "' is not in data frame")
+	}
 
+# parse 'param' argument
+	if (!param %in% names(df))
+		stop("'", param, "' is not in data frame")
+		
 # create local copy of relevant data
 	if (by == "control") { # special case of by "control"
 		if (any(df$type == "control"))
@@ -72,7 +81,7 @@ getCut <- function(df, by = c("control", "file", "well", "row", "column"),
 		else if (any(df$x == 0))
 			temp <- data.frame(g = TRUE, y = subset(df, x == 0)[[param]])
 		else
-			stop('require type == "control" or x values of 0 to use by = "control" option')
+			stop('require type == "control" or x values of 0 for the by = "control" option')
 	}
 	else {
 		temp <- df[c(by, param)]

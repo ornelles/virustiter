@@ -11,7 +11,7 @@ getCut(df, by = c("control", "file", "well", "row", "column"),
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
 
 \item{by}{Character string identifying the group in which to seek cutoff
-values \code{("control", "file", "well", "row" or "column")}.}
+values, typically in \code{("control", "file", "well", "row" or "column")}.}
 
 \item{param}{Variable name as character string in \code{df} to evaluate, 
 typically \code{"y"}.}
