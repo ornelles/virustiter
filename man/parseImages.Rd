@@ -9,9 +9,10 @@ parseImages(path, type = "tiff", which.images = c(1, 2, 2),
   cellMask.flag = FALSE, equalize = FALSE)
 }
 \arguments{
-\item{path}{A character vector of directory with either multilayer tiff
-image files \emph{or} subdirectories identified by well with separate,
-paired images per well.}
+\item{path}{A character vector identifying a directory or directories
+with either multilayer tiff image files \emph{or} subdirectories identified
+by well with separate, paired images per well \emph{or} a character vector
+of image files.}
 
 \item{type}{A character string identifying the type of image files to parse
 ("tif", "tiff", "jpeg", "jpg" or "png".)}
@@ -73,8 +74,8 @@ Extract the mean fluorescence intensity of DNA and a second fluorescent
 target image for individual cells from paired images.
 }
 \details{
-This is the core function that reads and parses image data in a suite of tools
-implemented with \code{\link{EBImage}} which has been developed to determine
+This is the core function to read and parse image data in a suite of tools
+implemented with \code{\link{EBImage}} to determine
 viral titers from sets of fluorescent micrographs. Typically, the images are
 acquired as paired images where the first of each pair
 is a DNA image and the second a fluorescent image of the viral target.
@@ -85,8 +86,8 @@ This function was developed to process fluorescent virus titers
 performed in multi-well plates and is designed to parse images
 collected at different multiplicities of infection or moi. The
 moi is expressed as virions (VP) \emph{or} infectious
-units (IU) \emph{or} volume (ml, ul, nl) per cell and is added to the
-data results of this function with the \code{mergePdata} function.
+units (IU) \emph{or} a unit of volume (ml, ul, nl) per cell. These details
+are added to output of this function with the \code{mergePdata()} function.
 The nuclear (typically DAPI) image file is expected to precede the
 corresponding viral antigen image file but this order can be changed with
 the \code{which.images} argument.
@@ -103,14 +104,13 @@ a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
 If the fluorescent images have \emph{more} background pixels
-than foreground
-pixels and if the images have background values that vary from image
-to image or have significant noise, the argument \code{equalize} can be set
-to \code{TRUE} to smooth the images by sequentially
-\emph{modifying the values in each} image with a
-median filter of radius 2, a gaussian blur of radius 2 followed by
-subtracting the median value for each image and adding an offset of 0.05.
-\emph{This cannot be used for a data set that has images with a large fraction
+than foreground pixels and if the images have background values that
+vary from image to image or have significant noise, the argument
+\code{equalize} can be set to \code{TRUE} to smooth the images by
+sequentially \emph{modifying the values in each} image with a
+median filter of radius 2, a Gaussian blur of radius 2, subtracting
+the median value for each image and adding an offset of 0.05.
+\emph{This cannot be used for images that have a large fraction
 of positive cells, such as the example data set.}
 }
 \examples{

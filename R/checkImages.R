@@ -3,9 +3,10 @@
 #' Check validity and optionally show paired DNA and a fluorescent images
 #' using the same selection criteria provided to \code{parseImages()}.
 #'
-#' @param path A character vector of directory with either multilayer tiff
-#'   image files \emph{or} subdirectories identified by well with separate,
-#'   paired images per well.
+#' @param path A character vector identifying a directory or directories
+#'   with either multilayer tiff image files \emph{or} subdirectories identified
+#'   by well with separate, paired images per well \emph{or} a character vector
+#'   of image files.
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
 #' @param which.images An integer of length 2 or 3. The first two numbers indicate
@@ -69,11 +70,20 @@ checkImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
-	if (length(path) > 1)
-		warning("only the first value in 'path' will be used")
-	path <- path[1]
-	if (file.info(path)$isdir == FALSE)
-		stop("The value in 'path' is not a directory.")
+
+# are all files or directories found in 'path' argument legitimate?
+	if (!all(file.exists(path)))
+		stop("not all files named in ", deparse(substitute(path)), " exist")
+
+	if (all(file.info(path)$isdir))
+		ff <- list.images(path = path, type = type, pattern = pattern)
+	else if (all(!file.info(path)$isdir))
+		ff <- path
+	else
+		stop("unable to use files/path in ", deparse(substitute(path)))
+	message("Found ", length(ff), " image files")
+
+# check on arguments
 	if (length(which.images) == 2)
 			which.images <- c(which.images, max(which.images))
 	if (length(which.images) != 3)
@@ -89,10 +99,6 @@ checkImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 		message("Use 'par(ask = TRUE)' to view images one-by-one")
 		method <- "raster"
 	}
-
-# extract paths to image files
-	ff <- list.images(path = path, type = type, pattern = pattern)
-	message("Found ", length(ff), " image files")
 
 # extract fields to determine if images are organized by well or stack
 	spl <- strsplit(ff, "/")

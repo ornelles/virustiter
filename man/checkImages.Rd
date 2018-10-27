@@ -8,9 +8,10 @@ checkImages(path, type = "tiff", which.images = c(1, 2, 2),
   pattern = NULL, method = c("none", "raster", "browser"))
 }
 \arguments{
-\item{path}{A character vector of directory with either multilayer tiff
-image files \emph{or} subdirectories identified by well with separate,
-paired images per well.}
+\item{path}{A character vector identifying a directory or directories
+with either multilayer tiff image files \emph{or} subdirectories identified
+by well with separate, paired images per well \emph{or} a character vector
+of image files.}
 
 \item{type}{A character string identifying the type of image files to parse
 ("tif", "tiff", "jpeg", "jpg" or "png".)}
