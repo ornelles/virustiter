@@ -38,12 +38,13 @@ be renamed \code{x} in the output. These variables include:
 }
 \description{
 Tally positive and negative values from from data.frame generated
-by \code{parseImages()} by either "well" or "file" representing each
-value of multiplicity.
+by \code{parseImages()} by either a grouping variable, typically "well"
+or "file" that represents a single multiplicity.
 }
 \details{
 The variable named \code{positive} will be tallied for each value of
-\code{moi} (if present) within each level of the grouping variable \code{by}.
+\code{moi} (if present) represented by each level of the grouping
+variable \code{by}.
 }
 \examples{
 # Sample data by folder

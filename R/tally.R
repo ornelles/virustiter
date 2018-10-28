@@ -1,8 +1,8 @@
 #' Tally Positive Fluorescent Values
 #'
 #' Tally positive and negative values from from data.frame generated
-#' by \code{parseImages()} by either "well" or "file" representing each
-#' value of multiplicity.
+#' by \code{parseImages()} by either a grouping variable, typically "well"
+#' or "file" that represents a single multiplicity.
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
 #' @param moi Character string identifying the independent value. If missing,
@@ -17,7 +17,8 @@
 #' @details
 #'
 #' The variable named \code{positive} will be tallied for each value of
-#' \code{moi} (if present) within each level of the grouping variable \code{by}. 
+#' \code{moi} (if present) represented by each level of the grouping
+#' variable \code{by}. 
 #'
 #' @return
 #'
