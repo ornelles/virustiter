@@ -4,11 +4,11 @@
 \alias{checkImages}
 \title{Check Paired Microscopic Images}
 \usage{
-checkImages(path, type = "tiff", which.images = c(1, 2, 2),
+checkImages(source, type = "tiff", which.images = c(1, 2, 2),
   pattern = NULL, method = c("none", "raster", "browser"))
 }
 \arguments{
-\item{path}{A character vector identifying a directory or directories
+\item{source}{A character vector identifying a directory or directories
 with either multilayer tiff image files \emph{or} subdirectories identified
 by well with separate, paired images per well \emph{or} a character vector
 of image files.}
@@ -44,18 +44,17 @@ Check validity and optionally show paired DNA and a fluorescent images
 using the same selection criteria provided to \code{parseImages()}.
 }
 \details{
-Images specified in \code{path} will be read, normalized and (optionally) displayed
-with the same logic in \code{parseImages()}. This functions determines if
-the proper number of files are present. If desired, images are displayed in
-pairs by either the browser or by the raster method. This has been implemented
-with \code{\link{EBImage}} and is part of a suite of tools to determine
-viral titers from fluorescent micrograph pairs. Typically, the first of each
-pair is a DNA image and the second a fluorescent image of the viral target.
-target signal. Although the nuclear (typically DAPI) image file is expected
-to precede the corresponding viral antigen image file, this order can be
-changed with the \code{which.images} argument.
+Images specified in \code{source} will be read, normalized and 
+(optionally) displayed with the same logic in \code{parseImages()}. This 
+function determines if the proper number of files are present. If desired, 
+images are displayed in pairs by either the browser or the raster method. 
+This has been implemented with \code{\link{EBImage}} and is part of a suite 
+of tools to determine viral titers from fluorescent micrograph pairs. 
+Typically, the first of each pair is a DNA image and the second a fluorescent 
+image of the viral target.  However, this order can be changed 
+with the \code{which.images} argument.
 
-Pairs of images associated with each moi can be individual files in a
+Images associated with each moi can be individual files in a
 single directory where each directory is named for the well such as
 \code{A1}, \code{A2}, etc. and the files within are identified as
 \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier

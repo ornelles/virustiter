@@ -3,53 +3,52 @@
 #' Extract the mean fluorescence intensity of DNA and a second fluorescent
 #' target image for individual cells from paired images.
 #'
-#' @param path A character vector identifying a directory or directories
+#' @param source A character vector identifying a directory or directories
 #'   with either multilayer tiff image files \emph{or} subdirectories identified
-#'   by well with separate, paired images per well \emph{or} a character vector
-#'   of image files.
+#'   by well with separate, paired images within each subdirectory for each
+#'   well \emph{or} a character vector of image files organized as described.
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
 #' @param which.images An integer of length 2 or 3. The first two numbers indicate
-#'   the relative position of the DNA image and the targetin each field. The optional
+#'   the position of the DNA image and the target image. The optional
 #'   third number specifies the total number of images for each field. A value of
-#'   c(1, 2) indicates DNA first and target second. A value of c(2, 1) indicates that
-#'   the order is target first and DNA image second. A value of c(1, 2, 3)
-#'   indicates a DNA image, a target image, and a third (ignored) image such as a
-#'   phase contrast image or second fluorescent color in each set.
-#' @param pattern Optional grep pattern as character string used by \code{list.files()}
-#'   to select image files.
+#'   c(1, 2) indicates DNA first and target second. A value of c(2, 1) indicates
+#'   target first and DNA image second. A value of c(1, 2, 4)
+#'   indicates DNA image, target image, and two additional (ignored) images
+#'   such as a second fluorescent color and phase contrast image for each field.
+#' @param pattern Optional \code{grep} pattern as a character string used
+#'   by \code{list.files()} to select image files.
 #' @param args.nucMask A list of arguments passed to \code{nucMask()}.
 #' @param args.trimMask A list of arguments passed to \code{trimMask()} such as
 #'   \code{cutoff} or \code{k}. If this value is \code{NA}, no trimming is performed.
-#' @param cellMask.flag If this \code{logical} value is \code{TRUE}, the default
+#' @param cellMask.flag If \code{TRUE}, the default
 #'   nuclear mask will be used to generate a mask with \code{cellMask()}. This
 #'   "cellular" mask will be used to measure fluorescence in the target image.
 #' @param equalize \emph{If the fluorescent target images have more background
 #'   pixels than foreground pixels} and if the background varies significantly
-#'   from image to image, this {logical} parameter can be set to
-#'   \code{TRUE} in order to equalized the fluorescent images by subtracting the
-#'   median value after applying a median filter and gaussian blur using the
-#'   function \code{bnormalize()}.
+#'   from image to image, this can be set to \code{TRUE} in order to equalized
+#'   the fluorescent images by subtracting the median value after applying a
+#'   median filter and gaussian blur using the function \code{bnormalize()}.
 #'
 #' @details
 #'
 #' This is the core function to read and parse image data in a suite of tools
-#' implemented with \code{\link{EBImage}} to determine
+#' implemented with \code{\link{EBImage}} intended to determine
 #' viral titers from sets of fluorescent micrographs. Typically, the images are
-#' acquired as paired images where the first of each pair
+#' acquired in pairs where the first of each pair
 #' is a DNA image and the second a fluorescent image of the viral target.
 #' Because individual cells are identified by the nuclear stain, it
 #' \emph{may} be beneficial to collect overexposed DNA images.
 #'
-#' This function was developed to process fluorescent virus titers
+#' These tools were developed to process fluorescent virus titers
 #' performed in multi-well plates and is designed to parse images
 #' collected at different multiplicities of infection or moi. The
-#' moi is expressed as virions (VP) \emph{or} infectious
-#' units (IU) \emph{or} a unit of volume (ml, ul, nl) per cell. These details
-#' are added to output of this function with the \code{mergePdata()} function.
-#' The nuclear (typically DAPI) image file is expected to precede the
-#' corresponding viral antigen image file but this order can be changed with
-#' the \code{which.images} argument.
+#' moi can be expressed as virions (VP) per cell \emph{or} infectious
+#' units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
+#' These details are added to output of this function with the
+#' \code{mergePdata()} function. The default order is for the nuclear
+#' (typically DAPI) image to precede the viral antigen image, but this
+#' sequence can be adjusted with the \code{which.images} argument.
 #'
 #' Images associated with each moi can be individual files in a
 #' single directory where each directory is named for the well such as
@@ -62,11 +61,19 @@
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
 #'
-#' If the fluorescent images have \emph{more} background pixels
-#' than foreground pixels and if the images have background values that
-#' vary from image to image or have significant noise, the argument
+#' A unique ID for each image can be created from a combination of
+#' \code{frame} and either \code{well} or \code{file}. This can be useful
+#' if it is necessary to determine a separate cutoff value for each target.
+#' \preformatted{
+#'   df$uid <- with(df, interaction(well, frame))
+#'   df$uid <- with(df, interaction(file, frame))
+#' }
+#'
+#' If the images have background values that vary from image to image or
+#' have significant noise and if the fluorescent images have \emph{more}
+#' background pixels than foreground pixels, then the argument
 #' \code{equalize} can be set to \code{TRUE} to smooth the images by
-#' sequentially \emph{modifying the values in each} image with a
+#' sequentially modifying the values in each target image with a
 #' median filter of radius 2, a Gaussian blur of radius 2, subtracting
 #' the median value for each image and adding an offset of 0.05.
 #' \emph{This cannot be used for images that have a large fraction
@@ -74,25 +81,25 @@
 #'
 #' @return
 #'
-#' A data.frame of processed image data. \strong{All} data.frames will have the
-#' following variables:
+#' A data.frame of processed image data. \strong{All} data.frames will
+#' have the following variables:
 #' \describe{
-#'   \item{\code{directory}}{Path to enclosing folder.}
-#'   \item{\code{frame}}{Image sequence (1, 2, 3, ...)}
+#'   \item{\code{frame}}{Image sequence within each level of well
+#'     or file as a factor (1, 2, 3, ...)}
 #'   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
-#'   \item{\code{area}}{Area of mask (nuclear or cell).}
+#'   \item{\code{area}}{Area of mask used to calculate target mfi.}
 #'   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
 #'     typically not meaningful with over-exposed images.}
-#'   \item{\code{mfi}}{Mean fluorescence intensity for signal of interest,
+#'   \item{\code{mfi}}{Mean fluorescence intensity for the target,
 #'     measured with selected mask.}
 #' }
 #' Results from data organized by \strong{well} will also include:
 #' \describe{
-#'   \item{\code{well}}{Harmonized well identifier. See \code{well.info()} function.}
+#'   \item{\code{well}}{Harmonized well identifier from the \code{well.info()} function.}
 #'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
 #'   \item{\code{column}}{Column number as a factor.}
 #' }
-#' while results from data organized as \strong{stacks} (multi-layered
+#' Results from data organized as \strong{stacks} (multi-layered
 #' tiff files) will include:
 #' \describe{
 #'   \item{\code{file}}{The file name as a factor.}
@@ -102,11 +109,11 @@
 #' # Note that execution of these examples can be rather slow...
 #'   path.by.folder <- system.file("extdata", "by_folder", package = "virustiter")
 #'   df.by.folder <- parseImages(path.by.folder)
-#'   head(df.by.folder)[-1] # drop potentially log directory name
+#'   head(df.by.folder)
 #'
 #'   path.by.stack <- system.file("extdata", "by_stack", package = "virustiter")
 #'   df.by.stack <- parseImages(path.by.stack)
-#'   head(df.by.stack)[-1] # drop potentially log directory name
+#'   head(df.by.stack)
 #'
 #' # plots
 #'   opar <- par(mfrow = c(1,2))
@@ -118,7 +125,7 @@
 #'
 #' @export
 #'
-parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
+parseImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	pattern = NULL, args.nucMask = NULL, args.trimMask = NULL,
 	cellMask.flag = FALSE, equalize = FALSE)
 {
@@ -126,16 +133,16 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
 
-# are all files or directories found in 'path' argument legitimate?
-	if (!all(file.exists(path)))
-		stop("not all files named in ", deparse(substitute(path)), " exist")
+# are all files or directories found in 'source' argument legitimate?
+	if (!all(file.exists(source)))
+		stop("not all files named in ", deparse(substitute(source)), " exist")
 
-	if (all(file.info(path)$isdir))
-		ff <- list.images(path = path, type = type, pattern = pattern)
-	else if (all(!file.info(path)$isdir))
-		ff <- path
+	if (all(file.info(source)$isdir))
+		ff <- list.images(path = source, type = type, pattern = pattern)
+	else if (all(!file.info(source)$isdir))
+		ff <- source
 	else
-		stop("unable to use files/path in ", deparse(substitute(path)))
+		stop("unable to use files/source in ", deparse(substitute(source)))
 
 # check on arguments
 	if (length(which.images) == 2)
@@ -166,7 +173,7 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 		filename <- field1
 	}
 	else
-		stop("\nunable to use mixture of image files in ", path, '"')
+		stop("\nunable to use mixture of image files in ", source, '"')
 
 # split image paths into related groups (by well or by file)
 	if (imageType == "byWell")
@@ -280,16 +287,17 @@ parseImages <- function(path, type = "tiff", which.images = c(1, 2, 2),
 			mfi <- computeFeatures.basic(cmask[,,i], myMfi[,,i])[,1]
 			if (imageType == "byWell") {
 				ww <- names(ffsplit)[IDX]
-				res <- rbind(res, data.frame(directory = paste(path, ww, sep = "/"),
-					well = well.info(ww)$well, row = well.info(ww)$row,
+				res <- rbind(res, data.frame(well = well.info(ww)$well,
+					row = well.info(ww)$row,
 					column = well.info(ww)$column, frame = i,
 					xm = XY[,1], ym = XY[,2], area, dna, mfi))
 			}
 			else # imageType == "byStack"
-				res <- rbind(res, data.frame(directory = path,
-					file = names(ffsplit)[IDX], frame = i, xm = XY[,1], ym = XY[,2],
+				res <- rbind(res, data.frame(file = names(ffsplit)[IDX],
+					frame = i, xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
 		}
+		res$frame <- factor(res$frame, levels = sort(unique(res$frame)))
 		rownames(res) <- NULL
 		ret[[IDX]] <- res
 	}
