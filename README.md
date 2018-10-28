@@ -2,9 +2,9 @@
 This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and `genefilter` packages.
 
 ## Overview
-This tools in this package are largely structured to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) *or* infectious units (IU) *or* volume (ml, ul, nl) per cell. Although the nuclear (DAPI) image file is expected to come before the corresponding viral antigen image file, different orders can be accommodated.
+This tools in this package are largely structured to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order expects the nuclear (DAPI) image file to come before the corresponding viral antigen image file, different orders can be accommodated.
 
-Image sets associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
+The sets of images associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
 
 Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the moi and unit of measure (as VP,  ml, ul, nl, etc). These data are merged with the image data for further analysis.
 
