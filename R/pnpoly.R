@@ -9,7 +9,7 @@
 #'   \code{xy.coords()}.
 #' @param vertices Points that define the vertices of the polygon, also
 #'   processed by \code{xy.coords()} where the order defines the polygon
-#'   and the first and last points are connected.
+#'   and the first and last points will be connected to close the polygon.
 #'
 #' @return
 #'
@@ -33,6 +33,7 @@ pnpoly <- function(points, vertices)
 	pp <- xy.coords(points)
 	vv <- xy.coords(vertices)
 	nvert <- length(vv$x)
+	npoints <- length(pp$x)
 
   # working function
 	.fun <- function(x, y, vx, vy, nvert) {
@@ -48,6 +49,6 @@ pnpoly <- function(points, vertices)
 	}
 
   # apply to each pair of coordinates in points
-	sapply(seq_len(lengths(points)[1]),
+	sapply(seq_len(npoints),
 		function(k) .fun(pp$x[k], pp$y[k], vv$x, vv$y, nvert))
 }
