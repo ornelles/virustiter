@@ -5,11 +5,11 @@
 \title{Generate Nuclear Mask from DNA Image}
 \usage{
 nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
-  radius = NULL, gamma = 1)
+  radius = NULL, gamma = 1, border = 0)
 }
 \arguments{
 \item{dna}{Fluorescent DNA \code{Image} object \emph{or} a character
-vector representing path(s) to DNA image file(s).}
+vector representing a path or paths to DNA image file(s).}
 
 \item{width}{Largest nuclear width (diameter) used as width parameter
 for \code{thresh2}.}
@@ -28,13 +28,16 @@ images, use 5 for finely detailed images.}
 images with smaller nuclei.}
 
 \item{gamma}{Exponent for \code{DNA^gamma} transformation.}
+
+\item{border}{Exclude objects within this many pixels from the edge.}
 }
 \value{
 A single object holding an integer \code{Image} mask for each DNA image.
+A mask for a single image of dimension \code{dim(dna) = c(nx, ny)} will be
+returned with a third dimension equal to 1. \code{dim(mask) = c(x, y, 1)}.
 }
 \description{
-Generate and return an integer \code{Image} mask from a fluorescent DNA image
-such as one obtained by DAPI staining.
+Generate and return an integer \code{Image} mask from a fluorescent DNA image.
 }
 \details{
 Generate an integer object mask representing segmented nuclei. The
@@ -48,12 +51,19 @@ The image or images will be processed sequentially by (1) an optional gamma
 transformation, (2) normalization, (3) \code{medianFilter()} with argument 
 \code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
 \code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
-\code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()} 
-and (8) \code{watershed()}.
+\code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
+(8) \code{watershed()} and then (9) optionally removing objects along
+the edge of the image.
 }
 \examples{
-  xm <- nucMask(system.file("extdata", "by_folder/b2/file001.tif",package = "virustiter"))
-  max(xm) # total number of nuclei
-  plot(colorLabels(xm))
+  f.example <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
+  xm0 <- nucMask(f.example)
+  max(xm0) # total number of nuclei
+  xm4 <- nucMask(f.example, border = 4)
+  max(xm4) # total number of nuclei
+  opar <- par(mfrow = c(1, 2))
+  plot(colorLabels(xm0))
+  plot(colorLabels(xm4))
+  par(opar)
 
 }
