@@ -11,7 +11,7 @@ Additional information about the experiment must be provided in a "phenotype" da
 Individual cells are identified by the nuclear stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages()` for more details and additional options to optimize detection. 
 
 ## Installation
-This is provided as an early release of a package that can be installed from github. A few steps are necessary to install it and related packages before use.
+This is the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
 
 First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
@@ -46,7 +46,8 @@ An example with images in individual files in folders is shown here. `parseImage
   path <- system.file("extdata", "by_folder", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
   
-  df <- parseImages(path)
+  img <- getImages(path)
+  df <- parseImages(img)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
   cut <- getCut(df)  # this is less than optimal, see the analysis below
@@ -62,7 +63,8 @@ An example with stacked images in a single folder is shown here. Repeat the abov
 ```
 Typical workflow:
 ```
-   df <- parseImages()   # read paired images with EBImage
+   img <- getImages()    # read paired images with EBImage
+   df <- parseImages()   # extract nuclear information and target mfi
    ...or...
    df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)
 
@@ -95,7 +97,7 @@ Supporting functions include these as well as others:
    p2p()               # interactively measure point-to-point distances
    pnpoly(p, v)        # test if points in p are within polygon (v)
 ```
-Often the cutoff value needs to be optimized with parameters provided to `getCut()` as well as those initially used such as `width` in `parseImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff values.
+Often the cutoff value needs to be optimized with parameters provided to `getCut()` as well as those initially used such as `width` in `getImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff values.
 
 The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
 
