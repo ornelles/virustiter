@@ -2,31 +2,17 @@
 % Please edit documentation in R/parseImages.R
 \name{parseImages}
 \alias{parseImages}
-\title{Extract Fluorescent Intensities from Paired Microscopic Images}
+\title{Parse Paired Microscopic Images}
 \usage{
-parseImages(source, type = "tiff", which.images = c(1, 2, 2),
-  pattern = NULL, args.nucMask = NULL, args.trimMask = NULL,
+parseImages(nuc, tgt = NULL, args.nucMask = NULL, args.trimMask = NULL,
   cellMask.flag = FALSE, equalize = FALSE)
 }
 \arguments{
-\item{source}{A character vector identifying a directory or directories
-with either multilayer tiff image files \emph{or} subdirectories identified
-by well with separate, paired images within each subdirectory for each
-well \emph{or} a character vector of image files organized as described.}
+\item{nuc}{A list of nuclear images. If \code{tgt} is \code{NULL}, \code{nuc}
+is assumed to be a list of length 2 with both nuclear and target images.}
 
-\item{type}{A character string identifying the type of image files to parse
-("tif", "tiff", "jpeg", "jpg" or "png".)}
-
-\item{which.images}{An integer of length 2 or 3. The first two numbers indicate
-the position of the DNA image and the target image. The optional
-third number specifies the total number of images for each field. A value of
-c(1, 2) indicates DNA first and target second. A value of c(2, 1) indicates
-target first and DNA image second. A value of c(1, 2, 4)
-indicates DNA image, target image, and two additional (ignored) images
-such as a second fluorescent color and phase contrast image for each field.}
-
-\item{pattern}{Optional \code{grep} pattern as a character string used
-by \code{list.files()} to select image files.}
+\item{tgt}{A list of fluorescent target images if \code{nuc} is a list of nuclear
+images. If \code{NULL}, \code{nuc} must be a list of both image types.}
 
 \item{args.nucMask}{A list of arguments passed to \code{nucMask()}.}
 
@@ -69,14 +55,15 @@ tiff files) will include:
 }
 }
 \description{
-Extract the mean fluorescence intensity of DNA and a second fluorescent
+Extract the mean fluorescence intensity of a DNA and second fluorescent
 target image for individual cells from paired images.
 }
 \details{
-This is the core function to read and parse image data in a suite of tools
+This is the core function to parse image data in a suite of tools
 implemented with \code{\link{EBImage}} intended to determine
-viral titers from sets of fluorescent micrographs. Typically, the images are
-acquired in pairs where the first of each pair
+viral titers from sets of fluorescent micrographs. The first argument
+to this function can be the result of \code{\link{getImages}}. The images
+provided to this function are pairs where the first of each pair
 is a DNA image and the second a fluorescent image of the viral target.
 Because individual cells are identified by the nuclear stain, it
 \emph{may} be beneficial to collect overexposed DNA images.
@@ -87,9 +74,10 @@ collected at different multiplicities of infection or moi. The
 moi can be expressed as virions (VP) per cell \emph{or} infectious
 units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 These details are added to output of this function with the
-\code{mergePdata()} function. The default order is for the nuclear
-(typically DAPI) image to precede the viral antigen image, but this
-sequence can be adjusted with the \code{which.images} argument.
+\code{mergePdata()} function. The expected order is for the nuclear
+(typically DAPI) image to precede the viral antigen image. This
+sequence can be adjusted with \code{which.images} argument in
+the function \code{\link{getImages}}.
 
 Images associated with each moi can be individual files in a
 single directory where each directory is named for the well such as
@@ -123,11 +111,13 @@ of positive cells, such as the example data set.}
 \examples{
 # Note that execution of these examples can be rather slow...
   path.by.folder <- system.file("extdata", "by_folder", package = "virustiter")
-  df.by.folder <- parseImages(path.by.folder)
+  images.by.folder <- getImages(path.by.folder)
+  df.by.folder <- parseImages(images.by.folder)
   head(df.by.folder)
 
   path.by.stack <- system.file("extdata", "by_stack", package = "virustiter")
-  df.by.stack <- parseImages(path.by.stack)
+  images.by.stack <- getImages(path.by.stack)
+  df.by.stack <- parseImages(images.by.stack)
   head(df.by.stack)
 
 # plots
