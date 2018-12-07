@@ -12,7 +12,7 @@ pnpoly(points, vertices)
 
 \item{vertices}{Points that define the vertices of the polygon, also
 processed by \code{xy.coords()} where the order defines the polygon
-and the first and last points are connected.}
+and the first and last points will be connected to close the polygon.}
 }
 \value{
 Logical vector indicating whether each point lies in (\code{TRUE})
