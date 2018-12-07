@@ -1,7 +1,7 @@
 #' Check Paired Microscopic Images
 #'
-#' Check validity and optionally show paired DNA and a fluorescent images
-#' using the same selection criteria provided to \code{parseImages()}.
+#' Check validity of paired DNA and a fluorescent images
+#' appropriate for \code{parseImages()}.
 #'
 #' @param source A character vector identifying a directory or directories
 #'   with either multilayer tiff image files \emph{or} subdirectories identified
@@ -25,12 +25,10 @@
 #'
 #' @details
 #'
-#' Images specified in \code{source} will be read, normalized and 
-#' (optionally) displayed with the same logic in \code{parseImages()}. This 
-#' function determines if the proper number of files are present. If desired, 
-#' images are displayed in pairs by either the browser or the raster method. 
-#' This has been implemented with \code{\link{EBImage}} and is part of a suite 
-#' of tools to determine viral titers from fluorescent micrograph pairs. 
+#' Images specified in \code{source} will be evaluated with the same logic in
+#' \code{link{getImages()}}. This 
+#' function determines if the proper number of files are present and reports
+#' on the number and form of the image files. 
 #' Typically, the first of each pair is a DNA image and the second a fluorescent 
 #' image of the viral target.  However, this order can be changed 
 #' with the \code{which.images} argument.
