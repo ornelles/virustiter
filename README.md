@@ -99,16 +99,16 @@ Supporting functions include these as well as others:
 ```
 Often the cutoff value needs to be optimized with parameters provided to `getCut()` as well as those initially used such as `width` in `getImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff values.
 
-The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 5` for the 'mad' multiplier is too generous.
+The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 3` for the 'mad' multiplier is too generous.
 
-The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist()` show that the value with `mult` = 3 is more sensible.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist()` show that the value with `mult` = 2.6 is just a little better than the default of 2.5.
 ```
-  mm <- seq(2, 6, 0.25)
-  cuts <- getCut(df, mult = mm)
+  mm <- seq(2, 3, 0.05)
+  cuts <- sapply(mm, function(m) getCut(df, mult = m))
   aic <- getAIC(df, cuts)
-  plot(mm, aic)	# by AIC, the best mult value is 3 or 5
-  plotHist(df, cuts[mm == 3], main = sprintf("Cutoff = %0.4f", cuts[mm==3]))
-  plotHist(df, cuts[mm == 5], main = sprintf("Cutoff = %0.4f", cuts[mm==5]))
+  plot(mm, aic, type = "b")	# by AIC, the best mult value is 2.65
+  plotHist(df, cuts[mm == 3], main = sprintf("Cutoff = %0.4f", cuts[mm == 2.5]))
+  plotHist(df, cuts[mm == 2.6], main = sprintf("Cutoff = %0.4f", cuts[mm == 2.65]))
 ```  
 ## License
 GPL-3
