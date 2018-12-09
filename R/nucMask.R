@@ -42,10 +42,10 @@
 #' returned with a third dimension equal to 1. \code{dim(mask) = c(x, y, 1)}. 
 #'
 #' @examples
-#'   f.example <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
-#'   xm0 <- nucMask(f.example)
+#'   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
+#'   xm0 <- nucMask(f.ex)
 #'   max(xm0) # total number of nuclei
-#'   xm4 <- nucMask(f.example, border = 4)
+#'   xm4 <- nucMask(f.ex, border = 4)
 #'   max(xm4) # total number of nuclei
 #'   opar <- par(mfrow = c(1, 2))
 #'   plot(colorLabels(xm0))

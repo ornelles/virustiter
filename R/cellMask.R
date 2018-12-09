@@ -30,9 +30,13 @@
 #' cytoplasmic stain such as actin or a diffuse membrane stain.
 #'
 #' To create a cytoplasmic mask that excludes the nucleus, simply subtract
-#' the nuclear mask from the cell mask as shown below:
+#' the nuclear mask from the cell mask as shown below. Use \code{erode} or
+#' \code{dilate} to adjust the nuclear mask to include more or less of the 
+#' peri-nuclear region. 
 #'
-#'   \code{cytoMask <- cellMask(nmask) - nmask}
+#' \preformatted{
+#'  cytoMask <- cellMask(nmask) - nmask
+#' }
 #'
 #' @return
 #' 
