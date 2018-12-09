@@ -1,63 +1,57 @@
 #' Find Cutoff by Otsu's Method
 #' 
-#' Calculate a working cutoff value using Otsu's method in the package
-#' \code{genefilter} for a mixture of values with a normal density. The
-#' method assumes the background population lies to the left
-#' of the normal mean of the population. This can be changed by the parameter
-#' \code{left}.
+#' Calculate a working cutoff value using an approximation of Otsu's method
+#' for a mixture of values with a normal density. This function assumes the
+#' background population has a normal distribution and lies to the left of
+#' distribution. 
 #' 
 #' @param x Fluorescent values to evaluate.
-#' @param mult Arbitrary numeric multiplier applied to standard deviation.
+#' @param mult Numeric multiplier applied to standard deviation.
 #' @param log \code{logical} flag to use log-transformed values.
-#' @param left \code{logical} flag to indicate that the background population lies to the
-#' left (\code{TRUE}) of the distribution.
 #' 
 #' @details
 #' 
 #' Data are assumed to be drawn from two unimodal, continuous 
-#' distributions where the background population of a normal distribution 
-#' lies on the left. The mode of this population is estimated by an 
-#' iterative, half-range method. The cutoff value returned is the mode +
-#' \code{mult} * standard deviation. Note that fluorescent values are
-#' typically log-transformed before analysis. The \code{mult} must be
-#' empirically determined. The default value of 5 is fairly conservative. 
+#' distributions where the background population follows a normal distribution. 
+#' The maximum of this population is determined from a kernel density estimate
+#' and the \emph{left} half of the distribution is fit to a Gaussian
+#' distribution. The cutoff value returned is the position of the peak +
+#' \code{mult} times the standard deviation of the distribution.
+#' Note that fluorescent values are typically log-transformed before analysis.
+#' The parameter \code{mult} must be empirically determined.
+#'
+#' This code replaces a previous version that used the \code{half.range.mode}
+#' function in the \code{genefilter} package.
 #' 
 #' @return
 #' 
-#' The cutoff estimate as half.mode + mult * standard deviation of the normal population.
+#' The cutoff estimated as position of the background peak + mult * standard
+#' deviation of the normal population.
 #' 
 #' @import
 #' EBImage
-#' genefilter
+#'
+#' @importFrom MASS fitdistr
 #' 
 #' @examples
-#'   x <- c(rnorm(1000), rnorm(500, mean = 3))
-#'   findBgnd(x, mult = 0, log = FALSE)
-#'   plot(density(x))
-#'   abline(v = findBgnd(x, mult = 2, log = FALSE))
+#'   x <- c(rlnorm(200), rlnorm(120, 4))
+#'   plot(density(log(x)))
+#'   abline(v = log(findBgnd(x, mult = 0)), col = 4) # peak
+#'   abline(v = log(findBgnd(x)), col = 2) # cutoff
 #'
 #' @export
 #' 
-findBgnd <- function(x, mult = 5, log = TRUE, left = TRUE)
+findBgnd <- function(x, mult = 2.5, log = TRUE)
 {
-	if(require(genefilter) == FALSE)
-		stop("load 'genefilter' package or replace 'nucMask' function")
-	if (log) {
-		x <- x[x>0]
-		x <- log(x)
-	}
-	x.mu <- half.range.mode(x)
-	if (left) {
-		side <- (x - x.mu)[x < x.mu]
-		x.sd <- sqrt(sum(side^2)/(length(side)-1))
-		ret <- x.mu + mult*x.sd
-	}
-	else {
-		side <- (x - x.mu)[x > x.mu]
-		x.sd <- sqrt(sum(side^2)/(length(side)-1))
-		ret <- x.mu - mult*x.sd
-	}
-	if (log)
-		ret <- exp(ret)
-	return(ret)
+	if (log == TRUE)
+		x <- log(x[x > 0])
+	d <- density(x)
+	xmid <- d$x[which.max(d$y)]
+	xl <- x[x <= xmid]
+	xx <- c(xl, 2*xmid  - xl)
+	fit <- MASS::fitdistr(xx, "normal")
+	ans <- fit$est[1] + mult * fit$est[2]
+	if (log == TRUE)
+		ans <- exp(ans)
+	return(ans)
 }
