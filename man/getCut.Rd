@@ -5,7 +5,7 @@
 \title{Determine Cutoff Value between Positive and Negative}
 \usage{
 getCut(df, by = c("control", "file", "well", "row", "column"),
-  param = "mfi", mult = 5, log = TRUE)
+  param = "mfi", mult = 2.5, log = TRUE)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}

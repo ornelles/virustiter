@@ -47,11 +47,11 @@
 #' @export
 #'
 getCut <- function(df, by = c("control", "file", "well", "row", "column"),
-	param = "mfi", mult = 5, log = TRUE)
+	param = "mfi", mult = 2.5, log = TRUE)
 {
 	if (missing(df)) {
 		usage <- c("getCut examples:",
-			'  getCut(df, by = "control", param = "mfi", mult = 5, log = TRUE)',
+			'  getCut(df, by = "control", param = "mfi", mult = 2, log = TRUE)',
 			'  getCut(df) # same as above',
 			'  getCut(df, "row", mult = 3, log = FALSE)')
 		cat(usage, sep = "\n")
@@ -88,7 +88,7 @@ getCut <- function(df, by = c("control", "file", "well", "row", "column"),
 		names(temp) <- c("g", "y")
 	}
 	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult = mult, log = log))
-	ret <- res$y
-	names(ret) <- if(by == "control") "control" else res$g
+	ret <- c(res$"y")
+	names(ret) <- if(by == "control") rep("control", length(ret)) else res$g
 	return(ret)
 }
