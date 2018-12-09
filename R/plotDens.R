@@ -36,12 +36,12 @@
 #' @export
 #'  
 plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column"),
-		smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE,
+		smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
 		param = "mfi", return.plot = FALSE, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotDens examples:",
-			'  plotDens(df, by = "well", smooth = 1, mult = 5, log = TRUE)',
+			'  plotDens(df, by = "well", smooth = 1, mult = 2, log = TRUE)',
 			'  plotDens(df) ## default values are same as above',
 			'  plotDens(df, cut = 0.002)  ## uses cutoff value of 0.002',
 			'  plotDens(df, groups = column, auto.key = T)')

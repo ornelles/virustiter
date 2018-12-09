@@ -5,7 +5,7 @@
 \title{Show Cutoff Values on a Densityplot of Mean Fluorescence Intensity}
 \usage{
 plotDens(df, cut, by = c("default", "well", "file", "row", "column"),
-  smooth = 1, mult = 5, log = TRUE, main = NULL, as.table = TRUE,
+  smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
   param = "mfi", return.plot = FALSE, ...)
 }
 \arguments{
