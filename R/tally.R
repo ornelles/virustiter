@@ -8,8 +8,8 @@
 #' @param moi Character string identifying the independent value. If missing,
 #'   variables named \code{"moi"} and \code{"x"} will be sought. Note
 #'   that in the returned value, this variable will be named \code{"x"}.
-#' @param by Character string identifying the grouping variable, typically
-#'   "well" or "file".
+#' @param by Character string identifying the grouping variable. If \code{NULL},
+#'   either "well" or "file" must be present and used as the grouping variable. 
 #' @param param Character string identifying the variable in \code{df} to evaluate, 
 #'   typically \code{"mfi"}.
 #' @param pd Optional phenotype \code{data.frame} to add to results.
@@ -51,7 +51,7 @@
 #'
 #' @export
 #'  
-tally <- function(df, moi, by = "well", param = "mfi", pd = NULL)
+tally <- function(df, moi, by = NULL, param = "mfi", pd = NULL)
 {
 # parameter check
 	if(!"positive" %in% names(df))
@@ -60,25 +60,26 @@ tally <- function(df, moi, by = "well", param = "mfi", pd = NULL)
 
 # if the moi parameter is missing, seek "moi" or "x" in df
 	if (missing(moi)) {
-		if ("moi" %in% names(df)) {
+		moi <- FALSE
+		if ("moi" %in% names(df))
 			moi <- "moi"
-			message("using variable 'moi' in ", deparse(substitute(df)))
-		}
-		else if ("x" %in% names(df)) {
+		else if ("x" %in% names(df))
 			moi <- "x"
-			message("using variable 'x' in ", deparse(substitute(df)))
-		}
-		else {
-			message("no variable has been assigned to 'moi'")
-			moi <- FALSE
-		}
+		else
+			message("No variable has been assigned to 'moi'")
 	}
 	else if (!moi %in% names(df))
 		stop("'", moi, "' is missing from ", deparse(substitute(df)))
 
 # assign grouping value
-	if (!by %in% names(df))
+	if (!is.null(by) && !by %in% names(df))
 		stop("'", by, "' is missing from ", deparse(substitute(df)))
+	else if ("well" %in% names(df))
+		by <- "well"
+	else if ("file" %in% names(df))
+		by <- "file"
+	else
+		stop("Unable to use '", deparse(substitute(by)), "' as grouping variable")
 	group <- df[[by]]
 
 # check for param
@@ -88,7 +89,7 @@ tally <- function(df, moi, by = "well", param = "mfi", pd = NULL)
 # record unit of measure
 	unit <- df$unit[1]
 	if (is.null(unit))
-		unit <- "<none>"
+		unit <- "[no unit]"
 
 # tally positive and create results data.frame
 	pos <- tapply(df$positive == TRUE, group, sum)

@@ -4,7 +4,7 @@
 \alias{tally}
 \title{Tally Positive Fluorescent Values}
 \usage{
-tally(df, moi, by = "well", param = "mfi", pd = NULL)
+tally(df, moi, by = NULL, param = "mfi", pd = NULL)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
@@ -13,8 +13,8 @@ tally(df, moi, by = "well", param = "mfi", pd = NULL)
 variables named \code{"moi"} and \code{"x"} will be sought. Note
 that in the returned value, this variable will be named \code{"x"}.}
 
-\item{by}{Character string identifying the grouping variable, typically
-"well" or "file".}
+\item{by}{Character string identifying the grouping variable. If \code{NULL},
+either "well" or "file" must be present and used as the grouping variable.}
 
 \item{param}{Character string identifying the variable in \code{df} to evaluate, 
 typically \code{"mfi"}.}
