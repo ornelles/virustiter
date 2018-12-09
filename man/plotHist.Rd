@@ -5,7 +5,7 @@
 \title{Show Cutoff with Histogram of Mean Fluorescence Intensity}
 \usage{
 plotHist(df, cut, by = c("default", "well", "file", "row", "column"),
-  mult = 5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
+  mult = 2.5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
   layout = NULL, ...)
 }
 \arguments{
