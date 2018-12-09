@@ -8,22 +8,25 @@ parseImages(nuc, tgt = NULL, args.nucMask = NULL, args.trimMask = NULL,
   cellMask.flag = FALSE, equalize = FALSE)
 }
 \arguments{
-\item{nuc}{A list of nuclear images. If \code{tgt} is \code{NULL}, \code{nuc}
-is assumed to be a list of length 2 with both nuclear and target images.}
+\item{nuc}{A list of nuclear images. If the second argument \code{tgt} is
+\code{NULL}, the first argument \code{nuc} is treated as a list of length
+2 containing  nuclear and target images.}
 
-\item{tgt}{A list of fluorescent target images if \code{nuc} is a list of nuclear
-images. If \code{NULL}, \code{nuc} must be a list of both image types.}
+\item{tgt}{A list of fluorescent images corresponding to the nuclear images
+in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
+list of both image types.}
 
-\item{args.nucMask}{A list of arguments passed to \code{nucMask()}.}
+\item{args.nucMask}{A list of arguments passed to \code{\link{nucMask()}}.}
 
-\item{args.trimMask}{A list of arguments passed to \code{trimMask()} such as
-\code{cutoff} or \code{k}. If this value is \code{NA}, no trimming is performed.}
+\item{args.trimMask}{A list of arguments passed to \code{\link{trimMask()}}
+such as\code{cutoff} or \code{k}. If this value is \code{NA}, no
+trimming is performed.}
 
 \item{cellMask.flag}{If \code{TRUE}, the default
 nuclear mask will be used to generate a mask with \code{cellMask()}. This
-"cellular" mask will be used to measure fluorescence in the target image.}
+larger mask will be used to measure fluorescence in the target image.}
 
-\item{equalize}{\emph{If the fluorescent target images have more background
+\item{equalize}{If the fluorescent target images have \emph{more background
 pixels than foreground pixels} and if the background varies significantly
 from image to image, this can be set to \code{TRUE} in order to equalized
 the fluorescent images by subtracting the median value after applying a
@@ -36,9 +39,9 @@ have the following variables:
   \item{\code{frame}}{Image sequence within each level of well
     or file as a factor (1, 2, 3, ...)}
   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
-  \item{\code{area}}{Area of mask used to calculate target mfi.}
+  \item{\code{area}}{Area of the mask (in pixels) used to calculate target mfi.}
   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
-    typically not meaningful with over-exposed images.}
+    typically not meaningful if the DNA image was over-exposed.}
   \item{\code{mfi}}{Mean fluorescence intensity for the target,
     measured with selected mask.}
 }
@@ -48,25 +51,26 @@ Results from data organized by \strong{well} will also include:
   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
   \item{\code{column}}{Column number as a factor.}
 }
-Results from data organized as \strong{stacks} (multi-layered
-tiff files) will include:
+Results from data organized as multi-layered tiff files (or stacks)
+will include:
 \describe{
   \item{\code{file}}{The file name as a factor.}
 }
 }
 \description{
-Extract the mean fluorescence intensity of a DNA and second fluorescent
-target image for individual cells from paired images.
+Identify nuclei by a DNA stain and measure the fluorescence intensity of
+the DNA and a second second fluorescent target image from paired images.
 }
 \details{
-This is the core function to parse image data in a suite of tools
-implemented with \code{\link{EBImage}} intended to determine
-viral titers from sets of fluorescent micrographs. The first argument
-to this function can be the result of \code{\link{getImages}}. The images
-provided to this function are pairs where the first of each pair
-is a DNA image and the second a fluorescent image of the viral target.
-Because individual cells are identified by the nuclear stain, it
-\emph{may} be beneficial to collect overexposed DNA images.
+This function identifies cells by a DNA stain and measures the
+fluorescent intensity in both the DNA stain and paired fluorescent image.
+This is part of a suite of tools implemented with \code{\link{EBImage}}
+designed to determine viral titers from sets of fluorescent micrographs.
+The first argument to this function can be the result of the function
+\code{\link{getImages}}. Images provided to this function are pairs where
+the first of each pair is a DNA image and the second is a fluorescent image
+of the viral antigen. Because individual cells are identified by the nuclear
+stain, it is often beneficial to collect overexposed DNA images.
 
 These tools were developed to process fluorescent virus titers
 performed in multi-well plates and is designed to parse images
@@ -74,7 +78,7 @@ collected at different multiplicities of infection or moi. The
 moi can be expressed as virions (VP) per cell \emph{or} infectious
 units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 These details are added to output of this function with the
-\code{mergePdata()} function. The expected order is for the nuclear
+\code{mergePdata()} function. The required order is for the nuclear
 (typically DAPI) image to precede the viral antigen image. This
 sequence can be adjusted with \code{which.images} argument in
 the function \code{\link{getImages}}.
@@ -92,7 +96,8 @@ specified by the argument \code{which.images}.
 
 A unique ID for each image can be created from a combination of
 \code{frame} and either \code{well} or \code{file}. This can be useful
-if it is necessary to determine a separate cutoff value for each target.
+if it is necessary to determine a separate cutoff value for each pair of
+images.
 \preformatted{
   df$uid <- with(df, interaction(well, frame))
   df$uid <- with(df, interaction(file, frame))
@@ -101,8 +106,8 @@ if it is necessary to determine a separate cutoff value for each target.
 If the images have background values that vary from image to image or
 have significant noise and if the fluorescent images have \emph{more}
 background pixels than foreground pixels, then the argument
-\code{equalize} can be set to \code{TRUE} to smooth the images by
-sequentially modifying the values in each target image with a
+\code{equalize} can be set to \code{TRUE}. This smooths the images by
+sequentially modifying values in each target image with a
 median filter of radius 2, a Gaussian blur of radius 2, subtracting
 the median value for each image and adding an offset of 0.05.
 \emph{This cannot be used for images that have a large fraction
