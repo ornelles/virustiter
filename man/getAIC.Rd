@@ -20,7 +20,7 @@ The AIC value associated with the fit for each value of cut or list of AIC
 values if a list of data frames was provided.
 }
 \description{
-Apply a give \code{cut} value to create a fitted model (or models) and
+Apply a given \code{cut} value to create a fitted model (or models) and
 return the Akaike's Criterion for the GLM fitted model. \code{getFit()}
 is called for each value of \code{cut}.
 }
