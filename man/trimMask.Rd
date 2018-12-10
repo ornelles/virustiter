@@ -2,46 +2,53 @@
 % Please edit documentation in R/trimMask.R
 \name{trimMask}
 \alias{trimMask}
-\title{Remove Objects by Size}
+\title{Remove Objects by Size, Proximity to Edge and Eccentricity}
 \usage{
-trimMask(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
+trimMask(mask, cutoff = NULL, k = c(1.5, 3), border = 0, ecc.max = 1)
 }
 \arguments{
 \item{mask}{Object mask or list of masks with connected pixels having
 the same integer value.}
 
 \item{cutoff}{Optional integer value of length 2 specifying the lower 
-and upper absolute cutoff values in pixels.}
+and upper limits for the area  in pixels. Either can be specified
+as \code{NA} to use the multiplier parameter, \code{k}.}
 
-\item{k}{Numeric value of length 2 specifying the lower and upper multiplier 
-to determine the cutoff from the \code{mean} and \code{mad} of the area.}
+\item{k}{Numeric value of length 2 specifying the lower and upper
+ multiplier to determine the cutoff from the \code{mean} and \code{mad}
+of the area.}
 
-\item{reenumerate}{Re-enumerate the objects in the trimmed mask.}
+\item{border}{Exclude objects within this many pixels from the edge.}
+
+\item{ecc.max}{Exclude objects with elliptical eccentricity greater than
+this value.}
 }
 \value{
-Object mask or list of masks with small and large objects removed.
+Object mask or list of masks with specified objects removed.
 }
 \description{
-Remove objects from an integer Image mask with areas outside of lower
-and upper cutoff values or by a lower and upper multiplier applied to
-the \code{mad} of the area.
+Remove large and small objects from an integer \code{Image} mask,
+remove objects that are near the edge of the image, and remove
+highly eccentric objects.
 }
 \details{
-If \code{cutoff} is specified, objects smaller than \code{cutoff[1]} and 
-larger than \code{cutoff[2]} will be removed. Otherwise, objects smaller 
-than \code{mean(area) - k[1]*mad(area)} and larger than \code{mean(area)+ 
-k[2]*mad(area)} will be removed. The mask will be reenumerated if that 
-parameter is \code{TRUE}.
+For each non-\code{NA} value in \code{cutoff}, objects smaller than \code
+{cutoff[1]} and larger than \code{cutoff[2]} will be removed. Otherwise, 
+objects smaller than \code{mean(area) - k[1]*mad(area)} and larger than
+\code{mean(area)+ k[2]*mad(area)} will be removed. Objects that are within
+\code{border} pixels of the edge will be removed. Objects that have
+eccentricity greater than \code{ecc.max} will be removed where a circle 
+has eccentricity of 0 and a straight line has eccentricity of 1. Note 
+that EBImage provides only approximate measures for this value. The mask 
+will be reenumerated if that parameter is \code{TRUE}.
 }
 \examples{
 
-  x <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
-  xb <- normalize(gblur(x, 2))
-  xt <- thresh(xb)
-  xm <- bwlabel(xt)
-  xm2 <- trimMask(xm)
-  xm3 <- trimMask(xm, cutoff = c(1, 20))
-  xm4 <- trimMask(xm, cutoff = c(100, 250))
-  plot(combine(xm, xm2, xm3, xm4), all = TRUE)
+  x <- readImage(system.file("extdata", "by_folder/a1/file001.tif", package = "virustiter"))
+  xm <- nucMask(x)
+  xm2 <- trimMask(xm, cutoff = c(200, 400))
+  xm3 <- trimMask(xm, border = 24)
+  xm4 <- trimMask(xm, ecc.max = 0.75)
+  plot(colorLabels(combine(xm, xm2, xm3, xm4)), all = TRUE)
 
 }
