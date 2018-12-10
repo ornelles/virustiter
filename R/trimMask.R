@@ -4,12 +4,12 @@
 #' and upper cutoff values or by a lower and upper multiplier applied to
 #' the \code{mad} of the area. 
 #' 
-#' @param mask Object mask with connected pixels having the same
-#' integer value.
+#' @param mask Object mask or list of masks with connected pixels having
+#'   the same integer value.
 #' @param cutoff Optional integer value of length 2 specifying the lower 
-#' and upper absolute cutoff values in pixels.
+#'   and upper absolute cutoff values in pixels.
 #' @param k Numeric value of length 2 specifying the lower and upper multiplier 
-#' to determine the cutoff from the \code{mean} and \code{mad} of the area.
+#'   to determine the cutoff from the \code{mean} and \code{mad} of the area.
 #' @param reenumerate Re-enumerate the objects in the trimmed mask.
 #' 
 #' @details
@@ -22,7 +22,7 @@
 #' 
 #' @return
 #'
-#' Object mask with small and large objects removed.
+#' Object mask or list of masks with small and large objects removed.
 #'
 #' @examples
 #'
@@ -42,29 +42,39 @@
 trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
 {
 	require(EBImage)
-	dm <- dim(mask)
-	if(length(dm) < 2 || length(dm) > 3)
-		stop("'mask' must be a 2- or 3-dimension integer array")
-	if (length(dm) == 2)
-		dim(mask) <- c(dm, 1)
-	nframes <- dim(mask)[3]
-	area <- lapply(1:nframes, function(i) computeFeatures.shape(mask[,,i])[,1])
-	xbar <- mean(unlist(area))
-	xmad <- mad(unlist(area))
-	if (is.null(cutoff)) {
-		lower <- xbar - k[1] * xmad
-		upper <- xbar + k[2] * xmad
+# process function
+	.proc <- function(mask, cutoff, k, reenumerate)
+	{
+		dm <- dim(mask)
+		if (length(dm) == 2) dim(mask) <- c(dm, 1)
+		nframes <- dim(mask)[3]
+		area <- lapply(1:nframes, function(i) computeFeatures.shape(mask[,,i])[,1])
+		xbar <- mean(unlist(area))
+		xmad <- mad(unlist(area))
+		if (is.null(cutoff)) {
+			lower <- xbar - k[1] * xmad
+			upper <- xbar + k[2] * xmad
+		}
+		else {
+			lower <- max(cutoff[1], min(unlist(area)))
+			upper <- min(cutoff[2], max(unlist(area)))
+		}
+		small <- lapply(area, function(z) which(z < lower))
+		large <- lapply(area, function(z) which(z > upper))
+		mask <- rmObjects(mask, small, reenumerate = FALSE)
+		mask <- rmObjects(mask, large)
+		dim(mask) <- dm
+		if (reenumerate)
+			mask <- reenumerate(mask)
+		return(mask)
 	}
-	else {
-		lower <- max(cutoff[1], min(unlist(area)))
-		upper <- min(cutoff[2], max(unlist(area)))
-	}
-	small <- lapply(area, function(z) which(z < lower))
-	large <- lapply(area, function(z) which(z > upper))
-	mask <- rmObjects(mask, small, reenumerate = FALSE)
-	mask <- rmObjects(mask, large)
-	dim(mask) <- dm
-	if (reenumerate)
-		mask <- reenumerate(mask)
-	return(mask)
+
+# dispatch function according to argument 'mask'
+	if (is(mask, "Image"))
+		ans <- .proc(mask, cutoff = cutoff, k = k, reenumerate = reenumerate)
+	else if (all(sapply(mask, is, "Image")))
+		ans <- lapply(mask, .proc, cutoff = cutoff, k = k, reenumerate = reenumerate)
+	else
+		stop("'mask' must be an Image or list of images")
+	return(ans)
 }

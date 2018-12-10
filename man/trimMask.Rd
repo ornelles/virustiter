@@ -7,8 +7,8 @@
 trimMask(mask, cutoff = NULL, k = c(1.5, 3), reenumerate = TRUE)
 }
 \arguments{
-\item{mask}{Object mask with connected pixels having the same
-integer value.}
+\item{mask}{Object mask or list of masks with connected pixels having
+the same integer value.}
 
 \item{cutoff}{Optional integer value of length 2 specifying the lower 
 and upper absolute cutoff values in pixels.}
@@ -19,7 +19,7 @@ to determine the cutoff from the \code{mean} and \code{mad} of the area.}
 \item{reenumerate}{Re-enumerate the objects in the trimmed mask.}
 }
 \value{
-Object mask with small and large objects removed.
+Object mask or list of masks with small and large objects removed.
 }
 \description{
 Remove objects from an integer Image mask with areas outside of lower
