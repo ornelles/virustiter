@@ -12,19 +12,21 @@ containing the seeds of identified regions. This would typically
 be a segmented nuclear mask or list of masks such as those generated
 by \code{nucMask()}.}
 
-\item{mask}{An optional \code{Image} object, array, or list these objects
-containing a binary mask defining regions of the image to be segmented.
-If this value is \code{NULL}, the nuclear mask (\code{seeds}) will be
-expanded for Voronoi segmentation. If the argument \code{seeds} is a
-list, \code{mask} must be a similar list of objects or arrays.}
+\item{mask}{An optional \code{Image} object, array, or a \code{list}
+these objects containing a binary mask defining regions of the image
+to be segmented. If this value is \code{NULL}, the nuclear mask
+(\code{seeds}) will be expanded for Voronoi segmentation. If the
+argument \code{seeds} is a list, \code{mask} must be a similar list
+of objects or arrays.}
 
-\item{brush}{Size of the brush size to expand the nuclear mask as an 
+\item{brush}{Size of the brush to expand the nuclear mask as an 
 odd number of pixels. If this value is \code{NULL}, the mean value of 
 the semi-major axis of the nuclei will be used.}
 
 \item{lambda}{A numeric value used by \code{propagate()} determining 
 the trade-off between the Euclidean distance in the image plane and the 
-contribution of the gradient. See \code{\link[EBImage]{propagate}} for details.}
+contribution of the gradient. See \code{\link[EBImage]{propagate}}
+for details.}
 }
 \value{
 An \code{Image} object produced by \code{propagate()} containing the labeled
@@ -38,13 +40,13 @@ nuclear mask and optional cellular mask with the
 \details{
 A mask to define \emph{approximate} cellular boundaries will be created
 from a nuclear mask in \code{seeds} and an optional cytoplasmic
-mask \code{mask}. If \code{mask} is \code{NULL}, the nuclear mask will 
-be dilated with a disc-shaped brush of size equal to \code{brush} or, if
-\code{brush} is \code{NULL}, the average semi-major axis of all nuclei.
-If \code{mask} is not \code{NULL}, \code{mask} must be a binary mask defining
-the limits for the Voronoi segmentation based on seeds provided by
-\code{seeds}. Such a binary mask can be created from a non-specific
-cytoplasmic stain such as actin or a diffuse membrane stain.
+mask \code{mask}. If the second argument, \code{mask}, is \code{NULL},
+the nuclear mask will be dilated with a disc-shaped brush of size equal
+to \code{brush} or, if \code{brush} is \code{NULL}, the average semi-major
+axis of all nuclei. If \code{mask} is not \code{NULL}, \code{mask} must be
+a binary mask defining the limits for the Voronoi segmentation based on
+the seeds provided in \code{seeds}. Such a binary mask can be created from
+a non-specific cytoplasmic stain such as actin or a diffuse membrane stain.
 
 To create a cytoplasmic mask that excludes the nucleus, simply subtract
 the nuclear mask from the cell mask as shown below. Use \code{erode} or
@@ -52,7 +54,9 @@ the nuclear mask from the cell mask as shown below. Use \code{erode} or
 peri-nuclear region. 
 
 \preformatted{
- cytoMask <- cellMask(nmask) - nmask # when both are single objects
+ cmask <- cellMask(nmask) - nmask # when both are single objects
+ cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucear 
+ cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
 }
 }
 \examples{
@@ -60,9 +64,9 @@ peri-nuclear region.
   y <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
   nm <- nucMask(x)
   cm <- cellMask(nm)
-  img <- rgbImage(red = normalize(y) * 0.8, green = normalize(y) * 0.2)
-  img <- paintObjects(nm, img, col = "yellow")
-  img <- paintObjects(cm, img, col = "green")
+  img <- rgbImage(red = normalize(y) * 0.2, green = normalize(y) * 0.8)
+  img <- paintObjects(nm, img, col = "cyan")
+  img <- paintObjects(cm, img, col = "red")
   plot(img)
 
 }
