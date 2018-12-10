@@ -4,13 +4,13 @@
 #' appropriate for \code{parseImages()}.
 #'
 #' @param source A character vector identifying a directory or directories
-#'   with either multilayer tiff image files \emph{or} subdirectories identified
+#'   with multilayer tiff files \emph{or} subdirectories identified
 #'   by well with separate, paired images per well \emph{or} a character vector
-#'   of image files.
+#'   of image files \emph{or} a \code{.zip} file with the above.
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
 #' @param which.images An integer of length 2 or 3. The first two numbers indicate
-#'   the relative position of the DNA image and the target in each field. The optional
+#'   the relative position of the DNA image and the target image in each field. The optional
 #'   third number specifies the total number of images for each field. A value of
 #'   \code{c(1, 2)} indicates DNA first and target second. A value of \code{c(2, 1)}
 #'   indicates that the order is target first and DNA image second. A value of
@@ -20,21 +20,21 @@
 #'   to select image files.
 #' @param method Character string specifying the method of displaying images.
 #'   Default of \code{"none"} simply summarizes the images. A value of \code{"raster"}
-#'   uses R raster graphics and \code{"browser"} attempts to use a browser,
-#'   which currently fails with EBImage...
+#'   uses R raster graphics and \code{"browser"} attempts to use a browser.
+#'   (Unfortunately this seems to be failing with EBImage version 4.22.0.)
+#' @param ask Logical value to use \code{par(ask = TRUE)} if \code{method = "raster"}.
 #'
 #' @details
 #'
 #' Images specified in \code{source} will be evaluated with the same logic in
-#' \code{link{getImages()}}. This 
-#' function determines if the proper number of files are present and reports
-#' on the number and form of the image files. 
-#' Typically, the first of each pair is a DNA image and the second a fluorescent 
-#' image of the viral target.  However, this order can be changed 
-#' with the \code{which.images} argument.
+#' \code{\link{getImages}} to determine if the proper number of files are
+#' present and report on the number and form of the image files. 
+#' The default value of the \code{which.images} argument treats the first of each
+#' pair a DNA image and the second as a fluorescent 
+#' image of the viral target.
 #'
-#' Images associated with each moi can be individual files in a
-#' single directory where each directory is named for the well such as
+#' Images associated with each multiplicity of infection can be individual
+#' files in a single directory where each directory named as the well such as
 #' \code{A1}, \code{A2}, etc. and the files within are identified as
 #' \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 #' can be in upper or lower case and can contain leading zeros such as
@@ -46,11 +46,11 @@
 #'
 #' @return
 #'
-#' This function is called to examine the sequence of image files and 
-#' optionally display the normalized images. Diagnostic messages are
-#' printed on the console via \code{message()}. Use the \code{grep} string
-#' in \code{pattern} to limit the selected images. The last group of images
-#' displayed is invisibly returned. 
+#' This function is called for the side effect of examining the sequence
+#' of image files and optionally displaying the normalized images.
+#' Diagnostic messages are printed on the console with \code{message()}.
+#' Use the \code{grep} string in \code{pattern} to limit the selected images.
+#' A character vector of the selected image files will invisibly returned. 
 #'
 #' @examples
 #' # Example with data organized by folder or well
@@ -62,7 +62,8 @@
 #' @export
 #'
 checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
-	pattern = NULL, method = c("none", "raster", "browser"))
+	pattern = NULL, method = c("none", "raster", "browser"),
+	ask = ifelse(method == "raster", TRUE, NULL))
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
@@ -72,13 +73,18 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	if (!all(file.exists(source)))
 		stop("not all files named in ", deparse(substitute(source)), " exist")
 
+# collect image files
 	if (all(file.info(source)$isdir))
 		ff <- list.images(path = source, type = type, pattern = pattern)
+	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
+		unzip(source, exdir = tempdir())
+		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
+	}
 	else if (all(!file.info(source)$isdir))
 		ff <- source
 	else
 		stop("unable to use files/source in ", deparse(substitute(source)))
-	message("Found ", length(ff), " image files")
+	message("Found ", length(ff), " image files"); flush.console()
 
 # check on arguments
 	if (length(which.images) == 2)
@@ -94,6 +100,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		message("Currently the display with browser seems to fail in EBImage")
 		message("The value has been changed to 'raster'.")
 		message("Use 'par(ask = TRUE)' to view images one-by-one")
+		flush.console()
 		method <- "raster"
 	}
 
@@ -166,7 +173,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # count and report on the number of groups to display
 	nff <- length(ffsplit)
-	message("Found ", nff, " groups of images")
+	message("Found ", nff, " groups of images"); flush.console()
 
 # process each group of files in turn
 	for (IDX in seq_along(ffsplit)) {
@@ -179,9 +186,11 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		i <- c(rbind(seq_len(n), n + seq_len(n)))
 		img <- combine(myDna, myMfi)[,,i]
 		if (method != "none")
+			opar <- par(ask = ask)
 			display(tile(img, nx = 2), all = TRUE, method = method,
 				title = names(ffsplit)[IDX])
+			par(opar)
 	}
 	message("Done")
-	invisible(img)
+	invisible(ff)
 }
