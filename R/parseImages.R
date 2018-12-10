@@ -184,9 +184,11 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 		nmask <- do.call("nucMask", arg.list)
 		message("done"); flush.console()
 	}
+	else
+		nmask <- nucMask
 
 # remove small and large nuclei with arguments in args.trimMask
-	if (is.null(args.trimMask) || args.trimMask == TRUE) {
+	if (is.null(args.trimMask) && is.null(nucMask) || args.trimMask == TRUE) {
 		message("Trimming nuclear masks...", appendLF = FALSE)
 		arg.list <- as.list(args(trimMask))
 		arg.list <- arg.list[names(arg.list) != ""]
