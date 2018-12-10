@@ -9,9 +9,9 @@ parseImages(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
   equalize = FALSE, simplify = TRUE)
 }
 \arguments{
-\item{nuc}{A list of nuclear images. If the second argument \code{tgt} is
-\code{NULL}, the first argument \code{nuc} is treated as a list of length
-2 containing  nuclear and target images.}
+\item{nuc}{A list of nuclear images. If the second argument (\code{tgt}) is
+\code{NULL}, the first argument (\code{nuc}) is assumed to be a list of
+length 2 containing  nuclear and target images.}
 
 \item{tgt}{A list of fluorescent images corresponding to the nuclear images
 in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
@@ -19,10 +19,9 @@ list of both image types.}
 
 \item{args.nucMask}{A list of arguments passed to \code{\link{nucMask()}}.}
 
-\item{args.trimMask}{A list of arguments passed to \code{\link{trimMask()}}
-such as\code{cutoff} or \code{k}. If this value is \code{NULL}, the
-\code{trimMask()} will be called with default parameters. If
-\code{FALSE}, no trimming is performed.}
+\item{args.trimMask}{A list of arguments passed to \code{\link{trimMask()}}.
+If \code{NULL}, \code{trimMask()} will be called with
+default parameters. If \code{FALSE}, no trimming is performed.}
 
 \item{equalize}{If the fluorescent target images have \emph{more background
 pixels than foreground pixels} and if the background varies significantly

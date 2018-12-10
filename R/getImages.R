@@ -1,12 +1,12 @@
 #' Get Paired Microscopic Images
 #'
-#' Check validity and and return paired DNA and fluorescent images
+#' Return a list of paired DNA and fluorescent images
 #' appropriate for \code{parseImages()}.
 #'
 #' @param source A character vector identifying a directory or directories
-#'   with either multilayer tiff image files \emph{or} subdirectories identified
+#'   with multilayer tiff files \emph{or} subdirectories identified
 #'   by well with separate, paired images per well \emph{or} a character vector
-#'   of image files.
+#'   of image files \emph{or} a \code{.zip} file with the above.
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
 #' @param which.images An integer of length 2 or 3. The first two numbers indicate
@@ -18,21 +18,17 @@
 #'   image such as a phase contrast image or second fluorescent color in each set.
 #' @param pattern Optional grep pattern as character string used by \code{list.files()}
 #'   to select image files.
-#' @param verbose Print diagnostic messages as files are parsed and read if 
-#'   \code{TRUE}.
+#' @param verbose Print diagnostic messages as files are read if \code{TRUE}.
 #'
 #' @details
 #'
-#' Images specified in \code{source} will be read and checked for
-#' the proper number of image files. This has been implemented with
-#' \code{\link{EBImage}} and is part of a suite 
-#' of tools to determine viral titers from fluorescent micrograph pairs. 
-#' Typically, the first of each pair is a DNA image and the second a fluorescent 
-#' image of the viral target.  However, this order can be changed 
-#' with the \code{which.images} argument.
+#' Images specified in \code{source} will be checked for the proper
+#' organization of image files. The order required by \code{parseImages()}
+#' is the DNA image first and fluorescent viral target second. This
+#' order can be changed with the \code{which.images} argument.
 #'
-#' Images associated with each moi can be individual files in a
-#' single directory where each directory is named for the well such as
+#' Images associated with each multiplicity of infection can be individual
+#' files in a single directory where each directory named as the well such as
 #' \code{A1}, \code{A2}, etc. and the files within are identified as
 #' \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 #' can be in upper or lower case and can contain leading zeros such as
@@ -44,9 +40,10 @@
 #'
 #' @return
 #'
-#' A list of two lists containing the nuclear images (nuc) and target (tgt).
+#' A list of two lists containing the nuclear (nuc) and target (tgt) images.
 #' Each well or file will be represented as an element in the lists \code{nuc}
-#' and \code{tgt}. Diagnostic messages are if \code{verbose} is \code{TRUE}.
+#' and \code{tgt}. Diagnostic messages are provided if \code{verbose}
+#' is \code{TRUE}.
 #'
 #' @examples
 #' # Example with data organized by folder or well
@@ -68,8 +65,13 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	if (!all(file.exists(source)))
 		stop("not all files named in ", deparse(substitute(source)), " exist")
 
+# collect image files
 	if (all(file.info(source)$isdir))
 		ff <- list.images(path = source, type = type, pattern = pattern)
+	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
+		unzip(source, exdir = tempdir())
+		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
+	}
 	else if (all(!file.info(source)$isdir))
 		ff <- source
 	else
