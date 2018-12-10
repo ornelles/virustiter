@@ -8,11 +8,11 @@ nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
   radius = NULL, gamma = 1, border = 0)
 }
 \arguments{
-\item{dna}{Fluorescent DNA \code{Image} object \emph{or} a character
-vector representing a path or paths to DNA image file(s).}
+\item{dna}{Fluorescent DNA \code{Image} or list of fluorescent DNA
+\code{Image}s.}
 
-\item{width}{Largest nuclear width (diameter) used as width parameter
-for \code{thresh2}.}
+\item{width}{Largest nuclear width (diameter) to be used as
+a \code{width} parameter for \code{thresh2}.}
 
 \item{offset}{Offset parameter for \code{thresh2}. Use 0.05
 for typical images, use 0.01 for low contrast images.}
@@ -32,17 +32,18 @@ images with smaller nuclei.}
 \item{border}{Exclude objects within this many pixels from the edge.}
 }
 \value{
-A single object holding an integer \code{Image} mask for each DNA image.
-A mask for a single image of dimension \code{dim(dna) = c(nx, ny)} will be
-returned with a third dimension equal to 1. \code{dim(mask) = c(x, y, 1)}.
+An integer \code{Image} mask or list of integer \code{Image} masks.
+Note that masks single images of dimension \code{dim(dna) = c(nx, ny)}
+will be returned with a third dimension set to 1. (\code{dim(mask) =
+c(nx, ny, 1)}.
 }
 \description{
-Generate and return an integer \code{Image} mask from a fluorescent DNA image.
+Generate an integer \code{Image} mask from a fluorescent DNA image.
 }
 \details{
-Generate an integer object mask representing segmented nuclei. The
-argument can be either a monochrome nuclear fluorescent image of one
-or more dimensions \emph{or} a character vector of path(s) to such images.
+Generate an integer object mask (or list of masks) representing
+segmented nuclei. The argument \code{nuc} must be a grayscale nuclear image
+of one or more dimensions \emph{or} a list of such images.
 
 Optimal conditions may need to be found by empirically adjusting the
 arguments, especially \code{width} and \code{offset}.
@@ -52,14 +53,15 @@ transformation, (2) normalization, (3) \code{medianFilter()} with argument
 \code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
 \code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
 \code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
-(8) \code{watershed()} and then (9) optionally removing objects along
-the edge of the image.
+(8) \code{watershed()} and then (9) objects within \code{border} pixels
+of the the edge of the image will be removed.
 }
 \examples{
   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
-  xm0 <- nucMask(f.ex)
+  nuc.ex <- readImage(f.ex) # single nuclear image
+  xm0 <- nucMask(nuc.ex)
   max(xm0) # total number of nuclei
-  xm4 <- nucMask(f.ex, border = 4)
+  xm4 <- nucMask(nuc.ex, border = 4)
   max(xm4) # total number of nuclei
   opar <- par(mfrow = c(1, 2))
   plot(colorLabels(xm0))

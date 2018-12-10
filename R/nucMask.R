@@ -1,11 +1,11 @@
 #' Generate Nuclear Mask from DNA Image
 #'
-#' Generate and return an integer \code{Image} mask from a fluorescent DNA image. 
+#' Generate an integer \code{Image} mask from a fluorescent DNA image. 
 #'
-#' @param dna Fluorescent DNA \code{Image} object \emph{or} a character
-#'   vector representing a path or paths to DNA image file(s).
-#' @param width Largest nuclear width (diameter) used as width parameter
-#'   for \code{thresh2}.
+#' @param dna Fluorescent DNA \code{Image} or list of fluorescent DNA
+#'   \code{Image}s.
+#' @param width Largest nuclear width (diameter) to be used as
+#'   a \code{width} parameter for \code{thresh2}.
 #' @param offset Offset parameter for \code{thresh2}. Use 0.05
 #'   for typical images, use 0.01 for low contrast images.
 #' @param size Radius for \code{medianFilter}, integer. Use 2 for typical
@@ -20,9 +20,9 @@
 #'
 #' @details
 #'
-#' Generate an integer object mask representing segmented nuclei. The
-#' argument can be either a monochrome nuclear fluorescent image of one
-#' or more dimensions \emph{or} a character vector of path(s) to such images.
+#' Generate an integer object mask (or list of masks) representing
+#' segmented nuclei. The argument \code{nuc} must be a grayscale nuclear image
+#' of one or more dimensions \emph{or} a list of such images.
 #'
 #' Optimal conditions may need to be found by empirically adjusting the
 #' arguments, especially \code{width} and \code{offset}.
@@ -32,20 +32,22 @@
 #' \code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
 #' \code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
 #' \code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
-#' (8) \code{watershed()} and then (9) optionally removing objects along
-#' the edge of the image.
+#' (8) \code{watershed()} and then (9) objects within \code{border} pixels
+#' of the the edge of the image will be removed. 
 #'
 #' @return
 #'
-#' A single object holding an integer \code{Image} mask for each DNA image.
-#' A mask for a single image of dimension \code{dim(dna) = c(nx, ny)} will be
-#' returned with a third dimension equal to 1. \code{dim(mask) = c(x, y, 1)}. 
+#' An integer \code{Image} mask or list of integer \code{Image} masks.
+#' Note that masks single images of dimension \code{dim(dna) = c(nx, ny)}
+#' will be returned with a third dimension set to 1. (\code{dim(mask) =
+#' c(nx, ny, 1)}. 
 #'
 #' @examples
 #'   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
-#'   xm0 <- nucMask(f.ex)
+#'   nuc.ex <- readImage(f.ex) # single nuclear image
+#'   xm0 <- nucMask(nuc.ex)
 #'   max(xm0) # total number of nuclei
-#'   xm4 <- nucMask(f.ex, border = 4)
+#'   xm4 <- nucMask(nuc.ex, border = 4)
 #'   max(xm4) # total number of nuclei
 #'   opar <- par(mfrow = c(1, 2))
 #'   plot(colorLabels(xm0))
@@ -66,39 +68,48 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 		ans <- unique(c(v[1:border,], v[(nx-border):nx,], v[,1:border], v[,(ny-border):ny]))
 		return(ans[ans != 0])
 	}
-# parameter check and process
-	if (is.character(dna) && file.exists(dna))
-		x <- readImage(dna)
-	else
-		x <- dna
-	if (gamma != 1)
-		x <- x^gamma
-	x <- normalize(x)
-	if (!is.null(size) && !is.na(size) && size != 0) {
-		size <- as.integer(size)
-		x <- medianFilter(x, size)
-	}
-	if (is.null(radius))
-		radius <- 2 * ceiling(3 * sigma) + 1
-	x <- gblur(x, sigma, radius)
-	x <- thresh2(x, width = width, offset = offset)
-	x <- fillHull(x)
-	x <- distmap(x)
-	x <- watershed(x)
 
-	if (border > 0) {
-		if (2*border + 1 > dim(x)[1] || 2*border + 1 > dim(x)[2])
-			warning("'border' too large for image size")
-		else {
-			len <- length(dim(x))
-			if (len == 2)
-				sel <- .edge(x, border)
-			else
-				sel <- apply(x, len, .edge, border = border)
-			x <- rmObjects(x, sel)
+# internal main process function
+	.proc <- function(x, width, offset, size, sigma, radius, gamma, border)
+	{
+	# parameter check and process
+		if (gamma != 1) x <- x^gamma
+		x <- normalize(x)
+		if (!is.null(size) && !is.na(size) && size != 0) {
+			size <- as.integer(size)
+			x <- medianFilter(x, size)
 		}
+		if (is.null(radius)) radius <- 2 * ceiling(3 * sigma) + 1
+		x <- gblur(x, sigma, radius)
+		x <- thresh2(x, width = width, offset = offset)
+		x <- fillHull(x)
+		x <- distmap(x)
+		x <- watershed(x)
+		if (border > 0) {
+			if (2*border + 1 > dim(x)[1] || 2*border + 1 > dim(x)[2])
+				warning("'border' too large for image size")
+			else {
+				len <- length(dim(x))
+				if (len == 2)
+					sel <- .edge(x, border)
+				else
+					sel <- apply(x, len, .edge, border = border)
+				x <- rmObjects(x, sel)
+			}
+		}
+		if (length(dim(x)) == 2)
+			dim(x) <- c(dim(x), 1)
+		return(x)
 	}
-	if (length(dim(x)) == 2)
-		dim(x) <- c(dim(x), 1)
-	return(x)
+
+# check argument and dispatch function accordingly
+	if (is(dna, "Image"))
+		ans <- .proc(dna, width = width, offset = offset, size = size,
+			sigma = sigma, radius = radius, gamma = gamma, border = border)
+	else if (all(sapply(dna, is, "Image")))
+		ans <- lapply(dna, .proc, width = width, offset = offset, size = size,
+			sigma = sigma, radius = radius, gamma = gamma, border = border)
+	else
+		stop("'dna' must be an Image or list of images")
+	return(ans)
 }

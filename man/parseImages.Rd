@@ -4,8 +4,9 @@
 \alias{parseImages}
 \title{Parse Paired Microscopic Images}
 \usage{
-parseImages(nuc, tgt = NULL, args.nucMask = NULL, args.trimMask = NULL,
-  cellMask.flag = FALSE, equalize = FALSE)
+parseImages(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
+  args.nucMask = NULL, args.trimMask = NULL, args.cellMask = NULL,
+  equalize = FALSE, simplify = TRUE)
 }
 \arguments{
 \item{nuc}{A list of nuclear images. If the second argument \code{tgt} is
@@ -19,22 +20,26 @@ list of both image types.}
 \item{args.nucMask}{A list of arguments passed to \code{\link{nucMask()}}.}
 
 \item{args.trimMask}{A list of arguments passed to \code{\link{trimMask()}}
-such as\code{cutoff} or \code{k}. If this value is \code{NA}, no
-trimming is performed.}
-
-\item{cellMask.flag}{If \code{TRUE}, the default
-nuclear mask will be used to generate a mask with \code{cellMask()}. This
-larger mask will be used to measure fluorescence in the target image.}
+such as\code{cutoff} or \code{k}. If this value is \code{NULL}, the
+\code{trimMask()} will be called with default parameters. If
+\code{FALSE}, no trimming is performed.}
 
 \item{equalize}{If the fluorescent target images have \emph{more background
 pixels than foreground pixels} and if the background varies significantly
 from image to image, this can be set to \code{TRUE} in order to equalized
 the fluorescent images by subtracting the median value after applying a
 median filter and gaussian blur using the function \code{bnormalize()}.}
+
+\item{simplify}{Return a single \code{data.frame} of results if \code{TRUE},
+otherwise return a list of \code{data.frames} for each member of the list.}
+
+\item{cellMask.flag}{If \code{TRUE}, the default
+nuclear mask will be used to generate a mask with \code{cellMask()}. This
+larger mask will be used to measure fluorescence in the target image.}
 }
 \value{
-A data.frame of processed image data. \strong{All} data.frames will
-have the following variables:
+A data.frame (or list of data.frames) containing  processed image
+data. \strong{Each} data.frame will have the following variables:
 \describe{
   \item{\code{frame}}{Image sequence within each level of well
     or file as a factor (1, 2, 3, ...)}

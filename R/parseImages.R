@@ -3,16 +3,16 @@
 #' Identify nuclei by a DNA stain and measure the fluorescence intensity of
 #' the DNA and a second second fluorescent target image from paired images.
 #'
-#' @param nuc A list of nuclear images. If the second argument \code{tgt} is
-#'   \code{NULL}, the first argument \code{nuc} is treated as a list of length
-#'   2 containing  nuclear and target images.
+#' @param nuc A list of nuclear images. If the second argument (\code{tgt}) is
+#'   \code{NULL}, the first argument (\code{nuc}) is assumed to be a list of
+#'   length 2 containing  nuclear and target images.
 #' @param tgt A list of fluorescent images corresponding to the nuclear images
 #'   in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
 #'   list of both image types. 
 #' @param args.nucMask A list of arguments passed to \code{\link{nucMask()}}.
-#' @param args.trimMask A list of arguments passed to \code{\link{trimMask()}}
-#'   such as\code{cutoff} or \code{k}. If this value is \code{NA}, no
-#'   trimming is performed.
+#' @param args.trimMask A list of arguments passed to \code{\link{trimMask()}}.
+#'   If \code{NULL}, \code{trimMask()} will be called with
+#'   default parameters. If \code{FALSE}, no trimming is performed.
 #' @param cellMask.flag If \code{TRUE}, the default
 #'   nuclear mask will be used to generate a mask with \code{cellMask()}. This
 #'   larger mask will be used to measure fluorescence in the target image.
@@ -21,6 +21,8 @@
 #'   from image to image, this can be set to \code{TRUE} in order to equalized
 #'   the fluorescent images by subtracting the median value after applying a
 #'   median filter and gaussian blur using the function \code{bnormalize()}.
+#' @param simplify Return a single \code{data.frame} of results if \code{TRUE},
+#'   otherwise return a list of \code{data.frames} for each member of the list.
 #'
 #' @details
 #'
@@ -77,8 +79,8 @@
 #'
 #' @return
 #'
-#' A data.frame of processed image data. \strong{All} data.frames will
-#' have the following variables:
+#' A data.frame (or list of data.frames) containing  processed image
+#' data. \strong{Each} data.frame will have the following variables:
 #' \describe{
 #'   \item{\code{frame}}{Image sequence within each level of well
 #'     or file as a factor (1, 2, 3, ...)}
@@ -123,33 +125,34 @@
 #'
 #' @export
 #'
-parseImages <- function(nuc, tgt = NULL, args.nucMask = NULL,
-	args.trimMask = NULL, cellMask.flag = FALSE, equalize = FALSE)
+parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
+	args.nucMask = NULL, args.trimMask = NULL, args.cellMask = NULL,
+	equalize = FALSE, simplify = TRUE)
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
 
-# check on arguments
+# check first two arguments, extract images, ensure that they are lists
 	if (is.null(tgt)) {
 		if (!is.list(nuc) || length(nuc) != 2)
-			stop("'nuc' must be a list oflength two")
-		dnaImages <- nuc[[1]]
-		mfiImages <- nuc[[2]]
+			stop("'nuc' must be a list of length two")
+		nucImages <- nuc[[1]]
+		tgtImages <- nuc[[2]]
 	}
 	else if (is(nuc, "Image") & is(tgt, "Image")) {
-		dnaImages <- list(nuc)
-		mfiImages <- list(tgt)
+		nucImages <- list(nuc)
+		tgtImages <- list(tgt)
 	}
 	else {
 		if (!is.list(nuc) || !is.list(tgt))
 			stop("'nuc' and 'tgt' must be Image objects or lists of Image objects")
-		dnaImages <- nuc
-		mfiImages <- tgt
+		nucImages <- nuc
+		tgtImages <- tgt
 	}
 
 # determine imageType as "well" or "file"
-	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", names(dnaImages),
+	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", names(nucImages),
 		ignore.case = TRUE)
 	if (length(sel) > 0 && all(sel))
 		imageType <- "byWell"
@@ -157,103 +160,145 @@ parseImages <- function(nuc, tgt = NULL, args.nucMask = NULL,
 		imageType <- "byFile"
 	else {
 		imageType <- "byFile"
-		names(dnaImages) <- sprintf("image%04d", seq_along(dnaImages))
-		Message("Unable to determine organization of imagesget")
+		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
+		Message("Unable to determine how images are organized")
 	}
  
-# option to smooth and equalize mfi images
+# smooth and equalize tgt images
 	if (equalize == TRUE) {
 		message("Equalizing target images...", appendLF = FALSE)
-		mfiImages <- lapply(mfiImages, bnormalize)
-		message("done")
+		tgtImages <- lapply(tgtImages, bnormalize)
+		message("done"); flush.console()
 	}
 
-# initialize variable to collect results, initialize progress bar
-	nff <- length(dnaImages)
-	ret <- rep(list(NULL), nff)
-	showProgress <- ifelse(nff > 2, TRUE, FALSE)
-
-	message("Processing images by ", ifelse(imageType == "byWell", "well", "file"))
-	if (showProgress)
-		pb <- txtProgressBar(min = 1, max = nff, style = 3)
-
-################################################################################
-#
-# process each group of files in turn
-#
-	for (IDX in seq_len(nff)) {
-		if (showProgress)
-			setTxtProgressBar(pb, IDX)
-
-	# create mask with any additional arguments in args.nucMask
+# process nucMask with additional arguments in args.nucMask
+	if (is.null(nucMask)) { 
+		message("Determining nuclear masks...", appendLF = FALSE)
 		arg.list <- as.list(args(nucMask))
 		arg.list <- arg.list[names(arg.list) != ""] # drop NULL values
-		arg.list$dna <- dnaImages[[IDX]]
+		arg.list$dna <- nucImages
 		nms <- names(args.nucMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
 		arg.list <- c(arg.list[!sel], args.nucMask[nms])
-		nmask <- do.call(nucMask, arg.list)
+		nmask <- do.call("nucMask", arg.list)
+		message("done"); flush.console()
+	}
 
-	# remove small and large nuclei with arguments in args.trimMask
-		if (is.null(args.trimMask) || (!is.na(args.trimMask))) {
-			arg.list <- as.list(args(trimMask))
-			arg.list <- arg.list[names(arg.list) != ""]
-			arg.list$mask <- nmask
-			nms <- names(args.trimMask)
-			nms <- nms[nms %in% names(arg.list)]
-			sel <- names(arg.list) %in% nms
-			arg.list <- c(arg.list[!sel], args.trimMask[nms])
-			nmask <- do.call(trimMask, arg.list)
-		}
+# remove small and large nuclei with arguments in args.trimMask
+	if (is.null(args.trimMask) || args.trimMask == TRUE) {
+		message("Trimming nuclear masks...", appendLF = FALSE)
+		arg.list <- as.list(args(trimMask))
+		arg.list <- arg.list[names(arg.list) != ""]
+		arg.list$mask <- nmask
+		nms <- names(args.trimMask)
+		nms <- nms[nms %in% names(arg.list)]
+		sel <- names(arg.list) %in% nms
+		arg.list <- c(arg.list[!sel], args.trimMask[nms])
+		nmask <- do.call("trimMask", arg.list)
+		message("done"); flush.console()
+	}
 
-	# expand mask to use estimated cell
-		if (cellMask.flag == TRUE)
-			cmask <- cellMask(nmask)
-		else
-			cmask <- nmask
+# process cellMask
+	if (cellMask == TRUE) {
+		message("Determining cell masks...", appendLF = FALSE)
+		arg.list <- as.list(args(cellMask))
+		arg.list <- arg.list[names(arg.list) != ""] # drop NULL values
+		arg.list$seeds <- nmask
+		nms <- names(args.cellMask)
+		nms <- nms[nms %in% names(arg.list)] # find replacements
+		sel <- names(arg.list) %in% nms
+		arg.list <- c(arg.list[!sel], args.cellMask[nms])
+		cmask <- do.call("cellMask", arg.list)
+		message("done"); flush.console()
+	}
+	else if(cellMask == FALSE)
+		cmask <- nmask
+	else if (class(cellMask) != class(nucMask))
+		stop("cellMask is not compatible with nucMask")
+	# else cmask has been provided
+
+# ensure that nmask and cmask are lists
+	if (!is.list(cmask)) cmask <- list(cmask)
+	if (!is.list(nmask)) nmask <- list(nmask)
+
+# check that images and masks are compatible
+	dm.nuc <- unname(sapply(nucImages, dim))
+	dm.tgt <- unname(sapply(tgtImages, dim))
+	dm.nm <- unname(sapply(nmask, dim))
+	dm.cm <- unname(sapply(cmask, dim))
+
+	if (!identical(dm.nuc, dm.tgt)) stop("nuc and tgt are mismatched")
+	if (!identical(dm.nuc, dm.nm)) stop("nuc and nucMask are mismatched")
+	if (!identical(dm.nuc, dm.cm)) stop("nuc and cellMask are mismatched")
+	if (!identical(dm.nm, dm.cm)) stop("uh...this can't happen")
+
+# initialize variable to collect results
+	nImages <- length(nucImages)
+	ans <- rep(list(NULL), nImages)
+
+# initialize progress bar
+	if (imageType == "byWell")
+		message("Processing images by 'well'")
+	else
+		message("Processing images by 'file'")
+	flush.console()
+	showProgress <- ifelse(nImages > 2, TRUE, FALSE)
+	if (showProgress)
+		pb <- txtProgressBar(min = 1, max = nImages, style = 3)
+
+################################################################################
+#
+# process each group of images
+#
+	for (idx in seq_len(nImages)) {
+		if (showProgress) setTxtProgressBar(pb, idx)
+
+	# extract appropriate element from list
+		myNuc <- nucImages[[idx]]; myTgt <- tgtImages[[idx]]
+		myNmask <- nmask[[idx]]; myCmask <- cmask[[idx]]
 
 	# ensure that images have three dimensions
-		myDna <- dnaImages[[IDX]]
-		myMfi <- mfiImages[[IDX]]
-		dm <- dim(nmask)
+		dm <- dim(myNmask)
 		if (length(dm) == 2)
-			 dim(myDna) <- dim(myMfi) <- dim(cmask) <- dim(nmask) <- c(dm, 1)
-		nframes <- dim(nmask)[3]
+			 dim(myNuc) <- dim(myTgt) <- dim(myCmask) <- dim(myNmask) <- c(dm, 1)
+		nframes <- dim(myNmask)[3]
 
-	# measure and assemble data for the group indexed by 'IDX'
+	# measure and assemble data for the group indexed by 'idx'
 		res <- data.frame()
 		for (i in seq_len(nframes)) {
-			area <- computeFeatures.shape(cmask[,,i])[,1]
-			XY <- computeFeatures.moment(nmask[,,i])[,1:2]
-			dna <- computeFeatures.basic(nmask[,,i], myDna[,,i])[,1]
-			mfi <- computeFeatures.basic(cmask[,,i], myMfi[,,i])[,1]
+			area <- computeFeatures.shape(myCmask[,,i])[,1]
+			XY <- computeFeatures.moment(myNmask[,,i])[,1:2]
+			dna <- computeFeatures.basic(myNmask[,,i], myNuc[,,i])[,1]
+			mfi <- computeFeatures.basic(myCmask[,,i], myTgt[,,i])[,1]
 			if (imageType == "byWell") {
-				ww <- names(dnaImages)[IDX]
+				ww <- names(nucImages)[idx]
 				res <- rbind(res, data.frame(well = well.info(ww)$well,
 					row = well.info(ww)$row,
 					column = well.info(ww)$column, frame = i,
 					xm = XY[,1], ym = XY[,2], area, dna, mfi))
 			}
 			else # imageType == "byStack"
-				res <- rbind(res, data.frame(file = names(dnaImages)[IDX],
+				res <- rbind(res, data.frame(file = names(nucImages)[idx],
 					frame = i, xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
 		}
 		res$frame <- factor(res$frame, levels = sort(unique(res$frame)))
 		rownames(res) <- NULL
-		ret[[IDX]] <- res
+		ans[[idx]] <- res
 	}
+	names(ans) <- names(nucImages)
 #
-# done with processing each group of files
+# done with processing each group of images
 #
 ################################################################################
 
 # compile and return collected data
-	ans <- do.call(rbind, ret)
-	rownames(ans) <- NULL
-	if (showProgress)
-		close(pb)
+	if (simplify == TRUE) {
+		ans <- do.call("rbind", ans)
+		rownames(ans) <- NULL
+	}
+	if (showProgress) close(pb)
 	message("Done")
 	return(ans)
 }
