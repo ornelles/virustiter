@@ -5,31 +5,29 @@
 \title{Generate Nuclear Mask from DNA Image}
 \usage{
 nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
-  radius = NULL, gamma = 1, border = 0)
+  radius = NULL, gamma = 1)
 }
 \arguments{
 \item{dna}{Fluorescent DNA \code{Image} or list of fluorescent DNA
 \code{Image}s.}
 
-\item{width}{Largest nuclear width (diameter) to be used as
-a \code{width} parameter for \code{thresh2}.}
+\item{width}{Maximum nuclear diameter (in pixels) to be used as
+the \code{width} parameter for \code{thresh2}.}
 
 \item{offset}{Offset parameter for \code{thresh2}. Use 0.05
 for typical images, use 0.01 for low contrast images.}
 
-\item{size}{Radius for \code{medianFilter}, integer. Use 2 for typical
-images, use 0 to skip \code{medianFilter}.}
+\item{size}{Radius (in pixels) for \code{medianFilter} as an integer.
+Use 2 for typical images, use 0 to skip \code{medianFilter}.}
 
 \item{sigma}{Standard deviation for \code{gblur}, use 2 for typical
 images, use 5 for finely detailed images.}
 
-\item{radius}{Radius for \code{gblur}, use default of 2 * ceiling(3 * sigma)
-+ 1 for typical images, use numbers smaller than the default of 13 for
-images with smaller nuclei.}
+\item{radius}{Radius for \code{gblur}, use default value of
+\code{2 * ceiling(3 * sigma) + 1} for typical images, use numbers
+smaller than the default of 13 for images with smaller nuclei.}
 
-\item{gamma}{Exponent for \code{DNA^gamma} transformation.}
-
-\item{border}{Exclude objects within this many pixels from the edge.}
+\item{gamma}{Exponent used for \code{DNA^gamma} transformation.}
 }
 \value{
 An integer \code{Image} mask or list of integer \code{Image} masks.
@@ -53,19 +51,12 @@ transformation, (2) normalization, (3) \code{medianFilter()} with argument
 \code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
 \code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
 \code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
-(8) \code{watershed()} and then (9) objects within \code{border} pixels
-of the the edge of the image will be removed.
+and (8) \code{watershed()}.
 }
 \examples{
   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
   nuc.ex <- readImage(f.ex) # single nuclear image
   xm0 <- nucMask(nuc.ex)
-  max(xm0) # total number of nuclei
-  xm4 <- nucMask(nuc.ex, border = 4)
-  max(xm4) # total number of nuclei
-  opar <- par(mfrow = c(1, 2))
   plot(colorLabels(xm0))
-  plot(colorLabels(xm4))
-  par(opar)
 
 }

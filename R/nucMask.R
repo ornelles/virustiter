@@ -4,19 +4,18 @@
 #'
 #' @param dna Fluorescent DNA \code{Image} or list of fluorescent DNA
 #'   \code{Image}s.
-#' @param width Largest nuclear width (diameter) to be used as
-#'   a \code{width} parameter for \code{thresh2}.
+#' @param width Maximum nuclear diameter (in pixels) to be used as
+#'   the \code{width} parameter for \code{thresh2}.
 #' @param offset Offset parameter for \code{thresh2}. Use 0.05
 #'   for typical images, use 0.01 for low contrast images.
-#' @param size Radius for \code{medianFilter}, integer. Use 2 for typical
-#'   images, use 0 to skip \code{medianFilter}.
+#' @param size Radius (in pixels) for \code{medianFilter} as an integer.
+#'   Use 2 for typical images, use 0 to skip \code{medianFilter}.
 #' @param sigma Standard deviation for \code{gblur}, use 2 for typical
 #'   images, use 5 for finely detailed images.
-#' @param radius Radius for \code{gblur}, use default of 2 * ceiling(3 * sigma)
-#'   + 1 for typical images, use numbers smaller than the default of 13 for
-#'   images with smaller nuclei.
-#' @param gamma Exponent for \code{DNA^gamma} transformation.
-#' @param border Exclude objects within this many pixels from the edge.  
+#' @param radius Radius for \code{gblur}, use default value of
+#'   \code{2 * ceiling(3 * sigma) + 1} for typical images, use numbers
+#'   smaller than the default of 13 for images with smaller nuclei.
+#' @param gamma Exponent used for \code{DNA^gamma} transformation.
 #'
 #' @details
 #'
@@ -32,8 +31,7 @@
 #' \code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
 #' \code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
 #' \code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
-#' (8) \code{watershed()} and then (9) objects within \code{border} pixels
-#' of the the edge of the image will be removed. 
+#' and (8) \code{watershed()}. 
 #'
 #' @return
 #'
@@ -46,20 +44,14 @@
 #'   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
 #'   nuc.ex <- readImage(f.ex) # single nuclear image
 #'   xm0 <- nucMask(nuc.ex)
-#'   max(xm0) # total number of nuclei
-#'   xm4 <- nucMask(nuc.ex, border = 4)
-#'   max(xm4) # total number of nuclei
-#'   opar <- par(mfrow = c(1, 2))
 #'   plot(colorLabels(xm0))
-#'   plot(colorLabels(xm4))
-#'   par(opar)
 #'
 #' @import EBImage
 #'
 #' @export
 #'
 nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
-	radius =  NULL, gamma = 1, border = 0)
+	radius =  NULL, gamma = 1)
 {
 # internal function to exclude edge objects 
 	.edge <- function(v, border) {
@@ -85,18 +77,6 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 		x <- fillHull(x)
 		x <- distmap(x)
 		x <- watershed(x)
-		if (border > 0) {
-			if (2*border + 1 > dim(x)[1] || 2*border + 1 > dim(x)[2])
-				warning("'border' too large for image size")
-			else {
-				len <- length(dim(x))
-				if (len == 2)
-					sel <- .edge(x, border)
-				else
-					sel <- apply(x, len, .edge, border = border)
-				x <- rmObjects(x, sel)
-			}
-		}
 		if (length(dim(x)) == 2)
 			dim(x) <- c(dim(x), 1)
 		return(x)
@@ -105,10 +85,10 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 # check argument and dispatch function accordingly
 	if (is(dna, "Image"))
 		ans <- .proc(dna, width = width, offset = offset, size = size,
-			sigma = sigma, radius = radius, gamma = gamma, border = border)
+			sigma = sigma, radius = radius, gamma = gamma)
 	else if (all(sapply(dna, is, "Image")))
 		ans <- lapply(dna, .proc, width = width, offset = offset, size = size,
-			sigma = sigma, radius = radius, gamma = gamma, border = border)
+			sigma = sigma, radius = radius, gamma = gamma)
 	else
 		stop("'dna' must be an Image or list of images")
 	return(ans)
