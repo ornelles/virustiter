@@ -75,10 +75,10 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # collect image files
 	if (all(file.info(source)$isdir))
-		ff <- list.images(path = source, type = type, pattern = pattern)
+		ff <- listImages(path = source, type = type, pattern = pattern)
 	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
 		unzip(source, exdir = tempdir())
-		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
+		ff <- listImages(path = tempdir(), type = type, pattern = pattern)
 	}
 	else if (all(!file.info(source)$isdir))
 		ff <- source

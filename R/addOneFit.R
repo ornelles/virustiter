@@ -1,8 +1,3 @@
-#########################################################################################
-#
-# add single fitted model with base graphics-provides options to add labels
-#
-#########################################################################################
 #' Add Single Fitted Model to Plot
 #'
 #' Add a single fitted model plot to an existing plot made with base graphics
