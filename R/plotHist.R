@@ -75,7 +75,7 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 
 # calculate background cutoff value and assign names 
 	if (missing(cut))
-		cut <- do.call(getCut, list(df, by, param, mult, log))
+		cut <- do.call("getCut", list(df, by, param, mult, log))
 	else {
 		labs <- as.character(levels(df[[by]]))
 		cut <- rep(cut, length.out = length(labs))
