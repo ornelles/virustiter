@@ -41,7 +41,7 @@
 #'
 #' \preformatted{
 #'  cmask <- cellMask(nmask) - nmask # when both are single objects
-#'  cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucear 
+#'  cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
 #'  cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
 #' }
 #'
@@ -75,6 +75,16 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 	else if (!is.integer(imageData(seeds)))
 		stop("'", deparse(substitute(seeds)), "' is not an integer Image mask")
 
+# if mask is used, require it to be an integer mask or list of the same
+	if (!is.null(mask)) {
+		if (is(mask, "list")) {
+			sel <- sapply(mask, function(x) is.integer(imageData(x)))
+			if (!all(sel))
+				stop("'", deparse(substitute(mask)), "' is a list but not all are integer Image masks")
+		}
+		else if (!is.integer(imageData(mask)))
+			stop("'", deparse(substitute(mask)), "' is not an integer Image mask")
+	}
 # process function
 	.proc <- function(seeds, mask, brush, lambda)
 	{
@@ -88,7 +98,7 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 				brush <- mean(apply(seeds, 3,
 					function(x) mean(computeFeatures.moment(x)[,"m.majoraxis"])))
 			brush <- 2*round(brush)%/%2 + 1 # make odd
-			mask <- dilate(seeds, makeBrush(brush, shape = "disc", step = FALSE))
+			mask <- dilate(seeds, makeBrush(brush, shape = "disc", step = TRUE))
 			mask <- fillHull(mask)
 		}
 	# ensure that mask is appropriate
@@ -105,7 +115,11 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 # dispatch function accordingly
 	if (is(seeds, "Image"))
 		ans <- .proc(seeds = seeds, mask = mask, brush = brush, lambda = lambda)
+	else if (length(seeds) == length(mask))
+		ans <- Map(function(s, m) .proc(s, m, brush = brush, lambda = lambda),
+			seeds, mask)
 	else
-		ans <- lapply(seeds, .proc, mask = mask, brush = brush, lambda = lambda)
+		stop(deparse(substitute(seeds)), " and ", deparse(substitute(mask)),
+			" are not compatible")
 	return(ans)
 }

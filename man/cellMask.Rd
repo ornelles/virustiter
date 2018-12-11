@@ -55,7 +55,7 @@ peri-nuclear region.
 
 \preformatted{
  cmask <- cellMask(nmask) - nmask # when both are single objects
- cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucear 
+ cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
  cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
 }
 }
