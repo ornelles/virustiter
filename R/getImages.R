@@ -77,7 +77,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	else
 		stop("unable to use files/source in ", deparse(substitute(source)))
 	if (verbose)
-		message("Found ", length(ff), " image files")
+		message("Found ", length(ff), " image file", ifelse(length(ff) == 1, "", "s"))
 
 # check on arguments
 	if (length(which.images) == 2)
@@ -158,7 +158,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 # count and report on the number of groups to display
 	nff <- length(ffsplit)
 	if (verbose)
-		message("Found ", nff, " groups of images")
+		message("Found ", nff, " group", ifelse(nff == 1, "", "s"), " of images")
 
 # report on findings 
 	if (verbose) {
