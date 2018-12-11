@@ -1,4 +1,4 @@
-#' Find Cutoff by Otsu's Method
+#' Find Background Value by Otsu's Method
 #' 
 #' Calculate a working cutoff value using an approximation of Otsu's method
 #' for a mixture of values with a normal density. This function assumes the
@@ -15,7 +15,7 @@
 #' distributions where the background population follows a normal distribution. 
 #' The maximum of this population is determined from a kernel density estimate
 #' and the \emph{left} half of the distribution is fit to a Gaussian
-#' distribution. The cutoff value returned is the position of the peak +
+#' distribution. The value returned is the position of the peak +
 #' \code{mult} times the standard deviation of the distribution.
 #' Note that fluorescent values are typically log-transformed before analysis.
 #' The parameter \code{mult} must be empirically determined.
@@ -25,7 +25,7 @@
 #' 
 #' @return
 #' 
-#' The cutoff estimated as position of the background peak + mult * standard
+#' The value estimated as position of the background peak + mult * standard
 #' deviation of the normal population.
 #' 
 #' @import
@@ -37,7 +37,7 @@
 #'   x <- c(rlnorm(200), rlnorm(120, 4))
 #'   plot(density(log(x)))
 #'   abline(v = log(findBgnd(x, mult = 0)), col = 4) # peak
-#'   abline(v = log(findBgnd(x)), col = 2) # cutoff
+#'   abline(v = log(findBgnd(x)), col = 2) # background limit
 #'
 #' @export
 #' 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/findBgnd.R
 \name{findBgnd}
 \alias{findBgnd}
-\title{Find Cutoff by Otsu's Method}
+\title{Find Background Value by Otsu's Method}
 \usage{
 findBgnd(x, mult = 2.5, log = TRUE)
 }
@@ -14,7 +14,7 @@ findBgnd(x, mult = 2.5, log = TRUE)
 \item{log}{\code{logical} flag to use log-transformed values.}
 }
 \value{
-The cutoff estimated as position of the background peak + mult * standard
+The value estimated as position of the background peak + mult * standard
 deviation of the normal population.
 }
 \description{
@@ -28,7 +28,7 @@ Data are assumed to be drawn from two unimodal, continuous
 distributions where the background population follows a normal distribution. 
 The maximum of this population is determined from a kernel density estimate
 and the \emph{left} half of the distribution is fit to a Gaussian
-distribution. The cutoff value returned is the position of the peak +
+distribution. The value returned is the position of the peak +
 \code{mult} times the standard deviation of the distribution.
 Note that fluorescent values are typically log-transformed before analysis.
 The parameter \code{mult} must be empirically determined.
@@ -40,6 +40,6 @@ function in the \code{genefilter} package.
   x <- c(rlnorm(200), rlnorm(120, 4))
   plot(density(log(x)))
   abline(v = log(findBgnd(x, mult = 0)), col = 4) # peak
-  abline(v = log(findBgnd(x)), col = 2) # cutoff
+  abline(v = log(findBgnd(x)), col = 2) # background limit
 
 }
