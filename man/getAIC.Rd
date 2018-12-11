@@ -2,25 +2,25 @@
 % Please edit documentation in R/getAIC.R
 \name{getAIC}
 \alias{getAIC}
-\title{Obtain AIC for 'Cut' Value}
+\title{Obtain AIC for Given Background Value}
 \usage{
-getAIC(df, cut, by = c("sequential", "column", "row"))
+getAIC(df, bgnd, by = c("sequential", "column", "row"))
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} or list of \code{data.frame}s with
 imaging results.}
 
-\item{cut}{Numeric vector of cutoff values to test.}
+\item{bgnd}{Numeric vector of background values to test.}
 
 \item{by}{A character string indicating the organization of the results as
 being a single result or by column or by rows.}
 }
 \value{
-The AIC value associated with the fit for each value of cut or list of AIC
+The AIC value associated with the fit for each value of bgnd or list of AIC
 values if a list of data frames was provided.
 }
 \description{
-Apply a given \code{cut} value to create a fitted model (or models) and
+Apply a given \code{bgnd} value to create a fitted model (or models) and
 return the Akaike's Criterion for the GLM fitted model. \code{getFit()}
-is called for each value of \code{cut}.
+is called for each value of \code{bgnd}.
 }
