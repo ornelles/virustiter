@@ -1,17 +1,17 @@
-#' Show Cutoff Values on a Densityplot of Mean Fluorescence Intensity
+#' Show Background Cutoff on a Densityplot of Mean Fluorescence Intensity
 #'
 #' Display a \code{densityplot} of each well or file with \code{lattice} graphics
 #' showing the selected background cutoff value or values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param cut Numeric vector of cutoff values. If missing, \code{getCut} will be
+#' @param bgnd Numeric vector of bgnd values. If missing, \code{getBgnd} will be
 #'   called with default parameters. 
 #' @param by Character vector indicating grouping where "default" will use
 #'   \code{well} if present or \code{file}. This value is also passed to
-#'   \code{getCut} if necessary.
+#'   \code{getBgnd} if necessary.
 #' @param smooth Numeric value passed to the \code{density} function.
-#' @param mult Numeric value passed to \code{getCut} to scale cutoff.
-#' @param log A \code{logical} value passed to \code{getCut}.
+#' @param mult Numeric value passed to \code{getBgnd} to scale bgnd.
+#' @param log A \code{logical} value passed to \code{getBgnd}.
 #' @param main Optional character string to serve as plot title.
 #' @param as.table A \code{logical} value passed to \code{histogram}.
 #' @param param Name of the variable to be analyzed as a character string; 
@@ -22,8 +22,8 @@
 #'
 #' This presents similar representation of the data as \code{plotHist} and can be
 #' used to examine the uniformity of results from an imaging experiment and to
-#' iteratively check the \code{mult} argument provided to \code{getCut}. The
-#' cutoff values are incorporated into the strip labels. 
+#' iteratively check the \code{mult} argument provided to \code{getBgnd}. The
+#' bgnd values are incorporated into the strip labels. 
 #'
 #' @return
 #'
@@ -35,7 +35,7 @@
 #'
 #' @export
 #'  
-plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column"),
+plotDens <- function(df, bgnd, by = c("default", "well", "file", "row", "column"),
 		smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
 		param = "mfi", return.plot = FALSE, ...)
 {
@@ -43,7 +43,7 @@ plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		usage <- c("plotDens examples:",
 			'  plotDens(df, by = "well", smooth = 1, mult = 2, log = TRUE)',
 			'  plotDens(df) ## default values are same as above',
-			'  plotDens(df, cut = 0.002)  ## uses cutoff value of 0.002',
+			'  plotDens(df, bgnd = 0.002)  ## uses bgnd value of 0.002',
 			'  plotDens(df, groups = column, auto.key = T)')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
@@ -67,13 +67,22 @@ plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		stop(deparse(substitute(param)), " not in data set")
 	d.adj <- smooth	# to hand to density plot
 
-# calculate background cutoff value and create strip labels 
-	if (missing(cut))
-		cut <- do.call("getCut", list(df, by, param, mult, log))
+# calculate background cutoff value and assign names 
+	if (missing(bgnd))
+		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
 	else {
-		labs <- as.character(levels(df[[by]]))
-		cut <- rep(cut, length.out = length(labs))
-		names(cut) <- labs
+		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+		idx <- which(sel)[1] # first one that matches
+		if (length(idx) > 0) {
+			labs <- lapply(split(df[[by]], df[[idx]]), function(v) unique(as.character(v)))
+			bgnd <- rep(bgnd, lengths(labs))
+			names(bgnd) <- unlist(labs)
+		}
+		else {
+			labs <- as.character(levels(df[[by]]))
+			bgnd <- rep(bgnd, lengths(labs))
+			names(bgnd) <- labs
+		}
 	}
 
 # create plot title
@@ -83,26 +92,26 @@ plotDens <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		main <- list(main.text, cex = 1, font = 1)
 	}
 
-# adjust strip labels to show cutoff
-	strip.labels <- paste(names(cut), signif(cut, 2), sep = " at ")
+# adjust strip labels to show cutoff values
+	strip.labels <- paste(names(bgnd), signif(bgnd, 2), sep = " at ")
 	form <- as.formula(paste("~", param, "|", by))
 	xlist <- list()	# for log argument in scales
 	if (log == TRUE) {
 		xlist <- list(log = 10)
-		cut <- log10(cut)
+		bgnd <- log10(bgnd)
 	}
 	obj <- densityplot(form, data = df,
 		scales = list(x = xlist, y = list(draw = FALSE, relation = "free")),
 		main = main,
-		panel = function(x, bgnd = cut) {
+		panel = function(x, myBgnd = bgnd) {
 			panel.densityplot(x, plot.points = FALSE)
-			panel.abline(v = bgnd[panel.number()], col = 2)},
+			panel.abline(v = myBgnd[panel.number()], col = 2)},
 		as.table = as.table,
 		strip = strip.custom(factor.levels = strip.labels,
 			par.strip.text = list(cex = 0.9)),
 		xscale.components = xscale.components.log10ticks, ...)
 	plot(obj)
 	if (log == TRUE)	# return to linear scale
-		cut <- 10^cut
+		bgnd <- 10^bgnd
 	return(invisible(obj))	# return lattice plot
 }

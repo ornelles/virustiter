@@ -2,24 +2,24 @@
 # plotHist
 #
 # display histogram for each well or file with lattice graphics with background cutoff
-# 'cut' value as a single value or named vector from getCut()
+# 'bgnd' value as a single value or named vector from getBgnd()
 #
 # if missing and 'positive' is present, the maximum value will be shown
 #
 #########################################################################################
-#' Show Cutoff with Histogram of Mean Fluorescence Intensity
+#' Show Background Limit with Histogram of Mean Fluorescence Intensity
 #'
 #' Display a histogram of each well or file with \code{lattice} graphics showing
 #' the selected background cutoff value or values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param cut Numeric vector of cutoff values. If missing, \code{getCut} will be
+#' @param bgnd Numeric vector of background values. If missing, \code{getBgnd} will be
 #'   called with default parameters. 
 #' @param by Character vector indicating grouping where "default" will use
 #'   \code{well} if present or \code{file}. This value is also passed to
-#'   \code{getCut} if necessary.
-#' @param mult Numeric value passed to \code{getCut} to scale cutoff.
-#' @param log A \code{logical} value passed to \code{getCut}.
+#'   \code{getBgnd} if necessary.
+#' @param mult Numeric value passed to \code{getBgnd} to scale bgnd.
+#' @param log A \code{logical} value passed to \code{getBgnd}.
 #' @param param Name of the variable to be analyzed as a character string; 
 #'   typically "mfi" or "val".
 #' @param main Optional character string to serve as plot title.
@@ -32,7 +32,7 @@
 #'
 #' This presents similar representation of the data as \code{plotDensity} and
 #' can be used to examine the uniformity of results from an imaging experiment
-#' and to iteratively check the \code{mult} argument provided to \code{getCut}. 
+#' and to iteratively check the \code{mult} argument provided to \code{getBgnd}. 
 #'
 #' @return
 #'
@@ -44,14 +44,14 @@
 #'
 #' @export
 #'  
-plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column"),
+plotHist <- function(df, bgnd, by = c("default", "well", "file", "row", "column"),
 		mult = 2.5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
 		layout = NULL, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
-			'  plotHist(df)      # calculates and plots default cut values in df',
-			'  plotHist(df, cut) # where cut is explicitly provided')
+			'  plotHist(df)      # calculates and plots default bgnd values in df',
+			'  plotHist(df, bgnd) # where bgnd is explicitly provided')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
@@ -66,24 +66,34 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		else if ("file" %in% names(df))
 			by <- "file"
 		else
-			stop("'well' and 'file' not in data set")
+			stop("'well' or 'file' is not in data set")
 	}
 	else if (!by %in% names(df))
-		stop("'", by, "' not in data set")
+		stop("'", by, "' is not in data set")
+
 	if (!param %in% names(df))
 		stop(deparse(substitute(param)), " not in data set")
 
 # calculate background cutoff value and assign names 
-	if (missing(cut))
-		cut <- do.call("getCut", list(df, by, param, mult, log))
+	if (missing(bgnd))
+		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
 	else {
-		labs <- as.character(levels(df[[by]]))
-		cut <- rep(cut, length.out = length(labs))
-		names(cut) <- labs
+		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+		idx <- which(sel)[1] # first one that matches
+		if (length(idx) > 0) {
+			labs <- lapply(split(df[[by]], df[[idx]]), function(v) unique(as.character(v)))
+			bgnd <- rep(bgnd, lengths(labs))
+			names(bgnd) <- unlist(labs)
+		}
+		else {
+			labs <- as.character(levels(df[[by]]))
+			bgnd <- rep(bgnd, lengths(labs))
+			names(bgnd) <- labs
+		}
 	}
 
 # create strip labels
-	strip.labels <- paste(names(cut), signif(cut, 2), sep = " at ")
+	strip.labels <- paste(names(bgnd), signif(bgnd, 2), sep = " at ")
 
 # assemble lattice plot
 	if (is.null(layout))
@@ -95,7 +105,7 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 	xlist <- list()	# for log argument in scales
 	if (log == TRUE) {
 		xlist <- list(log = 10)
-		cut <- log10(cut)
+		bgnd <- log10(bgnd)
 	}
 	form <- as.formula(paste("~", param, "|", by))
 	obj <- histogram(form, data = df, main = main,
@@ -104,7 +114,7 @@ plotHist <- function(df, cut, by = c("default", "well", "file", "row", "column")
 		{
 			panel.histogram(x,  ...)
 			idx <- unique(df[[by]][subscripts])
-			panel.abline(v = cut[idx], col = 2)
+			panel.abline(v = bgnd[idx], col = 2)
 		},
 		scales = list(x = xlist, y = list(relation = "free", rot = 0)),
 		strip = strip.custom(factor.levels = strip.labels,

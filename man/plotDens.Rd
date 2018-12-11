@@ -2,27 +2,27 @@
 % Please edit documentation in R/plotDens.R
 \name{plotDens}
 \alias{plotDens}
-\title{Show Cutoff Values on a Densityplot of Mean Fluorescence Intensity}
+\title{Show Background Cutoff on a Densityplot of Mean Fluorescence Intensity}
 \usage{
-plotDens(df, cut, by = c("default", "well", "file", "row", "column"),
+plotDens(df, bgnd, by = c("default", "well", "file", "row", "column"),
   smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
   param = "mfi", return.plot = FALSE, ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
 
-\item{cut}{Numeric vector of cutoff values. If missing, \code{getCut} will be
+\item{bgnd}{Numeric vector of bgnd values. If missing, \code{getBgnd} will be
 called with default parameters.}
 
 \item{by}{Character vector indicating grouping where "default" will use
 \code{well} if present or \code{file}. This value is also passed to
-\code{getCut} if necessary.}
+\code{getBgnd} if necessary.}
 
 \item{smooth}{Numeric value passed to the \code{density} function.}
 
-\item{mult}{Numeric value passed to \code{getCut} to scale cutoff.}
+\item{mult}{Numeric value passed to \code{getBgnd} to scale bgnd.}
 
-\item{log}{A \code{logical} value passed to \code{getCut}.}
+\item{log}{A \code{logical} value passed to \code{getBgnd}.}
 
 \item{main}{Optional character string to serve as plot title.}
 
@@ -43,6 +43,6 @@ showing the selected background cutoff value or values.
 \details{
 This presents similar representation of the data as \code{plotHist} and can be
 used to examine the uniformity of results from an imaging experiment and to
-iteratively check the \code{mult} argument provided to \code{getCut}. The
-cutoff values are incorporated into the strip labels.
+iteratively check the \code{mult} argument provided to \code{getBgnd}. The
+bgnd values are incorporated into the strip labels.
 }

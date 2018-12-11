@@ -2,25 +2,25 @@
 % Please edit documentation in R/plotHist.R
 \name{plotHist}
 \alias{plotHist}
-\title{Show Cutoff with Histogram of Mean Fluorescence Intensity}
+\title{Show Background Limit with Histogram of Mean Fluorescence Intensity}
 \usage{
-plotHist(df, cut, by = c("default", "well", "file", "row", "column"),
+plotHist(df, bgnd, by = c("default", "well", "file", "row", "column"),
   mult = 2.5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
   layout = NULL, ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
 
-\item{cut}{Numeric vector of cutoff values. If missing, \code{getCut} will be
+\item{bgnd}{Numeric vector of background values. If missing, \code{getBgnd} will be
 called with default parameters.}
 
 \item{by}{Character vector indicating grouping where "default" will use
 \code{well} if present or \code{file}. This value is also passed to
-\code{getCut} if necessary.}
+\code{getBgnd} if necessary.}
 
-\item{mult}{Numeric value passed to \code{getCut} to scale cutoff.}
+\item{mult}{Numeric value passed to \code{getBgnd} to scale bgnd.}
 
-\item{log}{A \code{logical} value passed to \code{getCut}.}
+\item{log}{A \code{logical} value passed to \code{getBgnd}.}
 
 \item{param}{Name of the variable to be analyzed as a character string; 
 typically "mfi" or "val".}
@@ -44,5 +44,5 @@ the selected background cutoff value or values.
 \details{
 This presents similar representation of the data as \code{plotDensity} and
 can be used to examine the uniformity of results from an imaging experiment
-and to iteratively check the \code{mult} argument provided to \code{getCut}.
+and to iteratively check the \code{mult} argument provided to \code{getBgnd}.
 }
