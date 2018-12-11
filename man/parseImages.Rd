@@ -4,24 +4,37 @@
 \alias{parseImages}
 \title{Parse Paired Microscopic Images}
 \usage{
-parseImages(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
-  args.nucMask = NULL, args.trimMask = NULL, args.cellMask = NULL,
+parseImages(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
+  args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
   equalize = FALSE, simplify = TRUE)
 }
 \arguments{
 \item{nuc}{A list of nuclear images. If the second argument (\code{tgt}) is
-\code{NULL}, the first argument (\code{nuc}) is assumed to be a list of
+\code{NULL}, the first argument (\code{nuc}) must be a list of
 length 2 containing  nuclear and target images.}
 
 \item{tgt}{A list of fluorescent images corresponding to the nuclear images
 in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
 list of both image types.}
 
-\item{args.nucMask}{A list of arguments passed to \code{\link{nucMask()}}.}
+\item{nMask}{An optional \code{Image} object, array, or a \code{list}
+these objects containing an integer \code{Image} mask identifying nuclei.
+If this value is \code{NULL}, the nuclear mask will be determined by
+\code{nucMask()} with any arguments provided in \code{args.nMask}.}
+
+\item{cMask}{An optional \code{Image} object, array, or a \code{list}
+these objects containing an integer \code{Image} mask defining the
+the cell boundaries. If \code{TRUE}, the nuclear mask will be used to
+generate a mask with \code{cellMask()}. This larger mask will be used
+to measure fluorescence intensity in the target image.}
+
+\item{args.nMask}{A list of arguments passed to \code{\link{nucMask()}}.
+This argument is ignored if a \code{nMask} is provided.}
 
 \item{args.trimMask}{A list of arguments passed to \code{\link{trimMask()}}.
-If \code{NULL}, \code{trimMask()} will be called with
-default parameters. If \code{FALSE}, no trimming is performed.}
+This argument is ignored if a \code{nMask} is provided. Otherwise, if
+\code{NULL}, \code{trimMask()} will be called with default parameters.
+If \code{FALSE}, no trimming will be performed.}
 
 \item{equalize}{If the fluorescent target images have \emph{more background
 pixels than foreground pixels} and if the background varies significantly
@@ -31,10 +44,6 @@ median filter and gaussian blur using the function \code{bnormalize()}.}
 
 \item{simplify}{Return a single \code{data.frame} of results if \code{TRUE},
 otherwise return a list of \code{data.frames} for each member of the list.}
-
-\item{cellMask.flag}{If \code{TRUE}, the default
-nuclear mask will be used to generate a mask with \code{cellMask()}. This
-larger mask will be used to measure fluorescence in the target image.}
 }
 \value{
 A data.frame (or list of data.frames) containing  processed image
@@ -100,8 +109,8 @@ specified by the argument \code{which.images}.
 
 A unique ID for each image can be created from a combination of
 \code{frame} and either \code{well} or \code{file}. This can be useful
-if it is necessary to determine a separate cutoff value for each pair of
-images.
+if it is necessary to determine a separate background value for each
+pair of images.
 \preformatted{
   df$uid <- with(df, interaction(well, frame))
   df$uid <- with(df, interaction(file, frame))

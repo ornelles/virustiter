@@ -4,18 +4,26 @@
 #' the DNA and a second second fluorescent target image from paired images.
 #'
 #' @param nuc A list of nuclear images. If the second argument (\code{tgt}) is
-#'   \code{NULL}, the first argument (\code{nuc}) is assumed to be a list of
+#'   \code{NULL}, the first argument (\code{nuc}) must be a list of
 #'   length 2 containing  nuclear and target images.
 #' @param tgt A list of fluorescent images corresponding to the nuclear images
 #'   in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
-#'   list of both image types. 
-#' @param args.nucMask A list of arguments passed to \code{\link{nucMask()}}.
+#'   list of both image types.
+#' @param nMask An optional \code{Image} object, array, or a \code{list}
+#'   these objects containing an integer \code{Image} mask identifying nuclei.
+#'   If this value is \code{NULL}, the nuclear mask will be determined by
+#'   \code{nucMask()} with any arguments provided in \code{args.nMask}.
+#' @param args.nMask A list of arguments passed to \code{\link{nucMask()}}.
+#'   This argument is ignored if a \code{nMask} is provided.
 #' @param args.trimMask A list of arguments passed to \code{\link{trimMask()}}.
-#'   If \code{NULL}, \code{trimMask()} will be called with
-#'   default parameters. If \code{FALSE}, no trimming is performed.
-#' @param cellMask.flag If \code{TRUE}, the default
-#'   nuclear mask will be used to generate a mask with \code{cellMask()}. This
-#'   larger mask will be used to measure fluorescence in the target image.
+#'   This argument is ignored if a \code{nMask} is provided. Otherwise, if
+#'   \code{NULL}, \code{trimMask()} will be called with default parameters.
+#'   If \code{FALSE}, no trimming will be performed.
+#' @param cMask An optional \code{Image} object, array, or a \code{list}
+#'   these objects containing an integer \code{Image} mask defining the
+#'   the cell boundaries. If \code{TRUE}, the nuclear mask will be used to
+#'   generate a mask with \code{cellMask()}. This larger mask will be used
+#'   to measure fluorescence intensity in the target image.
 #' @param equalize If the fluorescent target images have \emph{more background
 #'   pixels than foreground pixels} and if the background varies significantly
 #'   from image to image, this can be set to \code{TRUE} in order to equalized
@@ -60,8 +68,8 @@
 #'
 #' A unique ID for each image can be created from a combination of
 #' \code{frame} and either \code{well} or \code{file}. This can be useful
-#' if it is necessary to determine a separate cutoff value for each pair of
-#' images.
+#' if it is necessary to determine a separate background value for each
+#' pair of images.
 #' \preformatted{
 #'   df$uid <- with(df, interaction(well, frame))
 #'   df$uid <- with(df, interaction(file, frame))
@@ -125,8 +133,8 @@
 #'
 #' @export
 #'
-parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
-	args.nucMask = NULL, args.trimMask = NULL, args.cellMask = NULL,
+parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
+	args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
 	equalize = FALSE, simplify = TRUE)
 {
 # requires EBImage, ensure appropriate values for parameters
@@ -161,7 +169,7 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 	else {
 		imageType <- "byFile"
 		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
-		Message("Unable to determine how images are organized")
+		message("Unable to determine images organization, using 'file'")
 	}
  
 # smooth and equalize tgt images
@@ -171,27 +179,25 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 		message("done"); flush.console()
 	}
 
-# process nucMask with additional arguments in args.nucMask
-	if (is.null(nucMask)) { 
-		message("Determining nuclear masks...", appendLF = FALSE)
-		arg.list <- as.list(args(nucMask))
-		arg.list <- arg.list[names(arg.list) != ""] # drop NULL values
+# process nMask with additional arguments in args.nMask
+	if (is.null(nMask)) { 
+		message("Getting nuclear masks...", appendLF = FALSE)
+		arg.list <- formals("nucMask")
 		arg.list$dna <- nucImages
-		nms <- names(args.nucMask)
+		nms <- names(args.nMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
-		arg.list <- c(arg.list[!sel], args.nucMask[nms])
+		arg.list <- c(arg.list[!sel], args.nMask[nms])
 		nmask <- do.call("nucMask", arg.list)
 		message("done"); flush.console()
 	}
 	else
-		nmask <- nucMask
+		nmask <- nMask
 
 # remove small and large nuclei with arguments in args.trimMask
-	if (is.null(args.trimMask) && is.null(nucMask) || args.trimMask == TRUE) {
+	if (is.null(nMask) && (is.null(args.trimMask) || args.trimMask == TRUE)) {
 		message("Trimming nuclear masks...", appendLF = FALSE)
-		arg.list <- as.list(args(trimMask))
-		arg.list <- arg.list[names(arg.list) != ""]
+		arg.list <- formals("trimMask")
 		arg.list$mask <- nmask
 		nms <- names(args.trimMask)
 		nms <- nms[nms %in% names(arg.list)]
@@ -201,23 +207,21 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 		message("done"); flush.console()
 	}
 
-# process cellMask
-	if (cellMask == TRUE) {
-		message("Determining cell masks...", appendLF = FALSE)
-		arg.list <- as.list(args(cellMask))
-		arg.list <- arg.list[names(arg.list) != ""] # drop NULL values
-		arg.list$seeds <- nmask
-		nms <- names(args.cellMask)
+# process cMask
+	if (cMask == TRUE) {
+		message("Getting cell masks...", appendLF = FALSE)
+		arg.list <- formals("cellMask")
+		nms <- names(args.cMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
-		arg.list <- c(arg.list[!sel], args.cellMask[nms])
-		cmask <- do.call("cellMask", arg.list)
+		arg.list <- c(arg.list[!sel], args.cMask[nms])
+		cmask <- Map(cellMask, nmask, MoreArgs = arg.list)
 		message("done"); flush.console()
 	}
-	else if(cellMask == FALSE)
+	else if(cMask == FALSE)
 		cmask <- nmask
-	else if (class(cellMask) != class(nucMask))
-		stop("cellMask is not compatible with nucMask")
+	else if (class(cMask) != class(nMask))
+		stop("cMask is not compatible with nMask")
 	# else cmask has been provided
 
 # ensure that nmask and cmask are lists
@@ -231,8 +235,8 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 	dm.cm <- unname(sapply(cmask, dim))
 
 	if (!identical(dm.nuc, dm.tgt)) stop("nuc and tgt are mismatched")
-	if (!identical(dm.nuc, dm.nm)) stop("nuc and nucMask are mismatched")
-	if (!identical(dm.nuc, dm.cm)) stop("nuc and cellMask are mismatched")
+	if (!identical(dm.nuc, dm.nm)) stop("nuc and nMask are mismatched")
+	if (!identical(dm.nuc, dm.cm)) stop("nuc and cMask are mismatched")
 	if (!identical(dm.nm, dm.cm)) stop("uh...this can't happen")
 
 # initialize variable to collect results
@@ -245,7 +249,7 @@ parseImages <- function(nuc, tgt = NULL, nucMask = NULL, cellMask = FALSE,
 	else
 		message("Processing images by 'file'")
 	flush.console()
-	showProgress <- ifelse(nImages > 2, TRUE, FALSE)
+	showProgress <- ifelse(nImages > 1, TRUE, FALSE)
 	if (showProgress)
 		pb <- txtProgressBar(min = 1, max = nImages, style = 3)
 

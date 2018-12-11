@@ -62,12 +62,12 @@
 #' @export
 #'
 checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
-	pattern = NULL, method = c("none", "raster", "browser"),
-	ask = ifelse(method == "raster", TRUE, NULL))
+	pattern = NULL, method = c("none", "raster", "browser"), ask = TRUE)
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
+	method <- match.arg(method)
 
 # are all files or directories found in 'source' argument legitimate?
 	if (!all(file.exists(source)))
@@ -84,7 +84,8 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		ff <- source
 	else
 		stop("unable to use files/source in ", deparse(substitute(source)))
-	message("Found ", length(ff), " image files"); flush.console()
+	message("Found ", length(ff), " image file", ifelse(length(ff) == 1, "", "s"))
+	flush.console()
 
 # check on arguments
 	if (length(which.images) == 2)
@@ -95,7 +96,6 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("the third value in 'which.images' must be the largest")
 
 # method
-	method <- match.arg(method)
 	if (method == "browser") {
 		message("Currently the display with browser seems to fail in EBImage")
 		message("The value has been changed to 'raster'.")
@@ -173,7 +173,8 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # count and report on the number of groups to display
 	nff <- length(ffsplit)
-	message("Found ", nff, " groups of images"); flush.console()
+	message("Found ", nff, " group", ifelse(nff == 1, "", "s"), " of images")
+	flush.console()
 
 # process each group of files in turn
 	for (IDX in seq_along(ffsplit)) {
@@ -185,11 +186,12 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 			n <- 1
 		i <- c(rbind(seq_len(n), n + seq_len(n)))
 		img <- combine(myDna, myMfi)[,,i]
-		if (method != "none")
+		if (method != "none") {
 			opar <- par(ask = ask)
 			display(tile(img, nx = 2), all = TRUE, method = method,
 				title = names(ffsplit)[IDX])
 			par(opar)
+		}
 	}
 	message("Done")
 	invisible(ff)

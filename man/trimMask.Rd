@@ -32,15 +32,14 @@ remove objects that are near the edge of the image, and remove
 highly eccentric objects.
 }
 \details{
-For each non-\code{NA} value in \code{cutoff}, objects smaller than \code
-{cutoff[1]} and larger than \code{cutoff[2]} will be removed. Otherwise, 
-objects smaller than \code{mean(area) - k[1]*mad(area)} and larger than
-\code{mean(area)+ k[2]*mad(area)} will be removed. Objects that are within
-\code{border} pixels of the edge will be removed. Objects that have
-eccentricity greater than \code{ecc.max} will be removed where a circle 
+For each non-\code{NA} value in \code{cutoff}, objects smaller than
+\code{cutoff[1]} and larger than \code{cutoff[2]} will be removed. 
+Otherwise, objects smaller than \code{mean(area) - k[1]*mad(area)} and
+larger than \code{mean(area)+ k[2]*mad(area)} will be removed. Objects
+that are within \code{border} pixels of the edge will be removed. Objects
+that have eccentricity greater than \code{ecc.max} will be removed. A circle
 has eccentricity of 0 and a straight line has eccentricity of 1. Note 
-that EBImage provides only approximate measures for this value. The mask 
-will be reenumerated if that parameter is \code{TRUE}.
+that EBImage provides a poor approximation of this value.
 }
 \examples{
 
