@@ -181,7 +181,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 
 # process nMask with additional arguments in args.nMask
 	if (is.null(nMask)) { 
-		message("Getting nuclear masks...", appendLF = FALSE)
+		message("Creating nuclear masks...", appendLF = FALSE)
 		arg.list <- formals("nucMask")
 		arg.list$dna <- nucImages
 		nms <- names(args.nMask)
@@ -191,8 +191,10 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		nmask <- do.call("nucMask", arg.list)
 		message("done"); flush.console()
 	}
-	else
+	else {
+		message("Using nuclear masks in '", deparse(substitute(nMask)), "'")
 		nmask <- nMask
+	}
 
 # remove small and large nuclei with arguments in args.trimMask
 	if (is.null(nMask) && (is.null(args.trimMask) || args.trimMask == TRUE)) {
@@ -208,8 +210,8 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	}
 
 # process cMask
-	if (cMask == TRUE) {
-		message("Getting cell masks...", appendLF = FALSE)
+	if (is.logical(cMask) && cMask == TRUE) {
+		message("Creating cell masks...", appendLF = FALSE)
 		arg.list <- formals("cellMask")
 		nms <- names(args.cMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
@@ -218,11 +220,14 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		cmask <- Map(cellMask, nmask, MoreArgs = arg.list)
 		message("done"); flush.console()
 	}
-	else if(cMask == FALSE)
+	else if(is.logical(cMask) && cMask == FALSE)
 		cmask <- nmask
-	else if (class(cMask) != class(nMask))
-		stop("cMask is not compatible with nMask")
-	# else cmask has been provided
+	else if (is(cMask, "list") || is(cMask, "Image")) {
+		message("Using cell masks in '", deparse(substitute(cMask)), "'")
+		cmask <- cMask
+	}
+	else
+		stop("unable to use value in '",deparse(substitute(cMask)), "'")
 
 # ensure that nmask and cmask are lists
 	if (!is.list(cmask)) cmask <- list(cmask)
@@ -260,7 +265,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	for (idx in seq_len(nImages)) {
 		if (showProgress) setTxtProgressBar(pb, idx)
 
-	# extract appropriate element from list
+	# extract appropriate element from lists
 		myNuc <- nucImages[[idx]]; myTgt <- tgtImages[[idx]]
 		myNmask <- nmask[[idx]]; myCmask <- cmask[[idx]]
 
