@@ -33,7 +33,8 @@ to select image files.}
 A list of two lists containing the nuclear (nuc) and target (tgt) images.
 Each well or file will be represented as an element in the lists \code{nuc}
 and \code{tgt}. Diagnostic messages are provided if \code{verbose}
-is \code{TRUE}.
+is \code{TRUE}. All images will have three dimensions, with the third
+dimension set to 1 if necessary.
 }
 \description{
 Return a list of paired DNA and fluorescent images

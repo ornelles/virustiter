@@ -43,7 +43,8 @@
 #' A list of two lists containing the nuclear (nuc) and target (tgt) images.
 #' Each well or file will be represented as an element in the lists \code{nuc}
 #' and \code{tgt}. Diagnostic messages are provided if \code{verbose}
-#' is \code{TRUE}.
+#' is \code{TRUE}. All images will have three dimensions, with the third
+#' dimension set to 1 if necessary.
 #'
 #' @examples
 #' # Example with data organized by folder or well
@@ -145,7 +146,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		if (length(dm) == 2)
 			dim(x) <- c(dm, 1)
 		N <- dim(x)[3]
-		x[,,seq(first, N, by)]})
+		x[,,seq(first, N, by), drop = FALSE]})
 
 # extract mfi images and adjust to 3 dimensions
 	mfiImages <- lapply(img, function(x, first = n_mfi, by = n_field) {
@@ -153,7 +154,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		if (length(dm) == 2)
 			dim(x) <- c(dm, 1)
 		N <- dim(x)[3]
-		x[,,seq(first, N, by)]})
+		x[,,seq(first, N, by), drop = FALSE]})
 
 # count and report on the number of groups to display
 	nff <- length(ffsplit)
