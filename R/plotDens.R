@@ -67,15 +67,26 @@ plotDens <- function(df, bgnd, by = c("default", "well", "file", "row", "column"
 		stop(deparse(substitute(param)), " not in data set")
 	d.adj <- smooth	# to hand to density plot
 
-# calculate background cutoff value and assign names matching well or file
+# calculate background cutoff value if necessary
 	if (missing(bgnd))
 		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
-	sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
-	idx <- names(which(sel)[1]) # first one that matches
+
+# assign names to bgnd to use as strip labels
+	if (is.null(names(bgnd)))
+		idx <- NA
+	else {
+		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+		idx <- names(which(sel)[1]) # first one that matches
+	}
 	if (!is.na(idx)) {
 		mat <- unique(df[c(by, idx)]) # two column matrix
 		bgnd <- bgnd[as.character(mat[[2]])]
-		names(bgnd) <- paste(as.character(mat[[1]]), names(bgnd))
+		lab1 <- as.character(mat[[1]])
+		lab2 <- names(bgnd)
+		if (all(lab2 %in% lab1))
+			names(bgnd) <- lab2
+		else
+			names(bgnd) <- paste(lab1, lab2)
 	}
 	else { # single background value provided
 		labs <- as.character(unique(df[[by]]))
