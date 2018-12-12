@@ -1,38 +1,30 @@
-#########################################################################################
-# plotHist
-#
-# display histogram for each well or file with lattice graphics with background cutoff
-# 'bgnd' value as a single value or named vector from getBgnd()
-#
-# if missing and 'positive' is present, the maximum value will be shown
-#
-#########################################################################################
-#' Show Background Limit with Histogram of Mean Fluorescence Intensity
+#' Show Histogram of Mean Fluorescence Intensity with Background Cutoff
 #'
 #' Display a histogram of each well or file with \code{lattice} graphics showing
 #' the selected background cutoff value or values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param bgnd Numeric vector of background values. If missing, \code{getBgnd} will be
-#'   called with default parameters. 
+#' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
+#'    will be called with default parameters. 
 #' @param by Character vector indicating grouping where "default" will use
 #'   \code{well} if present or \code{file}. This value is also passed to
 #'   \code{getBgnd} if necessary.
-#' @param mult Numeric value passed to \code{getBgnd} to scale bgnd.
-#' @param log A \code{logical} value passed to \code{getBgnd}.
+#' @param mult Numeric value passed to \code{getBgnd()} to scale bgnd.
+#' @param log A \code{logical} value passed to \code{getBgnd()}.
 #' @param param Name of the variable to be analyzed as a character string; 
 #'   typically "mfi" or "val".
 #' @param main Optional character string to serve as plot title.
-#' @param as.table A \code{logical} value passed to \code{histogram}.
+#' @param as.table A \code{logical} value passed to \code{histogram()}.
 #' @param layout An optional numeric vector to specify layout of histogram,
 #'   passed to \code{histogram}.
-#' @param ... Additional arguments handed to \code{histogram}.
+#' @param ... Additional arguments handed to \code{histogram()}.
 #'
 #' @details
 #'
-#' This presents similar representation of the data as \code{plotDensity} and
+#' This presents similar representation of the data as \code{plotDens())} and
 #' can be used to examine the uniformity of results from an imaging experiment
-#' and to iteratively check the \code{mult} argument provided to \code{getBgnd}. 
+#' and to iteratively check the \code{mult} argument provided to
+#' \code{getBgnd()}. 
 #'
 #' @return
 #'
@@ -72,24 +64,22 @@ plotHist <- function(df, bgnd, by = c("default", "well", "file", "row", "column"
 		stop("'", by, "' is not in data set")
 
 	if (!param %in% names(df))
-		stop(deparse(substitute(param)), " not in data set")
+		stop(deparse(substitute(param)), " is not in data set")
 
-# calculate background cutoff value and assign names 
+# calculate background cutoff value and assign names matching well or file
 	if (missing(bgnd))
 		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
-	else {
-		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
-		idx <- which(sel)[1] # first one that matches
-		if (length(idx) > 0) {
-			labs <- lapply(split(df[[by]], df[[idx]]), function(v) unique(as.character(v)))
-			bgnd <- rep(bgnd, lengths(labs))
-			names(bgnd) <- unlist(labs)
-		}
-		else {
-			labs <- as.character(levels(df[[by]]))
-			bgnd <- rep(bgnd, lengths(labs))
-			names(bgnd) <- labs
-		}
+	sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+	idx <- names(which(sel)[1]) # first one that matches
+	if (!is.na(idx)) {
+		mat <- unique(df[c(by, idx)]) # two column matrix
+		bgnd <- bgnd[as.character(mat[[2]])]
+		names(bgnd) <- paste(as.character(mat[[1]]), names(bgnd))
+	}
+	else { # single background value provided
+		labs <- as.character(unique(df[[by]]))
+		bgnd <- rep(bgnd, length(labs))
+		names(bgnd) <- labs
 	}
 
 # create strip labels
