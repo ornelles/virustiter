@@ -32,9 +32,9 @@ with any additional arguments in \code{...} to determine the background.
 }
 \examples{
 # Small set of data by stack
-  f <- system.file("extdata", "by_stack/file005.tif", package = "virustiter")
-  file.copy(f, tempdir(), overwrite = TRUE)
-  v <- parseImages(tempdir(), pattern = "file005")
+  f <- system.file("extdata", "by_stack", package = "virustiter")
+  i <- getImages(f, pattern = "file005")
+  v <- parseImages(i)
 
 # Score with grouping value of "file"
   v <- score(v, by = "file")

@@ -50,7 +50,8 @@ variable \code{by}.
 # Sample data by folder
   f <- system.file("extdata", "by_folder", package = "virustiter")
   pd <- read.csv(system.file("extdata", "by_folder/phenoData.csv", package = "virustiter"))
-  v <- parseImages(f)
+  i <- getImages(f)
+  v <- parseImages(i)
   v <- mergePdata(pd, v)
   v <- score(v)
   tally(v)
