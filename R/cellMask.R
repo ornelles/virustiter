@@ -112,10 +112,13 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 		dim(seeds) <- dim(mask) <- dm
 		return(propagate(Image(0, dm), seeds = seeds, mask = mask, lambda = lambda))
 	}
+
 # dispatch function accordingly
 	if (is(seeds, "Image"))
 		ans <- .proc(seeds = seeds, mask = mask, brush = brush, lambda = lambda)
-	else if (length(seeds) == length(mask))
+	else if (is(seeds, "list") && is.null(mask))
+		ans <- lapply(seeds, function(s) .proc(s, NULL, brush = brush, lambda = lambda))
+	else if (is(seeds, "list") && is(mask, "list") && length(seeds) == length(mask))
 		ans <- Map(function(s, m) .proc(s, m, brush = brush, lambda = lambda),
 			seeds, mask)
 	else
