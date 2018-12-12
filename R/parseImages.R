@@ -242,7 +242,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	if (!identical(dm.nuc, dm.tgt)) stop("nuc and tgt are mismatched")
 	if (!identical(dm.nuc, dm.nm)) stop("nuc and nMask are mismatched")
 	if (!identical(dm.nuc, dm.cm)) stop("nuc and cMask are mismatched")
-	if (!identical(dm.nm, dm.cm)) stop("uh...this can't happen")
+	if (!identical(dm.nm, dm.cm)) stop("uh oh...this can't happen")
 
 # initialize variable to collect results
 	nImages <- length(nucImages)
@@ -260,7 +260,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 
 ################################################################################
 #
-# process each group of images
+# process each group of images - FAILING if one in set is two dimensional...
 #
 	for (idx in seq_len(nImages)) {
 		if (showProgress) setTxtProgressBar(pb, idx)
@@ -270,7 +270,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		myNmask <- nmask[[idx]]; myCmask <- cmask[[idx]]
 
 	# ensure that images have three dimensions
-		dm <- dim(myNmask)
+		dm <- dim(myNuc)
 		if (length(dm) == 2)
 			 dim(myNuc) <- dim(myTgt) <- dim(myCmask) <- dim(myNmask) <- c(dm, 1)
 		nframes <- dim(myNmask)[3]
