@@ -5,7 +5,7 @@
 #'
 #' @param source A character vector identifying a directory or directories
 #'   with multilayer tiff files \emph{or} subdirectories identified
-#'   by well with separate, paired images per well \emph{or} a character vector
+#'   by well with separate, paired images \emph{or} a character vector
 #'   of image files \emph{or} a \code{.zip} file with the above.
 #' @param type A character string identifying the type of image files to parse
 #'   ("tif", "tiff", "jpeg", "jpg" or "png".)
@@ -16,9 +16,9 @@
 #'   indicates that the order is target first and DNA image second. A value of
 #'   \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
 #'   image such as a phase contrast image or second fluorescent color in each set.
-#' @param pattern Optional grep pattern as character string used by \code{list.files()}
-#'   to select image files.
-#' @param verbose Print diagnostic messages as files are read if \code{TRUE}.
+#' @param pattern Optional character string to serve as a \code{grep} pattern
+#'   for \code{list.files()} to select image files.
+#' @param verbose If \code{TRUE}, print diagnostic messages as files are read.
 #'
 #' @details
 #'
@@ -40,11 +40,10 @@
 #'
 #' @return
 #'
-#' A list of two lists containing the nuclear (nuc) and target (tgt) images.
+#' A list of two named lists containing the nuclear and target images.
 #' Each well or file will be represented as an element in the lists \code{nuc}
 #' and \code{tgt}. Diagnostic messages are provided if \code{verbose}
-#' is \code{TRUE}. All images will have three dimensions, with the third
-#' dimension set to 1 if necessary.
+#' is \code{TRUE}. 
 #'
 #' @examples
 #' # Example with data organized by folder or well
@@ -56,7 +55,7 @@
 #' @export
 #'
 getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
-	pattern = NULL, verbose = TRUE)
+	pattern = NULL, verbose = FALSE)
 {
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
@@ -67,13 +66,14 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("not all files named in ", deparse(substitute(source)), " exist")
 
 # collect image files
-	if (all(file.info(source)$isdir))
-		ff <- listImages(path = source, type = type, pattern = pattern)
-	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
+	if (all(file.info(source)$isdir)) # directory name(s)
+		ff <- list.images(path = source, type = type, pattern = pattern)
+	else if (all(grepl("zip$", source, ignore.case = TRUE))) { # zip file
+		file.remove(list.files(tempdir(), full = TRUE, recursive = TRUE))
 		unzip(source, exdir = tempdir())
-		ff <- listImages(path = tempdir(), type = type, pattern = pattern)
+		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
 	}
-	else if (all(!file.info(source)$isdir))
+	else if (all(!file.info(source)$isdir)) # file name(s)
 		ff <- source
 	else
 		stop("unable to use files/source in ", deparse(substitute(source)))
@@ -114,7 +114,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	else if (imageType == "byStack")
 		ffsplit <- split(ff, filename)
 	else
-		stop("unexpected value for 'imageType'")
+		stop("internal error: unexpected value for 'imageType'")
 
 # read all images as a list and coerce to grayscale with a warning
 	if (verbose)
@@ -137,16 +137,16 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
 			" are not multiples of ", n_field)
 	else if (length(bad == 1))
-		stop("\nThe number of images in ",
-			" is not a multiple of ", n_field)
+		stop("\nThe number of images in ", deparse(substitute(source)), 
+				" is not a multiple of ", n_field)
 
-# extract dna images and adjust to 3 dimensions
+# extract dna images
 	dnaImages <- lapply(img, function(x, first = n_dna, by = n_field) {
 		dm <- dim(x)
 		if (length(dm) == 2)
 			dim(x) <- c(dm, 1)
 		N <- dim(x)[3]
-		x[,,seq(first, N, by), drop = FALSE]})
+		x[,,seq(first, N, by), drop = TRUE]})
 
 # extract mfi images and adjust to 3 dimensions
 	mfiImages <- lapply(img, function(x, first = n_mfi, by = n_field) {
@@ -154,7 +154,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		if (length(dm) == 2)
 			dim(x) <- c(dm, 1)
 		N <- dim(x)[3]
-		x[,,seq(first, N, by), drop = FALSE]})
+		x[,,seq(first, N, by), drop = TRUE]})
 
 # count and report on the number of groups to display
 	nff <- length(ffsplit)

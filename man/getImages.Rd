@@ -5,12 +5,12 @@
 \title{Get Paired Microscopic Images}
 \usage{
 getImages(source, type = "tiff", which.images = c(1, 2, 2),
-  pattern = NULL, verbose = TRUE)
+  pattern = NULL, verbose = FALSE)
 }
 \arguments{
 \item{source}{A character vector identifying a directory or directories
 with multilayer tiff files \emph{or} subdirectories identified
-by well with separate, paired images per well \emph{or} a character vector
+by well with separate, paired images \emph{or} a character vector
 of image files \emph{or} a \code{.zip} file with the above.}
 
 \item{type}{A character string identifying the type of image files to parse
@@ -24,17 +24,16 @@ indicates that the order is target first and DNA image second. A value of
 \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
 image such as a phase contrast image or second fluorescent color in each set.}
 
-\item{pattern}{Optional grep pattern as character string used by \code{list.files()}
-to select image files.}
+\item{pattern}{Optional character string to serve as a \code{grep} pattern
+for \code{list.files()} to select image files.}
 
-\item{verbose}{Print diagnostic messages as files are read if \code{TRUE}.}
+\item{verbose}{If \code{TRUE}, print diagnostic messages as files are read.}
 }
 \value{
-A list of two lists containing the nuclear (nuc) and target (tgt) images.
+A list of two named lists containing the nuclear and target images.
 Each well or file will be represented as an element in the lists \code{nuc}
 and \code{tgt}. Diagnostic messages are provided if \code{verbose}
-is \code{TRUE}. All images will have three dimensions, with the third
-dimension set to 1 if necessary.
+is \code{TRUE}.
 }
 \description{
 Return a list of paired DNA and fluorescent images
