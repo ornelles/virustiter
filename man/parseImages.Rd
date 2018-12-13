@@ -9,9 +9,9 @@ parseImages(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
   equalize = FALSE, simplify = TRUE)
 }
 \arguments{
-\item{nuc}{A list of nuclear images. If the second argument (\code{tgt}) is
-\code{NULL}, the first argument (\code{nuc}) must be a list of
-length 2 containing  nuclear and target images.}
+\item{nuc}{A list of nuclear images, \emph{or}, if the second argument
+(\code{tgt}) is \code{NULL}, a list of length 2 containing nuclear and
+target images.}
 
 \item{tgt}{A list of fluorescent images corresponding to the nuclear images
 in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
@@ -24,9 +24,10 @@ If this value is \code{NULL}, the nuclear mask will be determined by
 
 \item{cMask}{An optional \code{Image} object, array, or a \code{list}
 these objects containing an integer \code{Image} mask defining the
-the cell boundaries. If \code{TRUE}, the nuclear mask will be used to
-generate a mask with \code{cellMask()}. This larger mask will be used
-to measure fluorescence intensity in the target image.}
+region of the image to define cell boundaries. If \code{TRUE}, the
+nuclear mask will be used to generate a mask with \code{cellMask()}.
+This larger mask will be used to measure fluorescence intensity in the
+target image.}
 
 \item{args.nMask}{A list of arguments passed to \code{\link{nucMask()}}.
 This argument is ignored if a \code{nMask} is provided.}
@@ -50,7 +51,7 @@ A data.frame (or list of data.frames) containing  processed image
 data. \strong{Each} data.frame will have the following variables:
 \describe{
   \item{\code{frame}}{Image sequence within each level of well
-    or file as a factor (1, 2, 3, ...)}
+    or file as a factor (f001, f002, f003, ...)}
   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
   \item{\code{area}}{Area of the mask (in pixels) used to calculate target mfi.}
   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
@@ -76,11 +77,11 @@ the DNA and a second second fluorescent target image from paired images.
 }
 \details{
 This function identifies cells by a DNA stain and measures the
-fluorescent intensity in both the DNA stain and paired fluorescent image.
+fluorescent intensity in both the DNA image and the paired fluorescent image.
 This is part of a suite of tools implemented with \code{\link{EBImage}}
 designed to determine viral titers from sets of fluorescent micrographs.
 The first argument to this function can be the result of the function
-\code{\link{getImages}}. Images provided to this function are pairs where
+\code{\link{getImages()}}. Images provided to this function are pairs where
 the first of each pair is a DNA image and the second is a fluorescent image
 of the viral antigen. Because individual cells are identified by the nuclear
 stain, it is often beneficial to collect overexposed DNA images.
@@ -91,10 +92,10 @@ collected at different multiplicities of infection or moi. The
 moi can be expressed as virions (VP) per cell \emph{or} infectious
 units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 These details are added to output of this function with the
-\code{mergePdata()} function. The required order is for the nuclear
-(typically DAPI) image to precede the viral antigen image. This
+\code{mergePdata()} function. Images must be orderws with the nuclear
+(typically DAPI) image before the viral antigen image. Note that this
 sequence can be adjusted with \code{which.images} argument in
-the function \code{\link{getImages}}.
+the function \code{\link{getImages()}}.
 
 Images associated with each moi can be individual files in a
 single directory where each directory is named for the well such as

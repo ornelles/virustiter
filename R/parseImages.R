@@ -3,9 +3,9 @@
 #' Identify nuclei by a DNA stain and measure the fluorescence intensity of
 #' the DNA and a second second fluorescent target image from paired images.
 #'
-#' @param nuc A list of nuclear images. If the second argument (\code{tgt}) is
-#'   \code{NULL}, the first argument (\code{nuc}) must be a list of
-#'   length 2 containing  nuclear and target images.
+#' @param nuc A list of nuclear images, \emph{or}, if the second argument
+#'  (\code{tgt}) is \code{NULL}, a list of length 2 containing nuclear and
+#'  target images.
 #' @param tgt A list of fluorescent images corresponding to the nuclear images
 #'   in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
 #'   list of both image types.
@@ -21,9 +21,10 @@
 #'   If \code{FALSE}, no trimming will be performed.
 #' @param cMask An optional \code{Image} object, array, or a \code{list}
 #'   these objects containing an integer \code{Image} mask defining the
-#'   the cell boundaries. If \code{TRUE}, the nuclear mask will be used to
-#'   generate a mask with \code{cellMask()}. This larger mask will be used
-#'   to measure fluorescence intensity in the target image.
+#'   region of the image to define cell boundaries. If \code{TRUE}, the
+#'   nuclear mask will be used to generate a mask with \code{cellMask()}.
+#'   This larger mask will be used to measure fluorescence intensity in the
+#'   target image.
 #' @param equalize If the fluorescent target images have \emph{more background
 #'   pixels than foreground pixels} and if the background varies significantly
 #'   from image to image, this can be set to \code{TRUE} in order to equalized
@@ -35,11 +36,11 @@
 #' @details
 #'
 #' This function identifies cells by a DNA stain and measures the
-#' fluorescent intensity in both the DNA stain and paired fluorescent image.
+#' fluorescent intensity in both the DNA image and the paired fluorescent image.
 #' This is part of a suite of tools implemented with \code{\link{EBImage}}
 #' designed to determine viral titers from sets of fluorescent micrographs.
 #' The first argument to this function can be the result of the function
-#' \code{\link{getImages}}. Images provided to this function are pairs where
+#' \code{\link{getImages()}}. Images provided to this function are pairs where
 #' the first of each pair is a DNA image and the second is a fluorescent image
 #' of the viral antigen. Because individual cells are identified by the nuclear
 #' stain, it is often beneficial to collect overexposed DNA images.
@@ -50,10 +51,10 @@
 #' moi can be expressed as virions (VP) per cell \emph{or} infectious
 #' units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 #' These details are added to output of this function with the
-#' \code{mergePdata()} function. The required order is for the nuclear
-#' (typically DAPI) image to precede the viral antigen image. This
+#' \code{mergePdata()} function. Images must be orderws with the nuclear
+#' (typically DAPI) image before the viral antigen image. Note that this
 #' sequence can be adjusted with \code{which.images} argument in
-#' the function \code{\link{getImages}}.
+#' the function \code{\link{getImages()}}.
 #'
 #' Images associated with each moi can be individual files in a
 #' single directory where each directory is named for the well such as
@@ -91,7 +92,7 @@
 #' data. \strong{Each} data.frame will have the following variables:
 #' \describe{
 #'   \item{\code{frame}}{Image sequence within each level of well
-#'     or file as a factor (1, 2, 3, ...)}
+#'     or file as a factor (f001, f002, f003, ...)}
 #'   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
 #'   \item{\code{area}}{Area of the mask (in pixels) used to calculate target mfi.}
 #'   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
@@ -142,17 +143,17 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		stop("The 'EBImage' package must be installed with biocLite")
 
 # check first two arguments, extract images, ensure that they are lists
-	if (is.null(tgt)) {
+	if (is.null(tgt)) { # first argument is a list of length 2
 		if (!is.list(nuc) || length(nuc) != 2)
 			stop("'nuc' must be a list of length two")
 		nucImages <- nuc[[1]]
 		tgtImages <- nuc[[2]]
 	}
-	else if (is(nuc, "Image") & is(tgt, "Image")) {
+	else if (is(nuc, "Image") & is(tgt, "Image")) { # both are images
 		nucImages <- list(nuc)
 		tgtImages <- list(tgt)
 	}
-	else {
+	else { # both must be lists
 		if (!is.list(nuc) || !is.list(tgt))
 			stop("'nuc' and 'tgt' must be Image objects or lists of Image objects")
 		nucImages <- nuc
@@ -169,7 +170,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	else {
 		imageType <- "byFile"
 		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
-		message("Unable to determine images organization, using 'file'")
+		message("Unable to determine organization of images, using 'file'")
 	}
  
 # smooth and equalize tgt images
@@ -197,7 +198,8 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	}
 
 # remove small and large nuclei with arguments in args.trimMask
-	if (is.null(nMask) && (is.null(args.trimMask) || args.trimMask == TRUE)) {
+	if (is.null(nMask) && (is.null(args.trimMask) ||
+			(is.logical(args.trimMask) && args.trimMask == TRUE))) {
 		message("Trimming nuclear masks...", appendLF = FALSE)
 		arg.list <- formals("trimMask")
 		arg.list$mask <- nmask
@@ -286,12 +288,12 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 				ww <- names(nucImages)[idx]
 				res <- rbind(res, data.frame(well = well.info(ww)$well,
 					row = well.info(ww)$row,
-					column = well.info(ww)$column, frame = i,
+					column = well.info(ww)$column, frame = sprintf("f%d", i),
 					xm = XY[,1], ym = XY[,2], area, dna, mfi))
 			}
 			else # imageType == "byStack"
 				res <- rbind(res, data.frame(file = names(nucImages)[idx],
-					frame = i, xm = XY[,1], ym = XY[,2],
+					frame = sprintf("f%d", i), xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
 		}
 		res$frame <- factor(res$frame, levels = sort(unique(res$frame)))
