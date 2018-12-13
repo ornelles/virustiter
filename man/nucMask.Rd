@@ -31,9 +31,6 @@ smaller than the default of 13 for images with smaller nuclei.}
 }
 \value{
 An integer \code{Image} mask or list of integer \code{Image} masks.
-Note that masks single images of dimension \code{dim(dna) = c(nx, ny)}
-will be returned with a third dimension set to 1. (\code{dim(mask) =
-c(nx, ny, 1)}.
 }
 \description{
 Generate an integer \code{Image} mask from a fluorescent DNA image.
@@ -43,15 +40,15 @@ Generate an integer object mask (or list of masks) representing
 segmented nuclei. The argument \code{nuc} must be a grayscale nuclear image
 of one or more dimensions \emph{or} a list of such images.
 
-Optimal conditions may need to be found by empirically adjusting the
-arguments, especially \code{width} and \code{offset}.
+Optimal conditions for detecting and segmented nuclei may require empirically
+adjusting the arguments, especially \code{width} and \code{offset}.
 
 The image or images will be processed sequentially by (1) an optional gamma 
-transformation, (2) normalization, (3) \code{medianFilter()} with argument 
-\code{size} if \code{size} is non-zero, (4) \code{gblur()} with arguments 
-\code{sigma} and \code{radius}, (5) \code{thresh2()} with arguments 
-\code{width} and \code{offset}, (6) \code{fillHull()}, (7) \code{distmap()}, 
-and (8) \code{watershed()}.
+transformation, (2) normalization, (3) a \code{medianFilter()} with argument 
+\code{size} if \code{size} is non-zero, (4) the \code{gblur()} filter with
+arguments \code{sigma} and \code{radius}, (5) thresholding with \code{thresh2()}
+with arguments \code{width} and \code{offset}, (6) \code{fillHull()},
+(7) \code{distmap()}, and (8) \code{watershed()}.
 }
 \examples{
   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")
