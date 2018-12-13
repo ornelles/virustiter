@@ -31,7 +31,7 @@ This is meant to be applied to images with a greater number of pixels
 representing background values than foreground values. The median value 
 of the image will be treated as the background and each image adjusted 
 to have an identical median background value. The image(s) will first 
-be smoothed by \code{medianFilter} with radius \code{size} then blurred 
+be smoothed by \code{medianFilter()} with radius \code{size} then blurred 
 by \code{gblur} with \code{sigma}. Each processed image will be 
 adjusted by subtracting the median value and adding \code{offset}.
 }
@@ -43,7 +43,8 @@ adjusted by subtracting the median value and adding \code{offset}.
   cells[,,2] <- cell + 0.005
   cells[,,3] <- cell + 0.01
   cells[,,4] <- cell + 0.02
-	cells <- normalize(cells, separate = FALSE)
-
+  cells <- normalize(cells, separate = FALSE)
+  plot(cells, all = TRUE)
+  plot(bnormalize(cells), all = TRUE)
 
 }
