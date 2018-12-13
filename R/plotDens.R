@@ -16,11 +16,11 @@
 #' @param as.table A \code{logical} value passed to \code{histogram()}.
 #' @param param Name of the variable to be analyzed as a character string; 
 #'   typically "mfi" or "val".
-#' @param ... Additional arguments handed to \code{histogram()}.
+#' @param ... Additional arguments handed to \code{densityplot()}.
 #'
 #' @details
 #'
-#' This presents similar representation of the data as \code{plotHist} and can
+#' This presents representation of the data like \code{plotHist()} and can
 #' be used to examine the uniformity of results from an imaging experiment and
 #' to iteratively check the \code{mult} argument provided to \code{getBgnd()}.
 #' The background values are incorporated into the strip labels. 
@@ -37,7 +37,7 @@
 #'  
 plotDens <- function(df, bgnd, by = c("default", "well", "file", "row", "column"),
 		smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
-		param = "mfi", return.plot = FALSE, ...)
+		param = "mfi", ...)
 {
 	if (missing(df)) {
 		usage <- c("plotDens examples:",

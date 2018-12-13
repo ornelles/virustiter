@@ -6,7 +6,7 @@
 \usage{
 plotDens(df, bgnd, by = c("default", "well", "file", "row", "column"),
   smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
-  param = "mfi", return.plot = FALSE, ...)
+  param = "mfi", ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
@@ -31,7 +31,7 @@ will be called with default parameters.}
 \item{param}{Name of the variable to be analyzed as a character string; 
 typically "mfi" or "val".}
 
-\item{...}{Additional arguments handed to \code{histogram()}.}
+\item{...}{Additional arguments handed to \code{densityplot()}.}
 }
 \value{
 The plot is returned as an invisible \code{lattice} object.
@@ -41,7 +41,7 @@ Display a \code{densityplot} of each well or file with \code{lattice} graphics
 showing the selected background cutoff value or values.
 }
 \details{
-This presents similar representation of the data as \code{plotHist} and can
+This presents representation of the data like \code{plotHist()} and can
 be used to examine the uniformity of results from an imaging experiment and
 to iteratively check the \code{mult} argument provided to \code{getBgnd()}.
 The background values are incorporated into the strip labels.
