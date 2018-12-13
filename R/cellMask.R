@@ -12,8 +12,8 @@
 #'   these objects containing a binary mask defining regions of the image
 #'   to be segmented. If this value is \code{NULL}, the nuclear mask
 #'   (\code{seeds}) will be expanded for Voronoi segmentation. If the
-#'   argument \code{seeds} is a list, \code{mask} must be a similar list
-#'   of objects or arrays.
+#'   first argument \code{seeds} is a list, \code{mask} must be a similar
+#'   list of objects or arrays.
 #' @param brush Size of the brush to expand the nuclear mask as an 
 #'   odd number of pixels. If this value is \code{NULL}, the mean value of 
 #'   the semi-major axis of the nuclei will be used. 
@@ -26,23 +26,27 @@
 #'
 #' A mask to define \emph{approximate} cellular boundaries will be created
 #' from a nuclear mask in \code{seeds} and an optional cytoplasmic
-#' mask \code{mask}. If the second argument, \code{mask}, is \code{NULL},
+#' mask \code{mask}. If the options second argument \code{mask} is \code{NULL},
 #' the nuclear mask will be dilated with a disc-shaped brush of size equal
 #' to \code{brush} or, if \code{brush} is \code{NULL}, the average semi-major
 #' axis of all nuclei. If \code{mask} is not \code{NULL}, \code{mask} must be
-#' a binary mask defining the limits for the Voronoi segmentation based on
-#' the seeds provided in \code{seeds}. Such a binary mask can be created from
-#' a non-specific cytoplasmic stain such as actin or a diffuse membrane stain.
+#' a binary (or integer) mask defining the limits for the Voronoi segmentation
+#' based on the seeds provided in \code{seeds}. Such a binary mask can be
+#' created by thresholding a non-specific widespread cytoplasmic signal such
+#' antibody labeling for actin or a diffuse membrane stain.
 #'
 #' To create a cytoplasmic mask that excludes the nucleus, simply subtract
-#' the nuclear mask from the cell mask as shown below. Use \code{erode} or
-#' \code{dilate} to adjust the nuclear mask to include more or less of the 
+#' the nuclear mask from the cell mask as shown below. Use \code{erode()} or
+#' \code{dilate()} to adjust the nuclear mask to include more or less of the 
 #' peri-nuclear region. 
 #'
 #' \preformatted{
-#'  cmask <- cellMask(nmask) - nmask # when both are single objects
-#'  cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
-#'  cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
+#' # When both are single objects
+#'   cmask <- cellMask(nmask) - nmask
+#'   cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
+#'
+#' # When both are list objects
+#'   cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
 #' }
 #'
 #' @return
@@ -51,8 +55,8 @@
 #' objects (cells) or a \code{list} of the same.
 #'
 #' @examples
-#'   x <- readImage(system.file("extdata", "by_folder/b2/file001.tif", package = "virustiter"))
-#'   y <- readImage(system.file("extdata", "by_folder/b2/file002.tif", package = "virustiter"))
+#'   x <- readImage(system.file("extdata", "by_folder/a4/file001.tif", package = "virustiter"))
+#'   y <- readImage(system.file("extdata", "by_folder/a4/file002.tif", package = "virustiter"))
 #'   nm <- nucMask(x)
 #'   cm <- cellMask(nm)
 #'   img <- rgbImage(red = normalize(y) * 0.2, green = normalize(y) * 0.8)
@@ -97,19 +101,18 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 			if (is.null(brush))
 				brush <- mean(apply(seeds, 3,
 					function(x) mean(computeFeatures.moment(x)[,"m.majoraxis"])))
-			brush <- 2*round(brush)%/%2 + 1 # make odd
+			brush <- 2*round(brush)%/%2 + 1 # ensure that the brush is odd
 			mask <- dilate(seeds, makeBrush(brush, shape = "disc", step = TRUE))
 			mask <- fillHull(mask)
+			dim(mask) <- dm
 		}
 	# ensure that mask is appropriate
 		if (!is.integer(imageData(mask)))
 			stop("'", deparse(substitute(mask)), "' is not a binary or integer Image mask")
-		if (length(dim(mask)) == 2)
-			dim(mask) <- c(dim(mask), 1)
-		if (!identical(dim(mask), dim(seeds)))
+		if (!identical(dim(mask), dm))
 			stop("dimensions of 'seeds' and 'mask' are not same")
 	# restore dimensions and return results from propagate
-		dim(seeds) <- dim(mask) <- dm
+		dim(seeds) <- dm
 		return(propagate(Image(0, dm), seeds = seeds, mask = mask, lambda = lambda))
 	}
 
@@ -117,7 +120,7 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 	if (is(seeds, "Image"))
 		ans <- .proc(seeds = seeds, mask = mask, brush = brush, lambda = lambda)
 	else if (is(seeds, "list") && is.null(mask))
-		ans <- lapply(seeds, function(s) .proc(s, NULL, brush = brush, lambda = lambda))
+		ans <- lapply(seeds, function(s) .proc(s, mask = NULL, brush = brush, lambda = lambda))
 	else if (is(seeds, "list") && is(mask, "list") && length(seeds) == length(mask))
 		ans <- Map(function(s, m) .proc(s, m, brush = brush, lambda = lambda),
 			seeds, mask)
