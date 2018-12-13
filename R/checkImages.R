@@ -75,10 +75,11 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # collect image files
 	if (all(file.info(source)$isdir))
-		ff <- listImages(path = source, type = type, pattern = pattern)
+		ff <- list.images(path = source, type = type, pattern = pattern)
 	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
+		file.remove(list.files(tempdir(), full = TRUE, recursive = TRUE))
 		unzip(source, exdir = tempdir())
-		ff <- listImages(path = tempdir(), type = type, pattern = pattern)
+		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
 	}
 	else if (all(!file.info(source)$isdir))
 		ff <- source
@@ -152,7 +153,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
 			" are not multiples of ", n_field)
 	else if (length(bad == 1))
-		stop("\nThe number of images in ",
+		stop("\nThe number of images in ", deparse(substitute(source)),
 			" is not a multiple of ", n_field)
 
 # extract dna images and adjust to 3 dimensions
@@ -194,5 +195,5 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		}
 	}
 	message("Done")
-	invisible(ff)
+	invisible(ff) # return list of file names
 }

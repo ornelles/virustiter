@@ -24,7 +24,7 @@ of the area.}
 this value.}
 }
 \value{
-Object mask or list of masks with specified objects removed.
+Object mask or list of masks with objects removed.
 }
 \description{
 Remove large and small objects from an integer \code{Image} mask,
@@ -49,5 +49,6 @@ that EBImage provides a poor approximation of this value.
   xm3 <- trimMask(xm, border = 24)
   xm4 <- trimMask(xm, ecc.max = 0.75)
   plot(colorLabels(combine(xm, xm2, xm3, xm4)), all = TRUE)
+  sapply(list(xm, xm2, xm3, xm4), apply, 3, max) # how many remain?
 
 }

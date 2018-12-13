@@ -15,7 +15,7 @@
 #' @examples
 #'   x <- readImage(system.file("extdata", "by_folder/b4/file001.tif", package = "virustiter"))
 #'   nm0 <- nucMask(x)
-#'   sel <- edgeObjects(nm0, border = 8)
+#'   sel <- edgeObjects(nm0, border = 16)
 #'   nm1 <- rmObjects(nm0, sel)
 #'   plot(colorLabels(combine(nm0, nm1)), all = TRUE, nx = 1)
 #'

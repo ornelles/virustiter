@@ -1,12 +1,12 @@
 #' Determine Value Discriminating Positive from Negative Values
 #'
-#' Determine the maximum background value betwen "positive" and "negative"
-#' values in argument \code{param}. The group used to determine the background
-#' is specified by \code{by} as control values or by row, column or file.  
+#' Determine the optimum background value between "positive" and "negative"
+#' values in the argument \code{param}. The group used to determine the
+#' background is specified by the argument \code{by}.  
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
 #' @param by Character string identifying the group in which to seek background
-#'   values, typically in \code{("control", "file", "well", "row" or "column")}.
+#'   values, typically in \code{("control", "well", "file", "row" or "column")}.
 #' @param param Variable name as character string in \code{df} to evaluate, 
 #'   typically \code{"y"}.
 #' @param mult Muliplier constant passed to \code{findBgnd()}.
@@ -20,14 +20,14 @@
 #' value is "control", all values identified as 
 #' \code{type == "control"} or with \code{x == 0} will be considered to be 
 #' background. Otherwise, a background will be determined by Otsu's method
-#' for the groups identified identified in \code{by} ("file", "well",
-#' "column" or "row"). The background value will be determined by the logic
-#' in \code{findBgnd()}.
+#' for the groups identified identified by the character string in \code{by}.
+#' Typically his would be \code{"file"} or \code{"well"} but can be any factor
+#' variable in the data.frame \code{df}. The background value will be
+#' determined by the logic in \code{findBgnd()}.
 #' 
 #' The annotated data frame must have the variable identified in 
 #' \code{param} and a variable named \code{x} as well as an appropriate
-#' grouping value: either \code{file, well, row} or \code{column}
-#' as required. 
+#' grouping value identified in \code{by}.
 #'
 #' @return
 #'
@@ -36,8 +36,8 @@
 #' @examples
 #' # Subset of data by_stack
 #'   f <- system.file("extdata", "by_stack/file005.tif", package = "virustiter")
-#'   file.copy(f, tempdir(), overwrite = TRUE) # need files to reside in directory
-#'   v <- parseImages(tempdir(), pattern = "file005")
+#'   img <- getImages(f)
+#'   v <- parseImages(img)
 #'
 #' # Get background value for grouping value of "file"
 #'   getBgnd(v, by = "file")

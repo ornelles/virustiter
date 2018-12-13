@@ -10,21 +10,22 @@
 #' @details
 #' This function will fit a GLM binomial model using a two-column response
 #' where the fit is weighted by the total numbers of cases. Data are fit by
-#' the \code{glm} function using a complementary log-log model. The data
-#' can be organized as a single, sequential manner or by rows or columns.
-#' If the argument \code{by} is "sequential", all the data are assumed to
-#' represent a single assay. If \code{by} is either "row" or "column", fits
-#' will be generated for data partitioned by row or column, respectively.
+#' the \code{glm()} function using a complementary log-log model. The data
+#' can be organized as a single, sequential series of values \emph{or} by
+#' rows \emph{or} columns. If the argument \code{by} is \code{"sequential"},
+#' all the data are assumed to represent a single assay. If \code{by} is
+#' either \code{"row"} or \code{"column"}, fits will be generated for data
+#' partitioned by row or column, respectively.
 #'
 #' The argument \code{obj} must be produced either by \code{tally()} or by
-#' \code{score()}. If a variable named "positive" is present, the data are
-#' assumed to have been produced by \code{score} and the function
-#' \code{tally} will be called before proceeding. If variables named "pos"
-#' and "neg" are present, the data are assumed to be the product of
-#' \code{tally}. In the case of a data frame produced by \code{score}, the
-#' data must have a variable named "moi" or "x" representing the multiplicity
-#' of infection. Data produced by \code{tally} will always have a variable
-#' named "x" representing the multiplicity. 
+#' \code{score()}. If a variable named \code{"positive"} is present, the data
+#' are assumed to have been produced by \code{score()} and the function
+#' \code{tally()} will be called before proceeding. If variables named 
+#' \code{"pos"} and \code{"neg"} are present, the data are assumed to be the
+#' product of \code{tally()}. In the case of a data frame produced by
+#' \code{score()}, the data must have a variable named \code{"moi"} or \code{"x"}
+#' representing the multiplicity of infection. Data produced by \code{tally()}
+#' will always have a variable named \code{"x"} representing the multiplicity. 
 #'
 #' @return
 #'

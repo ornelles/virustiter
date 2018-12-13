@@ -22,8 +22,8 @@ by \code{optim()}. See the details for more information.}
 }
 \value{
 A list of subpixel translations named \code{"dx"} and \code{"dy"} 
-that can be applied to \code{Image} with \code{translate()} to
-maximize the alignment between mask and target.
+that can be applied to the argument \code{target} with
+\code{translate()} to maximize the alignment between mask and target.
 }
 \description{
 Determine the optimal x-y shift to align the target image with the
@@ -39,7 +39,7 @@ representing the difference between the two images. The
 \code{optim()} function minimizes \code{FUN} with respect to
 \code{x[1]} and \code{x[2]}. The default function is designed
 to align nuclear masks with predominantly nuclear signals and
-should be replaced for other image patterns. 
+should be replaced for other localization patterns. 
 
 The argument \code{parscale} is used by \code{optim()} to scale the 
 parameters in \code{x} such that a unit change in the parameter 

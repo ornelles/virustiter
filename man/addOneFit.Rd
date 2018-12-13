@@ -9,7 +9,7 @@ addOneFit(fm, line.col = 4, ref.col = 4, pch.col = line.col, ...)
 \arguments{
 \item{fm}{Fitted model or list of fitted models from \code{getFit()}.}
 
-\item{line.col}{Color for best-fit line (appropriate for \code{par("col")}.}
+\item{line.col}{Color for best-fit line appropriate for \code{par("col")}.}
 
 \item{pch.col}{Pch color passed to \code{plot}.}
 
@@ -28,7 +28,7 @@ Prepare a single diagnostic plot with more labeling options than \code{plotFit()
 
 
 Base graphics are used to add a plot to an existing plot produced by 
-\code{plotFit} or \code{plotOneFit}. The first argument is
+\code{plotFit()} or \code{plotOneFit()}. The first argument is
 a single fitted model from \code{getFit()}. The function calls
 \code{getTiter()} to obtain the fit and confidence intervals.
 }

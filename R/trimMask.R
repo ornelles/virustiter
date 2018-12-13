@@ -29,7 +29,7 @@
 #' 
 #' @return
 #'
-#' Object mask or list of masks with specified objects removed.
+#' Object mask or list of masks with objects removed.
 #'
 #' @examples
 #'
@@ -39,6 +39,7 @@
 #'   xm3 <- trimMask(xm, border = 24)
 #'   xm4 <- trimMask(xm, ecc.max = 0.75)
 #'   plot(colorLabels(combine(xm, xm2, xm3, xm4)), all = TRUE)
+#'   sapply(list(xm, xm2, xm3, xm4), apply, 3, max) # how many remain?
 #'
 #' @import EBImage
 #' 

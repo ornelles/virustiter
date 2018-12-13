@@ -1,12 +1,13 @@
 #' Find Background Value by Otsu's Method
 #' 
-#' Calculate a working cutoff value using an approximation of Otsu's method
-#' for a mixture of values with a normal density. This function assumes the
-#' background population has a normal distribution and lies to the left of
-#' distribution. 
+#' Calculate a value between background and foreground pixels using
+#' an approximation of Otsu's method for a mixture of values with a
+#' normal density. This function assumes the background population
+#' has a normal distribution and lies on the left of distribution. 
 #' 
 #' @param x Fluorescent values to evaluate.
-#' @param mult Numeric multiplier applied to standard deviation.
+#' @param mult Numeric multiplier applied to the standard deviation,
+#'   with default value of 2.5.
 #' @param log \code{logical} flag to use log-transformed values.
 #' 
 #' @details
@@ -20,7 +21,7 @@
 #' Note that fluorescent values are typically log-transformed before analysis.
 #' The parameter \code{mult} must be empirically determined.
 #'
-#' This code replaces a previous version that used the \code{half.range.mode}
+#' This code replaces a previous version that used the \code{half.range.mode()}
 #' function in the \code{genefilter} package.
 #' 
 #' @return

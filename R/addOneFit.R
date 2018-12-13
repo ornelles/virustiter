@@ -6,13 +6,13 @@
 #'
 #' @param fm Fitted model or list of fitted models from \code{getFit()}.
 #' @param pch.col Pch color passed to \code{plot}.
-#' @param line.col Color for best-fit line (appropriate for \code{par("col")}.
+#' @param line.col Color for best-fit line appropriate for \code{par("col")}.
 #' @param ... Additional arguments passed to \code{plot()}.
 #'
 #' @details
 #'
 #' Base graphics are used to add a plot to an existing plot produced by 
-#' \code{plotFit} or \code{plotOneFit}. The first argument is
+#' \code{plotFit()} or \code{plotOneFit()}. The first argument is
 #' a single fitted model from \code{getFit()}. The function calls
 #' \code{getTiter()} to obtain the fit and confidence intervals.
 #'

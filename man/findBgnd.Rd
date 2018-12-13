@@ -9,7 +9,8 @@ findBgnd(x, mult = 2.5, log = TRUE)
 \arguments{
 \item{x}{Fluorescent values to evaluate.}
 
-\item{mult}{Numeric multiplier applied to standard deviation.}
+\item{mult}{Numeric multiplier applied to the standard deviation,
+with default value of 2.5.}
 
 \item{log}{\code{logical} flag to use log-transformed values.}
 }
@@ -18,10 +19,10 @@ The value estimated as position of the background peak + mult * standard
 deviation of the normal population.
 }
 \description{
-Calculate a working cutoff value using an approximation of Otsu's method
-for a mixture of values with a normal density. This function assumes the
-background population has a normal distribution and lies to the left of
-distribution.
+Calculate a value between background and foreground pixels using
+an approximation of Otsu's method for a mixture of values with a
+normal density. This function assumes the background population
+has a normal distribution and lies on the left of distribution.
 }
 \details{
 Data are assumed to be drawn from two unimodal, continuous 
@@ -33,7 +34,7 @@ distribution. The value returned is the position of the peak +
 Note that fluorescent values are typically log-transformed before analysis.
 The parameter \code{mult} must be empirically determined.
 
-This code replaces a previous version that used the \code{half.range.mode}
+This code replaces a previous version that used the \code{half.range.mode()}
 function in the \code{genefilter} package.
 }
 \examples{

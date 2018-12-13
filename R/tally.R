@@ -1,15 +1,16 @@
 #' Tally Positive Fluorescent Values
 #'
-#' Tally positive and negative values from from data.frame generated
-#' by \code{parseImages()} by either a grouping variable, typically "well"
-#' or "file" that represents a single multiplicity.
+#' Tally positive and negative values from from the data.frame generated
+#' by \code{parseImages()} by a grouping variable such as \code{"well"}
+#' or \code{"file"} that corresponds to a single multiplicity.
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
 #' @param moi Character string identifying the independent value. If missing,
 #'   variables named \code{"moi"} and \code{"x"} will be sought. Note
 #'   that in the returned value, this variable will be named \code{"x"}.
 #' @param by Character string identifying the grouping variable. If \code{NULL},
-#'   either "well" or "file" must be present and used as the grouping variable. 
+#'   either \code{"well"} or \code{"file"} must be present and will be used as
+#'   the grouping variable. 
 #' @param param Character string identifying the variable in \code{df} to evaluate, 
 #'   typically \code{"mfi"}.
 #' @param pd Optional phenotype \code{data.frame} to add to results.

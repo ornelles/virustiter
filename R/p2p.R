@@ -2,7 +2,8 @@
 #' 
 #' Use the \code{locator} function in base graphics to interactively
 #' measure distances between pairs of points on an existing image.
-#' End the interaction pressing <Esc> \emph{or} control-clicking.
+#' End the interaction pressing the \strong{Esc} key \emph{or}
+#' control-clicking.
 #' 
 #' @param n	Maximum number of pairs to measure, integer.
 #' @param col,type,pch Values handed to \code{locator()}.
