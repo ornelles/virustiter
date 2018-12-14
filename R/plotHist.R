@@ -80,17 +80,17 @@ plotHist <- function(df, bgnd, by = c("default", "well", "file", "row", "column"
 	if (!is.na(idx)) {
 		mat <- unique(df[c(by, idx)]) # two column matrix
 		bgnd <- bgnd[as.character(mat[[2]])]
-		lab1 <- as.character(mat[[1]])
-		lab2 <- names(bgnd)
-		if (all(lab2 %in% lab1))
-			names(bgnd) <- lab2
+		lab.by <- as.character(mat[[1]])
+		lab.bgnd <- names(bgnd)
+		if (all(lab.bgnd %in% lab.by))
+			names(bgnd) <- lab.bgnd
 		else
-			names(bgnd) <- paste(lab1, lab2)
+			names(bgnd) <- paste(lab.by, lab.bgnd)
 	}
 	else { # single background value provided
-		labs <- as.character(unique(df[[by]]))
-		bgnd <- rep(bgnd, length(labs))
-		names(bgnd) <- labs
+		lab.by <- as.character(unique(df[[by]]))
+		bgnd <- rep(bgnd, length(lab.by))
+		names(bgnd) <- lab.by
 	}
 
 # create strip labels
