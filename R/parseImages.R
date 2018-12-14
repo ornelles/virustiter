@@ -51,7 +51,7 @@
 #' moi can be expressed as virions (VP) per cell \emph{or} infectious
 #' units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 #' These details are added to output of this function with the
-#' \code{mergePdata()} function. Images must be orderws with the nuclear
+#' \code{mergePdata()} function. Images must be ordered with the nuclear
 #' (typically DAPI) image before the viral antigen image. Note that this
 #' sequence can be adjusted with \code{which.images} argument in
 #' the function \code{\link{getImages()}}.
@@ -92,7 +92,7 @@
 #' data. \strong{Each} data.frame will have the following variables:
 #' \describe{
 #'   \item{\code{frame}}{Image sequence within each level of well
-#'     or file as a factor (f001, f002, f003, ...)}
+#'     or file as an \code{integer} (1, 2, 3, ...)}
 #'   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
 #'   \item{\code{area}}{Area of the mask (in pixels) used to calculate target mfi.}
 #'   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
@@ -287,16 +287,14 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 			if (imageType == "byWell") {
 				ww <- names(nucImages)[idx]
 				res <- rbind(res, data.frame(well = well.info(ww)$well,
-					row = well.info(ww)$row,
-					column = well.info(ww)$column, frame = sprintf("f%d", i),
-					xm = XY[,1], ym = XY[,2], area, dna, mfi))
+					row = well.info(ww)$row, column = well.info(ww)$column,
+					frame = i, xm = XY[,1], ym = XY[,2], area, dna, mfi))
 			}
 			else # imageType == "byStack"
 				res <- rbind(res, data.frame(file = names(nucImages)[idx],
-					frame = sprintf("f%d", i), xm = XY[,1], ym = XY[,2],
+					frame = i, xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
 		}
-		res$frame <- factor(res$frame, levels = sort(unique(res$frame)))
 		rownames(res) <- NULL
 		ans[[idx]] <- res
 	}

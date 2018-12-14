@@ -51,7 +51,7 @@ A data.frame (or list of data.frames) containing  processed image
 data. \strong{Each} data.frame will have the following variables:
 \describe{
   \item{\code{frame}}{Image sequence within each level of well
-    or file as a factor (f001, f002, f003, ...)}
+    or file as an \code{integer} (1, 2, 3, ...)}
   \item{\code{xm, ym}}{Center of mass (in pixels) for nucleus.}
   \item{\code{area}}{Area of the mask (in pixels) used to calculate target mfi.}
   \item{\code{dna}}{Mean fluorescence intensity for DNA stain,
@@ -92,7 +92,7 @@ collected at different multiplicities of infection or moi. The
 moi can be expressed as virions (VP) per cell \emph{or} infectious
 units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 These details are added to output of this function with the
-\code{mergePdata()} function. Images must be orderws with the nuclear
+\code{mergePdata()} function. Images must be ordered with the nuclear
 (typically DAPI) image before the viral antigen image. Note that this
 sequence can be adjusted with \code{which.images} argument in
 the function \code{\link{getImages()}}.
