@@ -5,7 +5,8 @@
 \title{Check Paired Microscopic Images}
 \usage{
 checkImages(source, type = "tiff", which.images = c(1, 2, 2),
-  pattern = NULL, method = c("none", "raster", "browser"), ask = TRUE)
+  pattern = NULL, method = c("none", "raster", "browser"), ask = TRUE,
+  separate = FALSE, nx = 2)
 }
 \arguments{
 \item{source}{A character vector identifying a directory or directories
@@ -33,13 +34,16 @@ uses R raster graphics and \code{"browser"} attempts to use a browser.
 (Unfortunately this seems to be failing with EBImage version 4.22.0.)}
 
 \item{ask}{Logical value to use \code{par(ask = TRUE)} if \code{method = "raster"}.}
+
+\item{separate}{Logical value to normalize each frame separately if
+\code{TRUE}. Aplies only if \code{display} is not \code{"none"}.}
+
+\item{nx}{Integer value passed to \code{display{}} that specifies the number of
+images in a column if \code{display} is not \code{"none"}.}
 }
 \value{
-This function is called for the side effect of examining the sequence
-of image files and optionally displaying the normalized images.
-Diagnostic messages are printed on the console with \code{message()}.
-Use the \code{grep} string in \code{pattern} to limit the selected images.
-A character vector of the selected image files will invisibly returned.
+An \code{invisible} character vector of image files, diagnostic messages
+are printed on the console with the option to display normalized image pairs.
 }
 \description{
 Check validity of paired DNA and a fluorescent images
@@ -63,6 +67,10 @@ can be in upper or lower case and can contain leading zeros such as
 Alternatively, each group of images associated with a given moi can be
 a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
+
+If \code{'source'} is a zip file, files in the temporary directory 
+(\code{tempdir()}) will be deleted in order to receive the compressed
+files.
 }
 \examples{
 # Example with data organized by folder or well

@@ -61,11 +61,21 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
 
-# are all files or directories found in 'source' argument legitimate?
-	if (!all(file.exists(source)))
-		stop("not all files named in ", deparse(substitute(source)), " exist")
+# verify source files or directories
+	if (length(source) == 1 && !file.exists(source))
+		stop("unable to find '", deparse(substitute(source)), "'")
+	if (length(source) > 1 && !all(file.exists(source)))
+		stop("not all files named in '", deparse(substitute(source)), "' exist")
 
-# collect image files
+# verify and adjust 'which.images' argument
+	if (length(which.images) == 2)
+			which.images <- c(which.images, max(which.images))
+	if (length(which.images) != 3)
+		stop("'which.images' must be an integer vector of length 2 or 3")
+	if (which.images[3] != max(which.images))
+		stop("the third value in 'which.images' must be the largest")
+
+# collect image files, empty tempdir() for zip files
 	if (all(file.info(source)$isdir)) # directory name(s)
 		ff <- list.images(path = source, type = type, pattern = pattern)
 	else if (all(grepl("zip$", source, ignore.case = TRUE))) { # zip file
@@ -79,14 +89,6 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("unable to use files/source in ", deparse(substitute(source)))
 	if (verbose)
 		message("Found ", length(ff), " image file", ifelse(length(ff) == 1, "", "s"))
-
-# check on arguments
-	if (length(which.images) == 2)
-			which.images <- c(which.images, max(which.images))
-	if (length(which.images) != 3)
-		stop("'which.images' must be an integer vector of length 2 or 3")
-	if (which.images[3] != max(which.images))
-		stop("the third value in 'which.images' must be the largest")
 
 # extract fields to determine if images are organized by well or stack
 	spl <- strsplit(ff, "/")
@@ -165,7 +167,8 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	if (verbose) {
 		id <- names(ffsplit)
 		count <- lengths(ffsplit)
-		message(sprintf("%s: %d image pairs\n", id, count), appendLF = FALSE)
+		message(sprintf("%3d: %d pairs in %s\n", seq_along(id), count, id), appendLF = FALSE)
+#		message(sprintf("%s: %d image pairs\n", id, count), appendLF = FALSE)
 	}
 
 # return image pairs
