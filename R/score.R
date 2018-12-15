@@ -49,7 +49,7 @@ score <- function(df, bgnd = NULL, param = "mfi", ...)
   }
   stopifnot(param %in% names(df))
   if (is.null(bgnd)) {
-    message("using default parameters in getBgnd() for 'bgnd' parameter")
+    message("calculating background value with getBgnd()")
     bgnd <- getBgnd(df, param = param, ...)
   }
 
