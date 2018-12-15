@@ -2,19 +2,22 @@
 % Please edit documentation in R/getBgnd.R
 \name{getBgnd}
 \alias{getBgnd}
-\title{Determine Value Discriminating Positive from Negative Values}
+\title{Determine Background Value to Define Positive Samples}
 \usage{
-getBgnd(df, by = c("control", "file", "well", "row", "column"),
-  param = "mfi", mult = 2.5, log = TRUE)
+getBgnd(df, by, param = "mfi", mult = 2.5, log = TRUE)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
 
-\item{by}{Character string identifying the group in which to seek background
-values, typically in \code{("control", "well", "file", "row" or "column")}.}
+\item{by}{Character string identifying the grouping factor in \code{'df'}
+used to determine background values. Values of "row" or "column" will
+split the data by row or column before identifying background values.
+If missing or if specified as "row" or "column", values associated with
+\code{type == "control"} or \code{moi == 0} or \code{x == 0} will
+be used to determine the background.}
 
-\item{param}{Variable name as character string in \code{df} to evaluate, 
-typically \code{"y"}.}
+\item{param}{Variable name in \code{df} as a character string to evaluate, 
+typically \code{"mfi"} or \code{"y"}.}
 
 \item{mult}{Muliplier constant passed to \code{findBgnd()}.}
 
@@ -30,19 +33,23 @@ values in the argument \code{param}. The group used to determine the
 background is specified by the argument \code{by}.
 }
 \details{
-The value between positive and negative values in 
-\code{param} will be determined according to \code{by}. If this
-value is "control", all values identified as 
-\code{type == "control"} or with \code{x == 0} will be considered to be 
-background. Otherwise, a background will be determined by Otsu's method
-for the groups identified identified by the character string in \code{by}.
-Typically his would be \code{"file"} or \code{"well"} but can be any factor
-variable in the data.frame \code{df}. The background value will be
-determined by the logic in \code{findBgnd()}.
+#'
+The value between positive and negative values in \code{param} will be 
+determined according to \code{by}. If this value is "control" or is missing,
+all values identified as \code{type == "control"} or with \code{x/moi == 0}
+will be treated as background. If this value is "row" or "column", 
+any values with \code{type == "control"} or with \code{x/moi == 0} in each
+row or column will be used to define the background for that row or column.
+If zero moi values are not present, the background will be determined by
+Otsu's method for the groups defined by the character string in \code{by}.
+Typically this would be \code{"well"} or \code{"file"} but can be any factor 
+variable in the data.frame \code{df}. The background value will be determined
+by the logic in \code{findBgnd()}.
 
-The annotated data frame must have the variable identified in 
-\code{param} and a variable named \code{x} as well as an appropriate
-grouping value identified in \code{by}.
+The annotated data frame must have the variable identified in \code{param}
+and, if 'by' is missing, a variable named either \code{"x"} or \code{"moi"}.
+If 'by' is provided, this must exist as a factor in the in the argument
+\code{df}.
 }
 \examples{
 # Subset of data by_stack
