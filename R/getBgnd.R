@@ -67,7 +67,7 @@ getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE)
 		stop(deparse(substitute(df)), " must be a data.frame")
 
 # parse 'by' argument
-	if (missing(by))
+	if (missing(by) || by == "control")
 		by <- "control"
 	else if(!is.character(by))
 		stop ("'", deparse(substitute(by)), "' must be a character string")

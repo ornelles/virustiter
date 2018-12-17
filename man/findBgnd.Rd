@@ -12,7 +12,7 @@ findBgnd(x, mult = 2.5, log = TRUE)
 \item{mult}{Numeric multiplier applied to the standard deviation,
 with default value of 2.5.}
 
-\item{log}{\code{logical} flag to use log-transformed values.}
+\item{log}{A \code{logical} flag to use log-transformed values.}
 }
 \value{
 The value estimated as position of the background peak + mult * standard

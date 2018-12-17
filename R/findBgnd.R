@@ -8,7 +8,7 @@
 #' @param x Fluorescent values to evaluate.
 #' @param mult Numeric multiplier applied to the standard deviation,
 #'   with default value of 2.5.
-#' @param log \code{logical} flag to use log-transformed values.
+#' @param log A \code{logical} flag to use log-transformed values.
 #' 
 #' @details
 #' 
