@@ -4,46 +4,48 @@
 \alias{plotHist}
 \title{Show Histogram of Mean Fluorescence Intensity with Background Cutoff}
 \usage{
-plotHist(df, bgnd, by = c("default", "well", "file", "row", "column"),
-  mult = 2.5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
-  layout = NULL, ...)
+plotHist(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL,
+  mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
 
 \item{bgnd}{Numeric vector of background values. If missing, \code{getBgnd()}
-will be called with default parameters.}
+will be called with parameters \code{by, param, mult,} and \code{log}.}
 
-\item{by}{Character vector indicating grouping where "default" will use
-\code{well} if present or \code{file}. This value is also passed to
-\code{getBgnd} if necessary.}
+\item{panel}{Optional character string defining the \code{lattice} panels,
+typically \code{"well"} or \code{"file"}.}
 
-\item{mult}{Numeric value passed to \code{getBgnd()} to scale bgnd.}
+\item{param}{Character string identifying the variable to be analyzed. Also
+passed to \code{getBgnd()} if required.}
 
-\item{log}{A \code{logical} value passed to \code{getBgnd()}.}
+\item{log}{Optional \code{logical} or \code{numeric} value to transform
+\code{'param'} values. Also passed to \code{getBgnd()} if required.}
 
-\item{param}{Name of the variable to be analyzed as a character string; 
-typically "mfi" or "val".}
+\item{by, mult}{Additional parameters passed to \code{getBgnd()} if required.}
 
-\item{main}{Optional character string to serve as plot title.}
+\item{main}{Optional character string to serve as plot title. If \code{NULL},
+the system date will be used.}
 
 \item{as.table}{A \code{logical} value passed to \code{histogram()}.}
 
 \item{layout}{An optional numeric vector to specify layout of histogram,
-passed to \code{histogram}.}
+passed to \code{histogram()}.}
 
-\item{...}{Additional arguments handed to \code{histogram()}.}
+\item{...}{Additional arguments passed to \code{histogram()}.}
 }
 \value{
 The plot is returned as an invisible \code{lattice} object.
 }
 \description{
 Display a histogram of each well or file with \code{lattice} graphics showing
-the selected background cutoff value or values.
+the selected background cutoff values.
 }
 \details{
-This presents similar representation of the data as \code{plotDens())} and
-can be used to examine the uniformity of results from an imaging experiment
-and to iteratively check the \code{mult} argument provided to
-\code{getBgnd()}.
+A histogram of image intensity in \code{'param'} is plotted
+with the selected background cutoff similar to the function
+\code{plotDens())}. Both functions can be used to examine the uniformity
+of results from an imaging experiment and to interactively check the
+paramaters passed to \code{getBgnd()} to determine a suitable background
+cutoff value.
 }

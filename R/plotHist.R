@@ -1,30 +1,33 @@
 #' Show Histogram of Mean Fluorescence Intensity with Background Cutoff
 #'
 #' Display a histogram of each well or file with \code{lattice} graphics showing
-#' the selected background cutoff value or values.
+#' the selected background cutoff values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
 #' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
-#'    will be called with default parameters. 
-#' @param by Character vector indicating grouping where "default" will use
-#'   \code{well} if present or \code{file}. This value is also passed to
-#'   \code{getBgnd} if necessary.
-#' @param mult Numeric value passed to \code{getBgnd()} to scale bgnd.
-#' @param log A \code{logical} value passed to \code{getBgnd()}.
-#' @param param Name of the variable to be analyzed as a character string; 
-#'   typically "mfi" or "val".
-#' @param main Optional character string to serve as plot title.
+#'    will be called with parameters \code{by, param, mult,} and \code{log}.
+#' @param panel Optional character string defining the \code{lattice} panels,
+#'   typically \code{"well"} or \code{"file"}. 
+#' @param param Character string identifying the variable to be analyzed. Also
+#'   passed to \code{getBgnd()} if required.
+#' @param log Optional \code{logical} or \code{numeric} value to transform
+#'   \code{'param'} values. Also passed to \code{getBgnd()} if required. 
+#' @param by,mult Additional parameters passed to \code{getBgnd()} if required.
+#' @param main Optional character string to serve as plot title. If \code{NULL},
+#'   the system date will be used.
 #' @param as.table A \code{logical} value passed to \code{histogram()}.
 #' @param layout An optional numeric vector to specify layout of histogram,
-#'   passed to \code{histogram}.
-#' @param ... Additional arguments handed to \code{histogram()}.
+#'   passed to \code{histogram()}.
+#' @param ... Additional arguments passed to \code{histogram()}.
 #'
 #' @details
 #'
-#' This presents similar representation of the data as \code{plotDens())} and
-#' can be used to examine the uniformity of results from an imaging experiment
-#' and to iteratively check the \code{mult} argument provided to
-#' \code{getBgnd()}. 
+#' A histogram of image intensity in \code{'param'} is plotted
+#' with the selected background cutoff similar to the function
+#' \code{plotDens())}. Both functions can be used to examine the uniformity
+#' of results from an imaging experiment and to interactively check the
+#' paramaters passed to \code{getBgnd()} to determine a suitable background
+#' cutoff value. 
 #'
 #' @return
 #'
@@ -36,61 +39,67 @@
 #'
 #' @export
 #'  
-plotHist <- function(df, bgnd, by = c("default", "well", "file", "row", "column"),
-		mult = 2.5, log = TRUE, param = "mfi", main = NULL, as.table = TRUE,
-		layout = NULL, ...)
+plotHist <- function(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL, 
+		mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
-			'  plotHist(df)      # calculates and plots default bgnd values in df',
+			'  plotHist(df)       # calculate and plot default bgnd values in df',
 			'  plotHist(df, bgnd) # where bgnd is explicitly provided')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
-	library(lattice)
-	library(latticeExtra)
+	requireNamespace("lattice", quietly = TRUE)
+	requireNamespace("latticeExtra", quietly = TRUE)
 
-# parse arguments and perform error checking
-	by <- match.arg(by)
-	if (by == "default") {
-		if ("well" %in% names(df))
-			by <- "well"
-		else if ("file" %in% names(df))
-			by <- "file"
-		else
-			stop("'well' or 'file' is not in data set")
-	}
-	else if (!by %in% names(df))
-		stop("'", by, "' is not in data set")
-
+# check 'param' argument
 	if (!param %in% names(df))
 		stop(deparse(substitute(param)), " is not in data set")
 
-# calculate background cutoff value if necessary
-	if (missing(bgnd))
-		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
-
-# assign names to bgnd to use as strip labels
-	if (is.null(names(bgnd)))
-		idx <- NA
-	else {
-		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
-		idx <- names(which(sel)[1]) # first one that matches
+# process 'bgnd' argument
+	if (missing(bgnd)) {
+		argNames <- names(formals("getBgnd"))
+		sel <- sapply(mget(argNames), is.null)
+		bgnd <- do.call("getBgnd", mget(argNames)[!sel])
 	}
-	if (!is.na(idx)) {
-		mat <- unique(df[c(by, idx)]) # two column matrix
+
+# process 'panel' argument
+	if (missing(panel)) {
+		if ("well" %in% names(df)) panel <- "well"
+		if ("well" %in% names(df)) panel <- "well"
+		else if ("file" %in% names(df)) panel <- "file"
+		else stop("unable to assign panel group as 'well' or 'file'")
+	}
+	else if (!is.character(panel))
+		stop("'panel' must be a character vector")
+	else if (!panel %in% names(df))
+		stop("'", panel, "' not in data set")
+
+# determine factor index for strip labels from 'bgnd'
+	if (is.null(names(bgnd)))
+		index <- NA
+	else if(length(names(bgnd)) == 1 && names(bgnd) == "control")
+		index <- NA
+	else { # search for match among factors
+		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+		index <- names(which(sel)[1]) # first one that matches
+	}
+
+# assign names to 'bgnd' to use as strip labels
+	if (!is.na(index)) {
+		mat <- unique(df[c(panel, index)]) # two column matrix
 		bgnd <- bgnd[as.character(mat[[2]])]
-		lab.by <- as.character(mat[[1]])
+		lab.panel <- as.character(mat[[1]])
 		lab.bgnd <- names(bgnd)
-		if (all(lab.bgnd %in% lab.by))
+		if (all(lab.bgnd %in% lab.panel))
 			names(bgnd) <- lab.bgnd
 		else
-			names(bgnd) <- paste(lab.by, lab.bgnd)
+			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		lab.by <- as.character(unique(df[[by]]))
-		bgnd <- rep(bgnd, length(lab.by))
-		names(bgnd) <- lab.by
+		lab.panel <- as.character(unique(df[[panel]]))
+		bgnd <- rep(bgnd, length(lab.panel))
+		names(bgnd) <- lab.panel
 	}
 
 # create strip labels
@@ -98,30 +107,47 @@ plotHist <- function(df, bgnd, by = c("default", "well", "file", "row", "column"
 
 # assemble lattice plot
 	if (is.null(layout))
-		layout <- c(1, nlevels(df[[by]]))
+		layout <- c(1, nlevels(df[[panel]]))
 	if (is.null(main)) {
-		main.text <- paste0(deparse(substitute(df)), " mult = ", signif(mult, 2))
+		main.text <- Sys.Date()
 		main <- list(main.text, cex = 1, font = 1)
 	}
-	xlist <- list()	# for log argument in scales
-	if (log == TRUE) {
-		xlist <- list(log = 10)
-		bgnd <- log10(bgnd)
+
+# process 'log' argument
+	if (identical(log, NULL)) logsc <- FALSE
+	else if (identical(log, FALSE)) logsc <- FALSE
+	else if (identical(log, TRUE)) logsc <- 10
+	else if (log == 1) logsc <- 10
+	else logsc <- as.numeric(log)
+
+# prepare x scale
+	xlist <- list()	
+	if (logsc != 0) {
+		xlist <- list(log = logsc)
+		bgnd <- log(bgnd, logsc)
 	}
-	form <- as.formula(paste("~", param, "|", by))
-	obj <- histogram(form, data = df, main = main,
-		layout = layout, n = 64, as.table = as.table,
-		panel = function(x, ..., subscripts)
-		{
+	if (logsc == 10)
+		xsc <- latticeExtra::xscale.components.log10ticks
+	else if (is.numeric(logsc))
+		xsc <- latticeExtra::xscale.components.logpower
+	else
+		xsc <- latticeExtra::xscale.components.default
+
+# create lattice formula and object
+	form <- as.formula(paste("~", param, "|", panel))
+
+	obj <- histogram(form, data = df, main = main, layout = layout, n = 64,
+		panel = function(x, ..., subscripts) {
 			panel.histogram(x,  ...)
-			idx <- unique(df[[by]][subscripts])
-			panel.abline(v = bgnd[idx], col = 2)
+			index <- unique(df[[panel]][subscripts])
+			panel.abline(v = bgnd[index], col = 2)
 		},
 		scales = list(x = xlist, y = list(relation = "free", rot = 0)),
+		xscale.components = xsc, as.table = as.table,
 		strip = strip.custom(factor.levels = strip.labels,
 			par.strip.text = list(cex = 0.9)),
-		xscale.components = xscale.components.log10ticks,
 		...)
+
 	plot(obj)
 	invisible(obj)
 }

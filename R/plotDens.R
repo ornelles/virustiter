@@ -1,29 +1,35 @@
 #' Show Density Plot of Mean Fluorescence Intensity with Background Cutoff
 #'
-#' Display a \code{densityplot} of each well or file with \code{lattice} graphics
-#' showing the selected background cutoff value or values.
+#' Display a \code{densityplot} of each well or file with \code{lattice}
+#' graphics showing the selected background cutoff values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param bgnd Numeric vector of bgnd values. If missing, \code{getBgnd()}
-#'   will be called with default parameters. 
-#' @param by Character vector indicating grouping where "default" will use
-#'   \code{well} if present or \code{file}. This value is also passed to
-#'   \code{getBgnd()} if necessary.
-#' @param smooth Numeric value passed to the \code{density()} function.
-#' @param mult Numeric value passed to \code{getBgnd()} to scale bgnd.
-#' @param log A \code{logical} value passed to \code{getBgnd()}.
-#' @param main Optional character string to serve as plot title.
-#' @param as.table A \code{logical} value passed to \code{histogram()}.
-#' @param param Name of the variable to be analyzed as a character string; 
-#'   typically "mfi" or "val".
-#' @param ... Additional arguments handed to \code{densityplot()}.
+#' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
+#'    will be called with parameters \code{by, param, mult,} and \code{log}.
+#' @param panel Optional character string defining the \code{lattice} panels,
+#'   typically \code{"well"} or \code{"file"}. 
+#' @param adjust Numeric value controlling bandwith, passed to the
+#'   \code{density()} function.
+#' @param param Character string identifying the variable to be analyzed. Also
+#'   passed to \code{getBgnd()} if required.
+#' @param log Optional \code{logical} or \code{numeric} value to transform
+#'   \code{'param'} values. Also passed to \code{getBgnd()} if required. 
+#' @param by,mult Additional parameters passed to \code{getBgnd()} if required.
+#' @param main Optional character string to serve as plot title. If \code{NULL},
+#'   the system date will be used.
+#' @param as.table A \code{logical} value passed to \code{densityplot()}.
+#' @param layout An optional numeric vector to specify layout of densityplot,
+#'   passed to \code{densityplot()}.
+#' @param ... Additional arguments passed to \code{densityplot()}.
 #'
 #' @details
 #'
-#' This presents representation of the data like \code{plotHist()} and can
-#' be used to examine the uniformity of results from an imaging experiment and
-#' to iteratively check the \code{mult} argument provided to \code{getBgnd()}.
-#' The background values are incorporated into the strip labels. 
+#' A densityplot of image intensity in \code{'param'} is plotted
+#' with the selected background cutoff similar to the function
+#' \code{plotHist())}. Both functions can be used to examine the uniformity
+#' of results from an imaging experiment and to interactively check the
+#' paramaters passed to \code{getBgnd()} to determine a suitable background
+#' cutoff value. The background values are incorporated into the strip labels. 
 #'
 #' @return
 #'
@@ -35,92 +41,117 @@
 #'
 #' @export
 #'  
-plotDens <- function(df, bgnd, by = c("default", "well", "file", "row", "column"),
-		smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
-		param = "mfi", ...)
+plotDens <- function(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
+		by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotDens examples:",
-			'  plotDens(df, by = "well", smooth = 1, mult = 2, log = TRUE)',
-			'  plotDens(df) ## default values are same as above',
-			'  plotDens(df, bgnd = 0.002)  ## uses bgnd value of 0.002',
-			'  plotDens(df, groups = column, auto.key = T)')
+			'  plotDens(df, panel = "well", adjust = 1, mult = 2, log = TRUE)',
+			'  plotDens(df) # default values are same as above',
+			'  plotDens(df, bgnd = 0.002)  # uses bgnd value of 0.002')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
-	library(lattice)
-	library(latticeExtra)
+	requireNamespace("lattice", quietly = TRUE)
+	requireNamespace("latticeExtra", quietly = TRUE)
 
-# parse arguments and perform error checking
-	by <- match.arg(by)
-	if (by == "default") {
-		if ("well" %in% names(df))
-			by <- "well"
-		else if ("file" %in% names(df))
-			by <- "file"
-		else
-			stop("'well' and 'file' not in data set")
-	}
-	else if (!by %in% names(df))
-		stop("'", by, "' not in data set")
+# check 'param' argument
 	if (!param %in% names(df))
-		stop(deparse(substitute(param)), " not in data set")
-	d.adj <- smooth	# to hand to density plot
+		stop(deparse(substitute(param)), " is not in data set")
 
-# calculate background cutoff value if necessary
-	if (missing(bgnd))
-		bgnd <- do.call("getBgnd", list(df, by, param, mult, log))
-
-# assign names to bgnd to use as strip labels
-	if (is.null(names(bgnd)))
-		idx <- NA
-	else { # search among factors
-		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
-		idx <- names(which(sel)[1]) # first one that matches
+# process 'bgnd' argument
+	if (missing(bgnd)) {
+		argNames <- names(formals("getBgnd"))
+		sel <- sapply(mget(argNames), is.null)
+		bgnd <- do.call("getBgnd", mget(argNames)[!sel])
 	}
-	if (!is.na(idx)) {
-		mat <- unique(df[c(by, idx)]) # two column matrix
+
+# process 'panel' argument
+	if (missing(panel)) {
+		if ("well" %in% names(df)) panel <- "well"
+		if ("well" %in% names(df)) panel <- "well"
+		else if ("file" %in% names(df)) panel <- "file"
+		else stop("unable to assign panel group as 'well' or 'file'")
+	}
+	else if (!is.character(panel))
+		stop("'panel' must be a character vector")
+	else if (!panel %in% names(df))
+		stop("'", panel, "' not in data set")
+
+# determine factor index for strip labels from 'bgnd'
+	if (is.null(names(bgnd)))
+		index <- NA
+	else if(length(names(bgnd)) == 1 && names(bgnd) == "control")
+		index <- NA
+	else { # search for match among factors
+		sel <- sapply(lapply(df, levels), function(v) all(names(bgnd) %in% v))
+		index <- names(which(sel)[1]) # first one that matches
+	}
+
+# assign names to 'bgnd' to use as strip labels
+	if (!is.na(index)) {
+		mat <- unique(df[c(panel, index)]) # two column matrix
 		bgnd <- bgnd[as.character(mat[[2]])]
-		lab.by <- as.character(mat[[1]])
+		lab.panel <- as.character(mat[[1]])
 		lab.bgnd <- names(bgnd)
-		if (all(lab.bgnd %in% lab.by))
+		if (all(lab.bgnd %in% lab.panel))
 			names(bgnd) <- lab.bgnd
 		else
-			names(bgnd) <- paste(lab.by, lab.bgnd)
+			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		lab.by <- as.character(unique(df[[by]]))
-		bgnd <- rep(bgnd, length(lab.by))
-		names(bgnd) <- lab.by
+		lab.panel <- as.character(unique(df[[panel]]))
+		bgnd <- rep(bgnd, length(lab.panel))
+		names(bgnd) <- lab.panel
 	}
 
-# create plot title
+# create strip labels
+	strip.labels <- paste(names(bgnd), signif(bgnd, 2), sep = " at ")
+
+# assemble lattice plot
+	if (is.null(layout))
+		layout <- c(1, nlevels(df[[panel]]))
 	if (is.null(main)) {
-		main.text <- paste(deparse(substitute(df)), "  smooth = ", signif(smooth, 2),
-			" mult = ", signif(mult, 2), sep = "")
+		main.text <- Sys.Date()
 		main <- list(main.text, cex = 1, font = 1)
 	}
 
-# adjust strip labels to show cutoff values
-	strip.labels <- paste(names(bgnd), signif(bgnd, 2), sep = " at ")
-	form <- as.formula(paste("~", param, "|", by))
-	xlist <- list()	# for log argument in scales
-	if (log == TRUE) {
-		xlist <- list(log = 10)
-		bgnd <- log10(bgnd)
+# process 'log' argument
+	if (identical(log, NULL)) logsc <- FALSE
+	else if (identical(log, FALSE)) logsc <- FALSE
+	else if (identical(log, TRUE)) logsc <- 10
+	else if (log == 1) logsc <- 10
+	else logsc <- as.numeric(log)
+
+# prepare x scale
+	xlist <- list()	
+	if (logsc != 0) {
+		xlist <- list(log = logsc)
+		bgnd <- log(bgnd, logsc)
 	}
-	obj <- densityplot(form, data = df,
-		scales = list(x = xlist, y = list(draw = FALSE, relation = "free")),
-		main = main,
-		panel = function(x, myBgnd = bgnd) {
-			panel.densityplot(x, plot.points = FALSE)
-			panel.abline(v = myBgnd[panel.number()], col = 2)},
-		as.table = as.table,
+	if (logsc == 10)
+		xsc <- latticeExtra::xscale.components.log10ticks
+	else if (is.numeric(logsc))
+		xsc <- latticeExtra::xscale.components.logpower
+	else
+		xsc <- latticeExtra::xscale.components.default
+
+# create lattice formula and object
+	form <- as.formula(paste("~", param, "|", panel))
+
+	obj <- densityplot(form, data = df, main = main, layout = layout,
+		panel = function(x, ..., subscripts) {
+			panel.densityplot(x, ..., plot.points = FALSE)
+			index <- unique(df[[panel]][subscripts])
+			panel.abline(v = bgnd[index], col = 2)
+		},
+		scales = list(x = xlist, y = list(relation = "free", rot = 0)),
+		xscale.components = xsc, as.table = as.table,
 		strip = strip.custom(factor.levels = strip.labels,
 			par.strip.text = list(cex = 0.9)),
-		xscale.components = xscale.components.log10ticks, ...)
+		adjust = adjust,
+		...)
+
 	plot(obj)
-	if (log == TRUE)	# return to linear scale
-		bgnd <- 10^bgnd
-	return(invisible(obj))	# return lattice plot
+	invisible(obj)	# return lattice plot
 }

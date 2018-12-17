@@ -4,45 +4,52 @@
 \alias{plotDens}
 \title{Show Density Plot of Mean Fluorescence Intensity with Background Cutoff}
 \usage{
-plotDens(df, bgnd, by = c("default", "well", "file", "row", "column"),
-  smooth = 1, mult = 2.5, log = TRUE, main = NULL, as.table = TRUE,
-  param = "mfi", ...)
+plotDens(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
+  by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL,
+  ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
 
-\item{bgnd}{Numeric vector of bgnd values. If missing, \code{getBgnd()}
-will be called with default parameters.}
+\item{bgnd}{Numeric vector of background values. If missing, \code{getBgnd()}
+will be called with parameters \code{by, param, mult,} and \code{log}.}
 
-\item{by}{Character vector indicating grouping where "default" will use
-\code{well} if present or \code{file}. This value is also passed to
-\code{getBgnd()} if necessary.}
+\item{panel}{Optional character string defining the \code{lattice} panels,
+typically \code{"well"} or \code{"file"}.}
 
-\item{smooth}{Numeric value passed to the \code{density()} function.}
+\item{adjust}{Numeric value controlling bandwith, passed to the
+\code{density()} function.}
 
-\item{mult}{Numeric value passed to \code{getBgnd()} to scale bgnd.}
+\item{param}{Character string identifying the variable to be analyzed. Also
+passed to \code{getBgnd()} if required.}
 
-\item{log}{A \code{logical} value passed to \code{getBgnd()}.}
+\item{log}{Optional \code{logical} or \code{numeric} value to transform
+\code{'param'} values. Also passed to \code{getBgnd()} if required.}
 
-\item{main}{Optional character string to serve as plot title.}
+\item{by, mult}{Additional parameters passed to \code{getBgnd()} if required.}
 
-\item{as.table}{A \code{logical} value passed to \code{histogram()}.}
+\item{main}{Optional character string to serve as plot title. If \code{NULL},
+the system date will be used.}
 
-\item{param}{Name of the variable to be analyzed as a character string; 
-typically "mfi" or "val".}
+\item{as.table}{A \code{logical} value passed to \code{densityplot()}.}
 
-\item{...}{Additional arguments handed to \code{densityplot()}.}
+\item{layout}{An optional numeric vector to specify layout of densityplot,
+passed to \code{densityplot()}.}
+
+\item{...}{Additional arguments passed to \code{densityplot()}.}
 }
 \value{
 The plot is returned as an invisible \code{lattice} object.
 }
 \description{
-Display a \code{densityplot} of each well or file with \code{lattice} graphics
-showing the selected background cutoff value or values.
+Display a \code{densityplot} of each well or file with \code{lattice}
+graphics showing the selected background cutoff values.
 }
 \details{
-This presents representation of the data like \code{plotHist()} and can
-be used to examine the uniformity of results from an imaging experiment and
-to iteratively check the \code{mult} argument provided to \code{getBgnd()}.
-The background values are incorporated into the strip labels.
+A densityplot of image intensity in \code{'param'} is plotted
+with the selected background cutoff similar to the function
+\code{plotHist())}. Both functions can be used to examine the uniformity
+of results from an imaging experiment and to interactively check the
+paramaters passed to \code{getBgnd()} to determine a suitable background
+cutoff value. The background values are incorporated into the strip labels.
 }
