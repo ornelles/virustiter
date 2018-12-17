@@ -22,9 +22,9 @@
 mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 {
 # determine data type, check arguments and harmonize well names
-	if (!any(c("moi", "x") %in% names(phenoData)))
-		stop('"moi" or "x" must be in "phenoData"')
-
+#	if (!any(c("moi", "x") %in% names(phenoData)))
+#		stop('"moi" or "x" must be in "phenoData"')
+#
 # for separate images in folders (multi-well)
 	if ("well" %in% names(imageData)) {
 		stopifnot("well" %in% names(phenoData))
@@ -41,7 +41,10 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 	if (!"unit" %in% names(phenoData))
 		phenoData$unit <- "unspecified"
 	type <- rep("standard", nrow(phenoData))
-	type[phenoData$moi == 0] <- "control"
+	if ("moi" %in% names(phenoData))
+		type[phenoData$moi == 0] <- "control"
+	else if ("x" %in% names(phenoData))
+		type[phenoData$x == 0] <- "control"
 	phenoData$type <- type
 
 # remove any variables in imageData that are present in phenoData EXCEPT
