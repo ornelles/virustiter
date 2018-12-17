@@ -7,11 +7,11 @@
 findObjects(expr, data, mask, invert = FALSE)
 }
 \arguments{
-\item{expr}{An \code{expression} evaluated in \code{'data'} return
-a logical vector identifying objects (rows).}
+\item{expr}{An \code{expression} evaluated in \code{'data'} that returns
+a logical vector identifying objects (rows) in \code{'data'}.}
 
 \item{data}{A \code{data.frame} produced by \code{parseImages()} in which
-\code{'expr'} can be evaluated.}
+\code{'expr'} will be evaluated.}
 
 \item{mask}{An optional \code{Image} object in \code{Grayscale} mode or
 an array containing object masks. Object masks are sets of pixels with
@@ -27,7 +27,7 @@ a nested list of integers identifying the selected objects.
 }
 \description{
 Identify objects in data.frame produced by \code{parseImages()} 
-as defined by the expression \code{expr}.
+as specified by the expression \code{expr}.
 }
 \examples{
   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))
