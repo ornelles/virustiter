@@ -6,10 +6,10 @@
 #' @param df Annotated \code{data.frame} with imaging results.
 #' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
 #'    will be called with parameters \code{by, param, mult,} and \code{log}.
-#' @param panel Optional character string defining the \code{lattice} panels,
-#'   typically \code{"well"} or \code{"file"}. 
 #' @param param Character string identifying the variable to be analyzed. Also
 #'   passed to \code{getBgnd()} if required.
+#' @param panel Optional character string defining the \code{lattice} panels,
+#'   typically \code{"well"} or \code{"file"}. 
 #' @param log Optional \code{logical} or \code{numeric} value to transform
 #'   \code{'param'} values. Also passed to \code{getBgnd()} if required. 
 #' @param by,mult Additional parameters passed to \code{getBgnd()} if required.
@@ -39,7 +39,7 @@
 #'
 #' @export
 #'  
-plotHist <- function(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL, 
+plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL, 
 		mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 {
 	if (missing(df)) {
@@ -88,6 +88,8 @@ plotHist <- function(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL,
 # assign names to 'bgnd' to use as strip labels
 	if (!is.na(index)) {
 		mat <- unique(df[c(panel, index)]) # two column matrix
+		ord <- order(levels(df[[index]])) # preserve order of factors
+		mat <- mat[ord,]
 		bgnd <- bgnd[as.character(mat[[2]])]
 		lab.panel <- as.character(mat[[1]])
 		lab.bgnd <- names(bgnd)
@@ -97,7 +99,8 @@ plotHist <- function(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL,
 			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		lab.panel <- as.character(unique(df[[panel]]))
+		ord <- order(levels(as.factor(df[[panel]]))) # preserve order of factors
+		lab.panel <- as.character(unique(df[[panel]]))[ord]
 		bgnd <- rep(bgnd, length(lab.panel))
 		names(bgnd) <- lab.panel
 	}

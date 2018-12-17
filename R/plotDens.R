@@ -6,12 +6,12 @@
 #' @param df Annotated \code{data.frame} with imaging results.
 #' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
 #'    will be called with parameters \code{by, param, mult,} and \code{log}.
+#' @param param Character string identifying the variable to be analyzed. Also
+#'   passed to \code{getBgnd()} if required.
 #' @param panel Optional character string defining the \code{lattice} panels,
 #'   typically \code{"well"} or \code{"file"}. 
 #' @param adjust Numeric value controlling bandwith, passed to the
 #'   \code{density()} function.
-#' @param param Character string identifying the variable to be analyzed. Also
-#'   passed to \code{getBgnd()} if required.
 #' @param log Optional \code{logical} or \code{numeric} value to transform
 #'   \code{'param'} values. Also passed to \code{getBgnd()} if required. 
 #' @param by,mult Additional parameters passed to \code{getBgnd()} if required.
@@ -41,7 +41,7 @@
 #'
 #' @export
 #'  
-plotDens <- function(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
+plotDens <- function(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
 		by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 {
 	if (missing(df)) {
@@ -91,6 +91,8 @@ plotDens <- function(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
 # assign names to 'bgnd' to use as strip labels
 	if (!is.na(index)) {
 		mat <- unique(df[c(panel, index)]) # two column matrix
+		ord <- order(levels(df[[index]])) # preserve factor order
+		mat <- mat[ord,]
 		bgnd <- bgnd[as.character(mat[[2]])]
 		lab.panel <- as.character(mat[[1]])
 		lab.bgnd <- names(bgnd)
@@ -100,7 +102,8 @@ plotDens <- function(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
 			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		lab.panel <- as.character(unique(df[[panel]]))
+		ord <- order(levels(as.factor(df[[panel]]))) # preserve factor order
+		lab.panel <- as.character(unique(df[[panel]]))[ord]
 		bgnd <- rep(bgnd, length(lab.panel))
 		names(bgnd) <- lab.panel
 	}

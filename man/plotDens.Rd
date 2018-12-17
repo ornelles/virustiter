@@ -4,7 +4,7 @@
 \alias{plotDens}
 \title{Show Density Plot of Mean Fluorescence Intensity with Background Cutoff}
 \usage{
-plotDens(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
+plotDens(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
   by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL,
   ...)
 }
@@ -14,14 +14,14 @@ plotDens(df, bgnd, panel, adjust = 1, param = "mfi", log = TRUE,
 \item{bgnd}{Numeric vector of background values. If missing, \code{getBgnd()}
 will be called with parameters \code{by, param, mult,} and \code{log}.}
 
+\item{param}{Character string identifying the variable to be analyzed. Also
+passed to \code{getBgnd()} if required.}
+
 \item{panel}{Optional character string defining the \code{lattice} panels,
 typically \code{"well"} or \code{"file"}.}
 
 \item{adjust}{Numeric value controlling bandwith, passed to the
 \code{density()} function.}
-
-\item{param}{Character string identifying the variable to be analyzed. Also
-passed to \code{getBgnd()} if required.}
 
 \item{log}{Optional \code{logical} or \code{numeric} value to transform
 \code{'param'} values. Also passed to \code{getBgnd()} if required.}

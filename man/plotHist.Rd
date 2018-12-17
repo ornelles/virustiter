@@ -4,7 +4,7 @@
 \alias{plotHist}
 \title{Show Histogram of Mean Fluorescence Intensity with Background Cutoff}
 \usage{
-plotHist(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL,
+plotHist(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
   mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
 }
 \arguments{
@@ -13,11 +13,11 @@ plotHist(df, bgnd, panel, param = "mfi", log = TRUE, by = NULL,
 \item{bgnd}{Numeric vector of background values. If missing, \code{getBgnd()}
 will be called with parameters \code{by, param, mult,} and \code{log}.}
 
-\item{panel}{Optional character string defining the \code{lattice} panels,
-typically \code{"well"} or \code{"file"}.}
-
 \item{param}{Character string identifying the variable to be analyzed. Also
 passed to \code{getBgnd()} if required.}
+
+\item{panel}{Optional character string defining the \code{lattice} panels,
+typically \code{"well"} or \code{"file"}.}
 
 \item{log}{Optional \code{logical} or \code{numeric} value to transform
 \code{'param'} values. Also passed to \code{getBgnd()} if required.}
