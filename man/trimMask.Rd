@@ -4,27 +4,34 @@
 \alias{trimMask}
 \title{Remove Objects by Size, Proximity to Edge and Eccentricity}
 \usage{
-trimMask(mask, cutoff = NULL, k = c(1.5, 3), border = 0, ecc.max = 1)
+trimMask(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
+  ecc.max = 1)
 }
 \arguments{
 \item{mask}{Object mask or list of masks with connected pixels having
 the same integer value.}
 
 \item{cutoff}{Optional integer value of length 2 specifying the lower 
-and upper limits for the area  in pixels. Either can be specified
-as \code{NA} to use the multiplier parameter, \code{k}.}
+and upper limits for the area  in pixels. If \code{NULL}, the
+multiplier parameter \code{k} will be used to determine the limits.
+Either value can be specified as \code{NA} to use the multiplier parameter
+for that position. If \code{FALSE}, size exclusion will be applied.}
 
 \item{k}{Numeric value of length 2 specifying the lower and upper
  multiplier to determine the cutoff from the \code{mean} and \code{mad}
-of the area.}
+of the area if \code{cutoff} is \code{NULL}.}
 
 \item{border}{Exclude objects within this many pixels from the edge.}
+
+\item{brush}{Integer value (converted to nearest odd number) for
+\code{'brush'} to dilate (or erode) the final mask where values < 0
+erode and values > 0 dilate.}
 
 \item{ecc.max}{Exclude objects with elliptical eccentricity greater than
 this value.}
 }
 \value{
-Object mask or list of masks with objects removed.
+Object mask or list of masks with objects removed and re-enumerated.
 }
 \description{
 Remove large and small objects from an integer \code{Image} mask,
@@ -39,7 +46,8 @@ larger than \code{mean(area)+ k[2]*mad(area)} will be removed. Objects
 that are within \code{border} pixels of the edge will be removed. Objects
 that have eccentricity greater than \code{ecc.max} will be removed. A circle
 has eccentricity of 0 and a straight line has eccentricity of 1. Note 
-that EBImage provides a poor approximation of this value.
+that EBImage provides a poor approximation of this value. The final mask
+will be dilated or eroded if \code{brush} is non-zero.
 }
 \examples{
 

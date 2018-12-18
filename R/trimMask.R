@@ -7,12 +7,17 @@
 #' @param mask Object mask or list of masks with connected pixels having
 #'   the same integer value.
 #' @param cutoff Optional integer value of length 2 specifying the lower 
-#'   and upper limits for the area  in pixels. Either can be specified
-#'   as \code{NA} to use the multiplier parameter, \code{k}.
+#'   and upper limits for the area  in pixels. If \code{NULL}, the
+#'   multiplier parameter \code{k} will be used to determine the limits.
+#'   Either value can be specified as \code{NA} to use the multiplier parameter
+#'   for that position. If \code{FALSE}, size exclusion will be applied.  
 #' @param k Numeric value of length 2 specifying the lower and upper
 #'   multiplier to determine the cutoff from the \code{mean} and \code{mad}
-#'  of the area.
-#' @param border Exclude objects within this many pixels from the edge.  
+#'  of the area if \code{cutoff} is \code{NULL}.
+#' @param border Exclude objects within this many pixels from the edge.
+#' @param brush Integer value (converted to nearest odd number) for
+#'   \code{'brush'} to dilate (or erode) the final mask where values < 0
+#'   erode and values > 0 dilate. 
 #' @param ecc.max Exclude objects with elliptical eccentricity greater than
 #'   this value.
 #' 
@@ -25,11 +30,12 @@
 #' that are within \code{border} pixels of the edge will be removed. Objects
 #' that have eccentricity greater than \code{ecc.max} will be removed. A circle
 #' has eccentricity of 0 and a straight line has eccentricity of 1. Note 
-#' that EBImage provides a poor approximation of this value.
+#' that EBImage provides a poor approximation of this value. The final mask
+#' will be dilated or eroded if \code{brush} is non-zero. 
 #' 
 #' @return
 #'
-#' Object mask or list of masks with objects removed.
+#' Object mask or list of masks with objects removed and re-enumerated.
 #'
 #' @examples
 #'
@@ -45,30 +51,33 @@
 #' 
 #' @export
 #'
-trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, ecc.max = 1)
+trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
+	ecc.max = 1)
 {
 	require(EBImage)
 # process function
-	.proc <- function(mask, cutoff, k, border, ecc.max)
+	.proc <- function(mask, cutoff, k, border, erode, ecc.max)
 	{
 	# ensure three dimensions are present
 		dm <- dim(mask)
 		if (length(dm) == 2) dim(mask) <- c(dm, 1)
 		nframes <- dim(mask)[3]
 	# trim by area
-		area <- apply(mask, 3, function(v) computeFeatures.shape(v)[,1])
-		if (is(area, "matrix")) area <- split(area, c(col(area)))
-		xbar <- mean(unlist(area))
-		xmad <- mad(unlist(area))
-		if (is.null(cutoff)) cutoff <- c(NA, NA)
-		if (is.na(cutoff[1])) cutoff[1] <- xbar - k[1] * xmad
-		if (is.na(cutoff[2])) cutoff[2] <- xbar + k[2] * xmad
-		lower <- max(cutoff[1], min(unlist(area)))
-		upper <- min(cutoff[2], max(unlist(area)))
-		small <- lapply(area, function(z) which(z < lower))
-		large <- lapply(area, function(z) which(z > upper))
-		mask <- rmObjects(mask, small, reenumerate = FALSE)
-		mask <- rmObjects(mask, large)
+		if (!identical(cutoff, FALSE)) {
+			area <- apply(mask, 3, function(v) computeFeatures.shape(v)[,1])
+			if (is(area, "matrix")) area <- split(area, c(col(area)))
+			xbar <- mean(unlist(area))
+			xmad <- mad(unlist(area))
+			if (is.null(cutoff)) cutoff <- c(NA, NA)
+			if (is.na(cutoff[1])) cutoff[1] <- xbar - k[1] * xmad
+			if (is.na(cutoff[2])) cutoff[2] <- xbar + k[2] * xmad
+			lower <- max(cutoff[1], min(unlist(area)))
+			upper <- min(cutoff[2], max(unlist(area)))
+			small <- lapply(area, function(z) which(z < lower))
+			large <- lapply(area, function(z) which(z > upper))
+			mask <- rmObjects(mask, small, reenumerate = FALSE)
+			mask <- rmObjects(mask, large)
+		}
 	# trim border objects
 		if (border > 0) {
 			sel <- edgeObjects(mask, border = border)
@@ -81,15 +90,28 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, ecc.max = 1
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
 			mask <- rmObjects(mask, sel)
 		}
+	# apply erosion/dilation
+		brush <- as.integer(brush)
+		if (brush != 0) {
+			brush <- 2*(brush + ifelse(brush < 0, -1, 0))%/%2 + 1 # ensure odd number
+			if (brush < 0)
+				mask <- erode(mask, makeBrush(-brush, "disc"))
+			else if (brush > 0)
+				mask <- dilate(mask, makeBrush(brush, "disc"))
+			mdist <- distmap(mask)
+			mask <- watershed(mdist)
+		}
 		dim(mask) <- dm
 		return(mask)
 	}
 
 # dispatch function according to argument 'mask'
 	if (is(mask, "Image"))
-		ans <- .proc(mask, cutoff = cutoff, k = k, border = border, ecc.max = ecc.max)
+		ans <- .proc(mask, cutoff = cutoff, k = k, border = border,
+				erode = erode, ecc.max = ecc.max)
 	else if (all(sapply(mask, is, "Image")))
-		ans <- lapply(mask, .proc, cutoff = cutoff, k = k, border = border, ecc.max = ecc.max)
+		ans <- lapply(mask, .proc, cutoff = cutoff, k = k, border = border,
+				erode = erode, ecc.max = ecc.max)
 	else
 		stop("'mask' must be an Image or list of images")
 	return(ans)

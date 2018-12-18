@@ -21,7 +21,9 @@ list of objects or arrays.}
 
 \item{brush}{Size of the brush to expand the nuclear mask as an 
 odd number of pixels. If this value is \code{NULL}, the mean value of 
-the semi-major axis of the nuclei will be used.}
+the semi-major axis of the nuclei will be used. If this value is
+negative, the resulting mask will be dilated by the brush size. 
+IN PROGRESS - NOT YET.}
 
 \item{lambda}{A numeric value used by \code{propagate()} determining 
 the trade-off between the Euclidean distance in the image plane and the 
@@ -52,12 +54,15 @@ antibody labeling for actin or a diffuse membrane stain.
 To create a cytoplasmic mask that excludes the nucleus, simply subtract
 the nuclear mask from the cell mask as shown below. Use \code{erode()} or
 \code{dilate()} to adjust the nuclear mask to include more or less of the 
-peri-nuclear region. 
+peri-nuclear region.
+
+To create a smaller nuclear mask, use a negative brush value.
 
 \preformatted{
 # When both are single objects
-  cmask <- cellMask(nmask) - nmask
-  cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
+  cytoplasm <- cellMask(nmask) - nmask
+  cytoplasm2 <- cellMask(nmask) - cellMask(nmask, 5) # capture less of nucleus 
+  small.nmask <- cellMask(nmask, brush = -5)
 
 # When both are list objects
   cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects

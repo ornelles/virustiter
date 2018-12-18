@@ -16,7 +16,9 @@
 #'   list of objects or arrays.
 #' @param brush Size of the brush to expand the nuclear mask as an 
 #'   odd number of pixels. If this value is \code{NULL}, the mean value of 
-#'   the semi-major axis of the nuclei will be used. 
+#'   the semi-major axis of the nuclei will be used. If this value is
+#'   negative, the resulting mask will be dilated by the brush size. 
+#'   IN PROGRESS - NOT YET.
 #' @param lambda A numeric value used by \code{propagate()} determining 
 #'   the trade-off between the Euclidean distance in the image plane and the 
 #'   contribution of the gradient. See \code{\link[EBImage]{propagate}}
@@ -38,12 +40,15 @@
 #' To create a cytoplasmic mask that excludes the nucleus, simply subtract
 #' the nuclear mask from the cell mask as shown below. Use \code{erode()} or
 #' \code{dilate()} to adjust the nuclear mask to include more or less of the 
-#' peri-nuclear region. 
+#' peri-nuclear region.
+#'
+#' To create a smaller nuclear mask, use a negative brush value.
 #'
 #' \preformatted{
 #' # When both are single objects
-#'   cmask <- cellMask(nmask) - nmask
-#'   cmask <- cellMask(nmask) - dilate(nmask makeBrush(5, "disc")) # less nucleus 
+#'   cytoplasm <- cellMask(nmask) - nmask
+#'   cytoplasm2 <- cellMask(nmask) - cellMask(nmask, 5) # capture less of nucleus 
+#'   small.nmask <- cellMask(nmask, brush = -5)
 #'
 #' # When both are list objects
 #'   cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
@@ -89,6 +94,11 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 		else if (!is.integer(imageData(mask)))
 			stop("'", deparse(substitute(mask)), "' is not an integer Image mask")
 	}
+
+# if brush is present, ensure that it is an integer
+	if (!is.null(brush))
+		brush <- as.integer(brush)
+
 # process function
 	.proc <- function(seeds, mask, brush, lambda)
 	{
@@ -98,11 +108,17 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 			dim(seeds) <- c(dm, 1)
 	# create mask from seeds if mask == NULL
 		if (is.null(mask)) {
-			if (is.null(brush))
+			if (is.null(brush)) {
 				brush <- mean(apply(seeds, 3,
 					function(x) mean(computeFeatures.moment(x)[,"m.majoraxis"])))
-			brush <- 2*round(brush)%/%2 + 1 # ensure that the brush is odd
-			mask <- dilate(seeds, makeBrush(brush, shape = "disc", step = TRUE))
+				brush <- as.integer(brush)
+			}
+		# apply erosion or dilation
+			brush <- 2*(brush + ifelse(brush < 0, -1, 0))%/%2 + 1 # ensure odd number
+			if (brush < 0)
+				mask <- erode(seeds, makeBrush(-brush, "disc"))
+			else if (brush > 0)
+				mask <- dilate(seeds, makeBrush(brush, "disc"))
 			mask <- fillHull(mask)
 			dim(mask) <- dm
 		}
