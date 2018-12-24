@@ -15,17 +15,17 @@ the same integer value.}
 and upper limits for the area  in pixels. If \code{NULL}, the
 multiplier parameter \code{k} will be used to determine the limits.
 Either value can be specified as \code{NA} to use the multiplier parameter
-for that position. If \code{FALSE}, size exclusion will be applied.}
+for that position. If \code{FALSE}, no size exclusion will occur.}
 
 \item{k}{Numeric value of length 2 specifying the lower and upper
- multiplier to determine the cutoff from the \code{mean} and \code{mad}
-of the area if \code{cutoff} is \code{NULL}.}
+multiplier to determine the cutoff from the \code{median()} and
+\code{mad()} of the area if \code{cutoff} is \code{NULL}.}
 
 \item{border}{Exclude objects within this many pixels from the edge.}
 
-\item{brush}{Integer value (converted to nearest odd number) for
-\code{'brush'} to dilate (or erode) the final mask where values < 0
-erode and values > 0 dilate.}
+\item{brush}{Non-zero values are converted to nearest odd number for
+as the argument \code{'brush'} to dilate (or erode) the final mask
+where values < 0 erode and values > 0 dilate.}
 
 \item{ecc.max}{Exclude objects with elliptical eccentricity greater than
 this value.}
@@ -41,8 +41,8 @@ highly eccentric objects.
 \details{
 For each non-\code{NA} value in \code{cutoff}, objects smaller than
 \code{cutoff[1]} and larger than \code{cutoff[2]} will be removed. 
-Otherwise, objects smaller than \code{mean(area) - k[1]*mad(area)} and
-larger than \code{mean(area)+ k[2]*mad(area)} will be removed. Objects
+Otherwise, objects smaller than \code{median(area) - k[1]*mad(area)} and
+larger than \code{median(area)+ k[2]*mad(area)} will be removed. Objects
 that are within \code{border} pixels of the edge will be removed. Objects
 that have eccentricity greater than \code{ecc.max} will be removed. A circle
 has eccentricity of 0 and a straight line has eccentricity of 1. Note 

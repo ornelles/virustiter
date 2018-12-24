@@ -10,14 +10,14 @@
 #'   and upper limits for the area  in pixels. If \code{NULL}, the
 #'   multiplier parameter \code{k} will be used to determine the limits.
 #'   Either value can be specified as \code{NA} to use the multiplier parameter
-#'   for that position. If \code{FALSE}, size exclusion will be applied.  
+#'   for that position. If \code{FALSE}, no size exclusion will occur.
 #' @param k Numeric value of length 2 specifying the lower and upper
-#'   multiplier to determine the cutoff from the \code{mean} and \code{mad}
-#'  of the area if \code{cutoff} is \code{NULL}.
+#'   multiplier to determine the cutoff from the \code{median()} and
+#'   \code{mad()} of the area if \code{cutoff} is \code{NULL}.
 #' @param border Exclude objects within this many pixels from the edge.
-#' @param brush Integer value (converted to nearest odd number) for
-#'   \code{'brush'} to dilate (or erode) the final mask where values < 0
-#'   erode and values > 0 dilate. 
+#' @param brush Non-zero values are converted to nearest odd number for
+#'   as the argument \code{'brush'} to dilate (or erode) the final mask
+#'   where values < 0 erode and values > 0 dilate. 
 #' @param ecc.max Exclude objects with elliptical eccentricity greater than
 #'   this value.
 #' 
@@ -25,8 +25,8 @@
 #' 
 #' For each non-\code{NA} value in \code{cutoff}, objects smaller than
 #' \code{cutoff[1]} and larger than \code{cutoff[2]} will be removed. 
-#' Otherwise, objects smaller than \code{mean(area) - k[1]*mad(area)} and
-#' larger than \code{mean(area)+ k[2]*mad(area)} will be removed. Objects
+#' Otherwise, objects smaller than \code{median(area) - k[1]*mad(area)} and
+#' larger than \code{median(area)+ k[2]*mad(area)} will be removed. Objects
 #' that are within \code{border} pixels of the edge will be removed. Objects
 #' that have eccentricity greater than \code{ecc.max} will be removed. A circle
 #' has eccentricity of 0 and a straight line has eccentricity of 1. Note 
@@ -56,7 +56,7 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 {
 	require(EBImage)
 # process function
-	.proc <- function(mask, cutoff, k, border, erode, ecc.max)
+	.proc <- function(mask, cutoff, k, border, brush, ecc.max)
 	{
 	# ensure three dimensions are present
 		dm <- dim(mask)
@@ -66,11 +66,11 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 		if (!identical(cutoff, FALSE)) {
 			area <- apply(mask, 3, function(v) computeFeatures.shape(v)[,1])
 			if (is(area, "matrix")) area <- split(area, c(col(area)))
-			xbar <- mean(unlist(area))
+			xmed <- median(unlist(area))
 			xmad <- mad(unlist(area))
 			if (is.null(cutoff)) cutoff <- c(NA, NA)
-			if (is.na(cutoff[1])) cutoff[1] <- xbar - k[1] * xmad
-			if (is.na(cutoff[2])) cutoff[2] <- xbar + k[2] * xmad
+			if (is.na(cutoff[1])) cutoff[1] <- xmed - k[1] * xmad
+			if (is.na(cutoff[2])) cutoff[2] <- xmed + k[2] * xmad
 			lower <- max(cutoff[1], min(unlist(area)))
 			upper <- min(cutoff[2], max(unlist(area)))
 			small <- lapply(area, function(z) which(z < lower))
@@ -108,10 +108,10 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 # dispatch function according to argument 'mask'
 	if (is(mask, "Image"))
 		ans <- .proc(mask, cutoff = cutoff, k = k, border = border,
-				erode = erode, ecc.max = ecc.max)
+				brush = brush, ecc.max = ecc.max)
 	else if (all(sapply(mask, is, "Image")))
 		ans <- lapply(mask, .proc, cutoff = cutoff, k = k, border = border,
-				erode = erode, ecc.max = ecc.max)
+				brush = brush, ecc.max = ecc.max)
 	else
 		stop("'mask' must be an Image or list of images")
 	return(ans)
