@@ -85,6 +85,6 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 		ans <- lapply(dna, .proc, width = width, offset = offset, size = size,
 			sigma = sigma, radius = radius, gamma = gamma)
 	else
-		stop("'dna' must be an Image or list of images")
+		stop("'dna' must be an Image or list of Images")
 	return(ans)
 }
