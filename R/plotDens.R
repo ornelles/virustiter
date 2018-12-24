@@ -91,7 +91,7 @@ plotDens <- function(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
 # assign names to 'bgnd' to use as strip labels
 	if (!is.na(index)) {
 		mat <- unique(df[c(panel, index)]) # two column matrix
-		ord <- order(levels(df[[index]])) # preserve factor order
+		ord <- order(mat[[index]]) # preserve order of factor
 		mat <- mat[ord,]
 		bgnd <- bgnd[as.character(mat[[2]])]
 		lab.panel <- as.character(mat[[1]])

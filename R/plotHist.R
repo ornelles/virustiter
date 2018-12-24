@@ -88,7 +88,7 @@ plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
 # assign names to 'bgnd' to use as strip labels
 	if (!is.na(index)) {
 		mat <- unique(df[c(panel, index)]) # two column matrix
-		ord <- order(levels(df[[index]])) # preserve order of factors
+		ord <- order(mat[[index]]) # preserve order of factors
 		mat <- mat[ord,]
 		bgnd <- bgnd[as.character(mat[[2]])]
 		lab.panel <- as.character(mat[[1]])
