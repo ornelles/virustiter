@@ -24,7 +24,8 @@
 #' \code{optim()} function minimizes \code{FUN} with respect to
 #' \code{x[1]} and \code{x[2]}. The default function is designed
 #' to align nuclear masks with predominantly nuclear signals and
-#' should be replaced for other localization patterns. #' 
+#' should be replaced for other localization patterns. 
+#' 
 #' The argument \code{parscale} is used by \code{optim()} to scale the 
 #' parameters in \code{x} such that a unit change in the parameter 
 #' amounts to unit change in the optimizing function empirically, 
@@ -70,7 +71,7 @@ getShift <- function(mask, target, parscale = c(25, 25), FUN = idiff)
 }
 
 #
-# local? function for optimization
+# local function for optimization
 #
 idiff <- function(x, mask, target) {
 	dm <- dim(mask)
@@ -87,4 +88,5 @@ idiff <- function(x, mask, target) {
 		return(0)
 	else
 		return(mean(xp[xp > 0])) # mean used rather than sum to avoid edge artifacts
+#		return(median(xp[xp > 0])) # median for robust measure to avoid edge artifacts 
 }
