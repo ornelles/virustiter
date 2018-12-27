@@ -55,6 +55,20 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 	ecc.max = 1)
 {
 	require(EBImage)
+	if (missing(mask)) {
+		usage <- c("trimMask argument hints:",
+			'  k = c(3,5) to drop objects < 3x mad(area) and > 5x mad(area)',
+			'  cutoff = FALSE to stop trimming by area',
+      '  cutoff = c(100, Inf) to drop objects <100 pixels',
+      '  brush = -5 to erode mask with disc of radius 5 pixels',
+      '  brush = 5 to dilate mask with disc of radius 5 pixels',
+			'  border = 2 to drop objects with 2 pixels of image border',
+      '  ecc.max = 0.75 to eliminate objects with eccentricity of 0.75 or more')
+		cat(usage, sep = "\n")
+		return(invisible(NULL))
+	}
+
+
 # process function
 	.proc <- function(mask, cutoff, k, border, brush, ecc.max)
 	{

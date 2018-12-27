@@ -21,9 +21,7 @@ list of objects or arrays.}
 
 \item{brush}{Size of the brush to expand the nuclear mask as an 
 odd number of pixels. If this value is \code{NULL}, the mean value of 
-the semi-major axis of the nuclei will be used. If this value is
-negative, the resulting mask will be dilated by the brush size. 
-IN PROGRESS - NOT YET.}
+the semi-major axis of the nuclei will be used.}
 
 \item{lambda}{A numeric value used by \code{propagate()} determining 
 the trade-off between the Euclidean distance in the image plane and the 
@@ -32,7 +30,7 @@ for details.}
 }
 \value{
 An \code{Image} object produced by \code{propagate()} containing the labeled
-objects (cells) or a \code{list} of the same.
+objects (cells) or a \code{list} of such objects.
 }
 \description{
 Define boundaries between adjacent cells (regions) from a
@@ -42,7 +40,7 @@ nuclear mask and optional cellular mask with the
 \details{
 A mask to define \emph{approximate} cellular boundaries will be created
 from a nuclear mask in \code{seeds} and an optional cytoplasmic
-mask \code{mask}. If the options second argument \code{mask} is \code{NULL},
+mask \code{mask}. If the second argument (\code{mask}) is \code{NULL},
 the nuclear mask will be dilated with a disc-shaped brush of size equal
 to \code{brush} or, if \code{brush} is \code{NULL}, the average semi-major
 axis of all nuclei. If \code{mask} is not \code{NULL}, \code{mask} must be
@@ -51,21 +49,18 @@ based on the seeds provided in \code{seeds}. Such a binary mask can be
 created by thresholding a non-specific widespread cytoplasmic signal such
 antibody labeling for actin or a diffuse membrane stain.
 
-To create a cytoplasmic mask that excludes the nucleus, simply subtract
-the nuclear mask from the cell mask as shown below. Use \code{erode()} or
-\code{dilate()} to adjust the nuclear mask to include more or less of the 
-peri-nuclear region.
+To create a \emph{smaller} nuclear mask, use \code{trimMask()} on a nuclear
+mask with a negative brush value.
 
-To create a smaller nuclear mask, use a negative brush value.
+To create a cytoplasmic mask that excludes the nucleus, combine the 
+nuclear mask \code{nmask} and cell mask as shown below. 
 
 \preformatted{
-# When both are single objects
-  cytoplasm <- cellMask(nmask) - nmask
-  cytoplasm2 <- cellMask(nmask) - cellMask(nmask, 5) # capture less of nucleus 
-  small.nmask <- cellMask(nmask, brush = -5)
+# When both are single objects:
+  cytoplasm <- cellMask(nmask) * (nmask == 0)
 
-# When both are list objects
-  cmask <-lapply(nmask, function(nm) cellMask(nm) - nm) # for list objects
+# When both are list objects:
+  cytoplasm <- Map(function(a, b) a * (b == 0), cellMask(nmask), nmask)
 }
 }
 \examples{

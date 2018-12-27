@@ -88,5 +88,4 @@ idiff <- function(x, mask, target) {
 		return(0)
 	else
 		return(mean(xp[xp > 0])) # mean used rather than sum to avoid edge artifacts
-#		return(median(xp[xp > 0])) # median for robust measure to avoid edge artifacts 
 }

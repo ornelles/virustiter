@@ -50,6 +50,14 @@
 nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 	radius =  NULL, gamma = 1)
 {
+	if (missing(dna)) {
+		usage <- c("nucMask argument hints:",
+			'  dna: fluorescent DNA image or list of images',
+			'  width: maximum nuclear diameter',
+      '  other argments passed to thresh2(), medianFilter() and gblur()')
+		cat(usage, sep = "\n")
+		return(invisible(NULL))
+	}
 # internal function to exclude edge objects 
 	.edge <- function(v, border) {
 		nx <- dim(v)[1]
