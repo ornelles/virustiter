@@ -39,7 +39,7 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 
 # check value for unit and assign control wells
 	if (!"unit" %in% names(phenoData))
-		phenoData$unit <- "unspecified"
+		phenoData$unit <- "[no unit]"
 	type <- rep("standard", nrow(phenoData))
 	if ("moi" %in% names(phenoData))
 		type[phenoData$moi == 0] <- "control"
