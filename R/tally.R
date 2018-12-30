@@ -94,24 +94,27 @@ tally <- function(df, moi, by = NULL, param = "mfi", pd = NULL)
 		unit <- "[no unit]"
 
 # tally positive and create results data.frame
-	pos <- tapply(df$positive == TRUE, group, sum)
-	neg <- tapply(df$positive == FALSE, group, sum)
-	y <- pos/(pos + neg)
+	res <- aggregate(cbind(positive == TRUE, positive == FALSE) ~ group, df, sum)
+	names(res)[2:3] <- c("pos", "neg")
+	y <- with(res, pos/(pos + neg))
 	if (moi == FALSE)
 		x <- 1
 	else
-		x <- sapply(names(pos), function(v) df[[moi]][group == v][1])
+		x <- sapply(levels(res$group), function(v) df[[moi]][group == v][1])
 	if (by == "well") {
-		well <- names(pos)
+		well <- levels(as.factor(res$group))
 		row <- well.info(well)$row
 		column <- well.info(well)$column
-		res <- data.frame(well, row, column, unit, pos, neg, x, y)
+		res <- cbind(well, row, column, unit, res[c("pos", "neg")], x, y)
 	}
 	else if (by == "file") {
-		res <- data.frame(file = names(pos), unit, pos, neg, x, y)
+		file <- levels(as.factor(res$group))
+		res <- cbind(file, unit, res[c("pos", "neg")], x, y)
 	}
-	else 
-		res <- data.frame(group = names(pos), unit, pos, neg, x, y)
+	else {
+		group <- levels(as.factor(res$group))
+		res <- cbind(group, unit, res[c("pos", "neg")], x, y)
+	}
 	if (!is.null(pd))
 		res <- mergePdata(pd, res)
 	rownames(res) <- NULL
