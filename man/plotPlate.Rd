@@ -5,7 +5,7 @@
 \title{Plot Results of an Entire Plate by Well or File}
 \usage{
 plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
-  invert.y = TRUE, ...)
+  invert.y = TRUE, layout = NULL, ...)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}
@@ -19,6 +19,8 @@ plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 \item{main}{Optional character string to serve as plot title.}
 
 \item{invert.y}{A \code{logical} value to invert y coordinates.}
+
+\item{layout}{Optional layout for lattice plot grouped by file.}
 
 \item{...}{Additional arguments handed to \code{xyplot} including subset.}
 }

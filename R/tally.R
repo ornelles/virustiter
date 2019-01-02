@@ -5,7 +5,8 @@
 #' or \code{"file"} that corresponds to a single multiplicity.
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
-#' @param moi Character string identifying the independent value. If missing,
+#' @param pd Optional phenotype \code{data.frame} to add to results.
+#' @param moi Character string identifying the independent value. If \code{NULL},
 #'   variables named \code{"moi"} and \code{"x"} will be sought. Note
 #'   that in the returned value, this variable will be named \code{"x"}.
 #' @param by Character string identifying the grouping variable. If \code{NULL},
@@ -13,7 +14,6 @@
 #'   the grouping variable. 
 #' @param param Character string identifying the variable in \code{df} to evaluate, 
 #'   typically \code{"mfi"}.
-#' @param pd Optional phenotype \code{data.frame} to add to results.
 #'
 #' @details
 #'
@@ -53,15 +53,15 @@
 #'
 #' @export
 #'  
-tally <- function(df, moi, by = NULL, param = "mfi", pd = NULL)
+tally <- function(df, pd = NULL, moi = NULL, by = NULL, param = "mfi")
 {
 # parameter check
 	if(!"positive" %in% names(df))
 		stop("\ntally() requires the logical variable 'positive'.",
 			"\nPerhaps score() needs to be called on '", deparse(substitute(df)))
 
-# if the moi parameter is missing, seek "moi" or "x" in df
-	if (missing(moi)) {
+# if the moi is NULL, first seek "moi" and then "x" in df
+	if (is.null(moi)) {
 		moi <- FALSE
 		if ("moi" %in% names(df))
 			moi <- "moi"

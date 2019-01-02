@@ -1,10 +1,3 @@
-#########################################################################################
-# plotPlate
-#
-# display entire plate with lattice graphics (expects well values as "a03", etc.
-# otherwise treats it as a 
-#
-#########################################################################################
 #' Plot Results of an Entire Plate by Well or File
 #'
 #' Display an entire plate with lattice graphics grouped by well or file.
@@ -15,6 +8,7 @@
 #' @param alpha Transparency factor applied to plotting symbols.
 #' @param main Optional character string to serve as plot title.
 #' @param invert.y A \code{logical} value to invert y coordinates.
+#' @param layout Optional layout for lattice plot grouped by file. 
 #' @param ... Additional arguments handed to \code{xyplot} including subset.
 #'
 #' @import lattice
@@ -26,7 +20,7 @@
 #' @export
 #'
 plotPlate <- function(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
-	invert.y = TRUE, ...)
+	invert.y = TRUE, layout = NULL, ...)
 {
 	require(lattice)
 
@@ -77,13 +71,15 @@ plotPlate <- function(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 		df$ym <- -df$ym
 	if (byWell == TRUE) {
 		obj <- xyplot(ym ~ xm | well, data = df, groups = positive, cex = cex,
-			alpha = alpha, as.table = TRUE, aspect = "iso", layout = c(columns,rows),
+			alpha = alpha, as.table = TRUE, aspect = "iso", layout = c(columns, rows),
 			skip = skip, xlab = "", ylab = "", scales = list(draw = FALSE),
 			main = main, ...)
 	}
 	else {
+		if (is.null(layout))
+			layout <- c(columns, rows)
 		obj <- xyplot(ym ~ xm | file, data = df, groups = positive, cex = cex,
-			alpha = alpha, as.table = TRUE, aspect = "iso", layout = c(columns,rows),
+			alpha = alpha, as.table = TRUE, aspect = "iso", layout = layout,
  			xlab = "", ylab = "", scales = list(draw = FALSE), main = main, ...)
 	}
 	plot(obj)

@@ -3,8 +3,8 @@
 #' Plot a representation of the selected wells showing positive and
 #' negative cells with \code{\link[lattice]{xyplot}}.
 #'
+#' @param myWell Character vector of well(s) to be plotted.
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param myWell Character vector of wells to be plotted.
 #' @param byFrame A \code{logical} value to separate frames.
 #' @param cex Numeric value as factor by which to expand the plot symbol.
 #' @param invert.y A \code{logical} value to invert y coordinates.
@@ -18,11 +18,36 @@
 #'
 #' @export
 #'
-plotWell <- function(df, myWell = levels(df$well), byFrame = TRUE,
-	cex = 1, invert.y = TRUE, ...)
+plotWell <- function(myWell, df, byFrame = TRUE, cex = 1, invert.y = TRUE, ...)
 {
+# parse arguments
+	if (missing(myWell) && missing(df)) {
+		usage <- c("plotWell examples:",
+			'  plotWell(df)                    # plot all data by wells in df',
+			'  plotWell("a2", df)              # plot data in well A02',
+			'  plotWell(c("a1","a2","a3"), df) # plot data in three wells')
+		cat(usage, sep = "\n")
+		return(invisible(NULL))
+	}
+	else if (missing(df)) { # perhaps 'myWell' is data.frame?
+		if (is(myWell, "data.frame")) {
+			df <- myWell
+			myWell <- levels(df$well)
+		}
+		else
+			stop("unable to use ", deparse(substitute(myWell)), " without a data.frame")
+	}
+	else if (is(myWell, "data.frame") && is(df, "character")) {
+		temp <- myWell
+		myWell <- df
+		df <- temp
+	}
+
+# check arguments
 	if (!"well" %in% names(df))
 		stop("requires variable 'well' in ", deparse(substitute(df)))
+	if (!all(c("xm", "ym") %in% names(df)))
+		stop("requires both 'xm' and 'ym' in ",  deparse(substitute(df)))
 	if (!"positive" %in% names(df))
 		df$positive <- FALSE
 	if (invert.y)

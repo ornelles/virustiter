@@ -1,23 +1,22 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, `latticeExtra` and `genefilter` packages.
+This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages.
 
 ## Overview
-This tools in this package are largely structured to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order expects the nuclear (DAPI) image file to come before the corresponding viral antigen image file, different orders can be accommodated.
+The tools in this package have primarily been developed to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order expects the nuclear (DAPI) image file to come before the corresponding viral antigen image file, different orders can be accommodated.
 
 The sets of images associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
 
 Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the moi and unit of measure (as VP,  ml, ul, nl, etc). These data are merged with the image data for further analysis.
 
-Individual cells are identified by the nuclear stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand the size of the nuclear mask to include more of the associated cytoplasm. See the help function for `parseImages()` for more details and additional options to optimize detection. 
+Individual cells are identified by a DNA stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
 
 ## Installation
 This is the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
 
-First, the supporting packages `EBImage` and `genefilter` need to be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
+First, the supporting package `EBImage` must be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
 source("https://bioconductor.org/biocLite.R")
 biocLite("EBImage")
-biocLite("genefilter")
 ```
 Second, the `devtools` and `latticeExtra` packages need to be installed.
 ```
@@ -34,7 +33,7 @@ install_github("ornelles/virustiter")
 Phenotype date should be a data frame with the following variables:
 ```
   moi   A numeric value, which can be named 'x', indicating the multiplicity
-  unit  A character string identifying the units per cell as "VP "IU "ul or "ml"
+  unit  A character string identifying the units per cell such as "VP "IU "ul or "ml"
 ```
 and must include *either* `well` *or* `file` *but not both*:
 ```
@@ -65,8 +64,6 @@ Typical workflow:
 ```
    img <- getImages()    # read paired images with EBImage
    df <- parseImages()   # extract nuclear information and target mfi
-   ...or...
-   df <- readIJResults() # read data from Fluorescent Cell Count (ImageJ)
 
    pd <- data.frame(well = well.info(levels(df$well)), moi = moi, unit = unit)
    ...or...

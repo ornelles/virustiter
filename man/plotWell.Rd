@@ -4,13 +4,12 @@
 \alias{plotWell}
 \title{Plot Results by Well with Lattice Graphics}
 \usage{
-plotWell(df, myWell = levels(df$well), byFrame = TRUE, cex = 1,
-  invert.y = TRUE, ...)
+plotWell(myWell, df, byFrame = TRUE, cex = 1, invert.y = TRUE, ...)
 }
 \arguments{
-\item{df}{Annotated \code{data.frame} with imaging results.}
+\item{myWell}{Character vector of well(s) to be plotted.}
 
-\item{myWell}{Character vector of wells to be plotted.}
+\item{df}{Annotated \code{data.frame} with imaging results.}
 
 \item{byFrame}{A \code{logical} value to separate frames.}
 

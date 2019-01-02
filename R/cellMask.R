@@ -126,9 +126,14 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 	# create mask from seeds if mask == NULL
 		if (is.null(mask)) {
 			if (is.null(brush)) {
-				brush <- mean(apply(seeds, 3,
-					function(x) mean(computeFeatures.moment(x)[,"m.majoraxis"])))
-				brush <- as.integer(brush)
+				valid <- apply(seeds, 3, function(z) max(z) > 0) # avoid blank seeds
+				if (any(valid)) {
+					brush <- mean(apply(seeds[,,valid, drop = FALSE], 3,
+						function(x) mean(computeFeatures.moment(x)[,"m.majoraxis"])))
+					brush <- as.integer(brush)
+				}
+				else
+					brush <- 1
 			}
 		# apply dilation
 			brush <- 2*brush%/%2 + 1 # ensure odd number
