@@ -1,4 +1,4 @@
-#' Find Objects
+#' Find Objects - NOT QUITE
 #' 
 #' Identify objects in data.frame produced by \code{parseImages()} 
 #' as specified by the expression \code{expr}. 
@@ -57,7 +57,7 @@ findObjects <- function(expr, data, mask, invert = FALSE)
    group <- "well"
 	else if ("file" %in% names(data))
 		group <- "file"
-	spl.1 <- split(data, data[[group]], drop = TRUE)
+	spl.1 <- split(data, data[[group]], drop = FALSE)
 	spl.2 <- lapply(spl.1, function(v) split(v[[vname]], v[["frame"]], drop = TRUE))
 	neg <- lapply(spl.2, function(v) lapply(v, function(x) which(x == FALSE)))
 	pos <- lapply(spl.2, function(v) lapply(v, function(x) which(x == TRUE)))
@@ -65,8 +65,11 @@ findObjects <- function(expr, data, mask, invert = FALSE)
 # process mask
 	if (missing(mask))
 		ans <- if(invert) neg else pos
-	else if (is(mask, "Image"))
-		ans <- if(invert) rmObjects(mask, unlist(pos)) else rmObjects(mask, unlist(neg))
+	else if (is(mask, "Image")) {
+		pos <- unlist(pos, recursive = FALSE)
+		neg <- unlist(neg, recursive = FALSE)
+		ans <- if(invert) rmObjects(mask, pos) else rmObjects(mask, neg)
+	}
 	else if (is(mask, "list"))
 		ans <- if(invert) Map(rmObjects, mask, pos) else Map(rmObjects, mask, neg)
 	else
