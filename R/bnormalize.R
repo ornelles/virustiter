@@ -62,7 +62,7 @@ bnormalize <- function(img, size = 2, sigma = 2, offset = 0.05)
 		bgnd <- apply(img, 3, median)
 		bgndImg <- Image(rep(bgnd, each = prod(dm[1:2])), dim = dm)
 		img <- img - bgndImg + offset
-		img[img < 0] <- 0
 	}
+	img[img < 0] <- 0
 	return(img)
 }
