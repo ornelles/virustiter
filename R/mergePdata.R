@@ -54,7 +54,14 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 	if ("well" %in% names(imageData)) vars <- c(vars, "well")
 	vars <- unique(vars)
 	imageData <- imageData[vars]
+
+# add temporary sorting variable for imageData and merge
+	sval <- tail(make.unique(c(names(imageData), "srt")), 1)
+	imageData[[sval]] <- seq_len(nrow(imageData))
 	res <- merge(phenoData, imageData)
+	ord <- order(res[[sval]])
+	res <- res[ord, ]
+	res <- res[names(res) != sval]
 
 # convert strings to factors
 	sel <- sapply(res, is.character)
