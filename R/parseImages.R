@@ -82,9 +82,10 @@
 #' \code{equalize} can be set to \code{TRUE}. This smooths the images by
 #' sequentially modifying values in each target image with a
 #' median filter of radius 2, a Gaussian blur of radius 2, subtracting
-#' the median value for each image and adding an offset of 0.05.
-#' \emph{This cannot be used for images that have a large fraction
-#' of positive cells, such as the example data set.}
+#' the intensity at the fifth percentile for each image
+#' (see \code{bnormalize()} for more details) and adding an offset of 0.05.
+#' \emph{This may not work for images that have a very large fraction
+#' of non-background pixels.}
 #'
 #' @return
 #'
