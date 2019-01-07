@@ -56,10 +56,7 @@ edgeObjects <- function (x, border = 1)
 # dispatch on the dimensions of the argument
 	if (length(dm) == 2)
 		ans <- .edge(x, border = border)
-	else {
-		ans <- apply(x, 3, .edge, border = border)
-		if (is(ans, "matrix")) # ensure that a list is returned
-			ans <- split(ans, c(col(ans)))
-	}
+	else 
+		ans <- lapply(seq_len(dm[3]), function(i) .edge(x[,,i], border = border))
 	return(ans)
 }
