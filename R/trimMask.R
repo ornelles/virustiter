@@ -78,8 +78,7 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 		nframes <- dim(mask)[3]
 	# trim by area
 		if (!identical(cutoff, FALSE)) {
-			area <- apply(mask, 3, function(v) computeFeatures.shape(v)[,1])
-			if (is(area, "matrix")) area <- split(area, c(col(area)))
+			area <- lapply(seq_len(nframes), function(i) computeFeatures.shape(mask[,,i])[,1])
 			xmed <- median(unlist(area))
 			xmad <- mad(unlist(area))
 			if (is.null(cutoff)) cutoff <- c(NA, NA)
@@ -100,8 +99,8 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 		}
 	# trim by eccentricity
 		if (ecc.max != 1) {
-			ecc <- apply(mask, 3, function(v) computeFeatures.moment(v)[,"m.eccentricity"])
-			if (is(ecc, "matrix")) ecc <- split(ecc, c(col(ecc)))
+			ecc <- lapply(seq_len(nframes),
+				function(i) computeFeatures.moment(mask[,,i])[,"m.eccentricity"])
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
 			mask <- rmObjects(mask, sel, reenumerate = TRUE)
 		}
