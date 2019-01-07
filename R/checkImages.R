@@ -121,16 +121,16 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	spl <- strsplit(ff, "/")
 	field1 <- sapply(spl, tail, 1)
 	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	sel <- grepl("[[:alpha:]][[:digit:]]+$", field2) # test for well pattern
+	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", field2, ignore.case = TRUE)
 
-# assign value to imageType as "byWell" or "byStack" and complete message
+# assign value to imageType as "byWell" or "byFile" and complete message
 	if (all(sel)) {
 		imageType <- "byWell"
 		well <- field2
 		filename <- NULL
 	}
 	else if (!any(sel)) {
-		imageType <- "byStack"
+		imageType <- "byFile"
 		well <- NULL
 		filename <- field1
 	}
@@ -142,7 +142,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 # split image paths into related groups (by well or by file)
 	if (imageType == "byWell")
 		ffsplit <- split(ff, well)
-	else if (imageType == "byStack")
+	else if (imageType == "byFile")
 		ffsplit <- split(ff, filename)
 	else
 		stop("can't happen! Unexpected value for 'imageType'")

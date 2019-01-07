@@ -94,7 +94,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	spl <- strsplit(ff, "/")
 	field1 <- sapply(spl, tail, 1)
 	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	sel <- grepl("[[:alpha:]][[:digit:]]{1,4}$", field2) # test for well pattern
+	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", field2, ignore.case = TRUE)
 
 # assign variables to direct processing
 	if (all(sel)) {
@@ -103,7 +103,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		filename <- NULL
 	}
 	else if (!any(sel)) {
-		imageType <- "byStack"
+		imageType <- "byFile"
 		well <- NULL
 		filename <- field1
 	}
@@ -113,7 +113,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 # split image paths into related groups (by well or by file)
 	if (imageType == "byWell")
 		ffsplit <- split(ff, well)
-	else if (imageType == "byStack")
+	else if (imageType == "byFile")
 		ffsplit <- split(ff, filename)
 	else
 		stop("internal error: unexpected value for 'imageType'")
@@ -166,9 +166,10 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 # report on findings 
 	if (verbose) {
 		id <- names(ffsplit)
-		count <- lengths(ffsplit)
-		message(sprintf("%3d: %d pairs in %s\n", seq_along(id), count, id), appendLF = FALSE)
-#		message(sprintf("%s: %d image pairs\n", id, count), appendLF = FALSE)
+		count <- sapply(dnaImages, function(v) dim(v)[3])
+		count[is.na(count)] <- 1
+		message(sprintf("%3d: %d pair%s in %s\n", seq_along(id), count,
+			ifelse(count == 1, "", "s"), id), appendLF = FALSE)
 	}
 
 # return image pairs

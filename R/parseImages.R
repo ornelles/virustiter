@@ -290,7 +290,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 					row = well.info(ww)$row, column = well.info(ww)$column,
 					frame = i, xm = XY[,1], ym = XY[,2], area, dna, mfi))
 			}
-			else # imageType == "byStack"
+			else # imageType == "byFile"
 				res <- rbind(res, data.frame(file = names(nucImages)[idx],
 					frame = i, xm = XY[,1], ym = XY[,2],
 					area, dna, mfi))
