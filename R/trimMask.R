@@ -62,8 +62,8 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
       '  cutoff = c(100, Inf) to drop objects <100 pixels',
       '  brush = -5 to erode mask with disc of radius 5 pixels',
       '  brush = 5 to dilate mask with disc of radius 5 pixels',
-			'  border = 2 to drop objects with 2 pixels of image border',
-      '  ecc.max = 0.75 to eliminate objects with eccentricity of 0.75 or more')
+			'  border = 2 to drop objects within 2 pixels of image border',
+      '  ecc.max = 0.75 to drop objects with eccentricity > 0.75')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
@@ -90,19 +90,20 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 			small <- lapply(area, function(z) which(z < lower))
 			large <- lapply(area, function(z) which(z > upper))
 			mask <- rmObjects(mask, small, reenumerate = FALSE)
-			mask <- rmObjects(mask, large)
+			mask <- rmObjects(mask, large, reenumerate = FALSE)
+			mask <- reenumerate(mask) # needed because reenumeration may not OCCUR for no large
 		}
 	# trim border objects
 		if (border > 0) {
 			sel <- edgeObjects(mask, border = border)
-			mask <- rmObjects(mask, sel)
+			mask <- rmObjects(mask, sel, reenumerate = TRUE)
 		}
 	# trim by eccentricity
 		if (ecc.max != 1) {
 			ecc <- apply(mask, 3, function(v) computeFeatures.moment(v)[,"m.eccentricity"])
 			if (is(ecc, "matrix")) ecc <- split(ecc, c(col(ecc)))
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
-			mask <- rmObjects(mask, sel)
+			mask <- rmObjects(mask, sel, reenumerate = TRUE)
 		}
 	# apply erosion/dilation
 		brush <- as.integer(brush)
