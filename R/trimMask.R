@@ -2,22 +2,23 @@
 #' 
 #' Remove large and small objects from an integer \code{Image} mask,
 #' remove objects that are near the edge of the image, and remove
-#' highly eccentric objects.
+#' eccentric objects.
 #' 
 #' @param mask Object mask or list of masks with connected pixels having
 #'   the same integer value.
 #' @param cutoff Optional integer value of length 2 specifying the lower 
-#'   and upper limits for the area  in pixels. If \code{NULL}, the
-#'   multiplier parameter \code{k} will be used to determine the limits.
-#'   Either value can be specified as \code{NA} to use the multiplier parameter
-#'   for that position. If \code{FALSE}, no size exclusion will occur.
+#'   and upper limits for the area in pixels. A value of \code{FALSE} or
+#'   \code{NA} prevents any size exclusion from occurring. A value of
+#'   \code{NULL} makes use of the multiplier parameter \code{k} to determine 
+#'   the cutoff limits. Either of the two values in \code{cutoff} can be
+#'   specified as \code{NA} to use the multiplier parameter for that position.
 #' @param k Numeric value of length 2 specifying the lower and upper
 #'   multiplier to determine the cutoff from the \code{median()} and
 #'   \code{mad()} of the area if \code{cutoff} is \code{NULL}.
-#' @param border Exclude objects within this many pixels from the edge.
+#' @param border Objects within this many pixels of the edge will be excluded.
 #' @param brush Non-zero values are converted to nearest odd number for
-#'   as the argument \code{'brush'} to dilate (or erode) the final mask
-#'   where values < 0 erode and values > 0 dilate. 
+#'   as the argument \code{'brush'} to dilate the final mask for values > 0
+#'   and to erode the mask for values < 0. 
 #' @param ecc.max Exclude objects with elliptical eccentricity greater than
 #'   this value.
 #' 
@@ -51,15 +52,15 @@
 #' 
 #' @export
 #'
-trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
+trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 	ecc.max = 1)
 {
 	require(EBImage)
 	if (missing(mask)) {
 		usage <- c("trimMask argument hints:",
 			'  k = c(3,5) to drop objects < 3x mad(area) and > 5x mad(area)',
-			'  cutoff = FALSE to stop trimming by area',
-      '  cutoff = c(100, Inf) to drop objects <100 pixels',
+			'  cutoff = NULL will  use values in k to trim',
+      '  cutoff = c(100, Inf) to drop objects < 100 pixels',
       '  brush = -5 to erode mask with disc of radius 5 pixels',
       '  brush = 5 to dilate mask with disc of radius 5 pixels',
 			'  border = 2 to drop objects within 2 pixels of image border',
@@ -77,7 +78,7 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 		if (length(dm) == 2) dim(mask) <- c(dm, 1)
 		nframes <- dim(mask)[3]
 	# trim by area
-		if (!identical(cutoff, FALSE)) {
+		if (!identical(cutoff, FALSE) && !identical(cutoff, NA)) {
 			area <- lapply(seq_len(nframes), function(i) computeFeatures.shape(mask[,,i])[,1])
 			xmed <- median(unlist(area))
 			xmad <- mad(unlist(area))
@@ -104,17 +105,18 @@ trimMask <- function(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
 			mask <- rmObjects(mask, sel, reenumerate = TRUE)
 		}
-	# apply erosion/dilation
+	# apply erosion or dilation
 		brush <- as.integer(brush)
 		if (brush != 0) {
 			brush <- 2*(brush + ifelse(brush < 0, -1, 0))%/%2 + 1 # ensure odd number
-			if (brush < 0)
-				mask <- erode(mask, makeBrush(-brush, "disc"))
-			else if (brush > 0)
+			if (brush > 0) # dilating preserves values of mask
 				mask <- dilate(mask, makeBrush(brush, "disc"))
-			mdist <- distmap(mask)
-			mask <- watershed(mdist)
+			else if (brush > 0) { # but eroding creates a binary object!
+				mult <- erode(mask, makeBrush(-brush, "disc"))
+				mask <- mult * mask # converts to eroded integer mask 
+			}
 		}
+	# return mask to original dimensions 
 		dim(mask) <- dm
 		return(mask)
 	}

@@ -4,28 +4,29 @@
 \alias{trimMask}
 \title{Remove Objects by Size, Proximity to Edge and Eccentricity}
 \usage{
-trimMask(mask, cutoff = NULL, k = c(1.5, 3), border = 0, brush = 0,
-  ecc.max = 1)
+trimMask(mask, cutoff = FALSE, k = c(1.5, 3), border = 0,
+  brush = 0, ecc.max = 1)
 }
 \arguments{
 \item{mask}{Object mask or list of masks with connected pixels having
 the same integer value.}
 
 \item{cutoff}{Optional integer value of length 2 specifying the lower 
-and upper limits for the area  in pixels. If \code{NULL}, the
-multiplier parameter \code{k} will be used to determine the limits.
-Either value can be specified as \code{NA} to use the multiplier parameter
-for that position. If \code{FALSE}, no size exclusion will occur.}
+and upper limits for the area in pixels. A value of \code{FALSE} or
+\code{NA} prevents any size exclusion from occurring. A value of
+\code{NULL} makes use of the multiplier parameter \code{k} to determine 
+the cutoff limits. Either of the two values in \code{cutoff} can be
+specified as \code{NA} to use the multiplier parameter for that position.}
 
 \item{k}{Numeric value of length 2 specifying the lower and upper
 multiplier to determine the cutoff from the \code{median()} and
 \code{mad()} of the area if \code{cutoff} is \code{NULL}.}
 
-\item{border}{Exclude objects within this many pixels from the edge.}
+\item{border}{Objects within this many pixels of the edge will be excluded.}
 
 \item{brush}{Non-zero values are converted to nearest odd number for
-as the argument \code{'brush'} to dilate (or erode) the final mask
-where values < 0 erode and values > 0 dilate.}
+as the argument \code{'brush'} to dilate the final mask for values > 0
+and to erode the mask for values < 0.}
 
 \item{ecc.max}{Exclude objects with elliptical eccentricity greater than
 this value.}
@@ -36,7 +37,7 @@ Object mask or list of masks with objects removed and re-enumerated.
 \description{
 Remove large and small objects from an integer \code{Image} mask,
 remove objects that are near the edge of the image, and remove
-highly eccentric objects.
+eccentric objects.
 }
 \details{
 For each non-\code{NA} value in \code{cutoff}, objects smaller than
