@@ -88,7 +88,7 @@ Supporting functions include these as well as others:
    addOneFit(fm)       # add another best-fit line and points to an existing plot
    getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
    nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
-   trimMask(mask)      # remove objects based on size from image mask
+   trimMask(mask, TRUE) # remove objects based on size from image mask
    cellMask(mask)      # expand a nuclear mask into a cell image mask
    bnormalize(img)     # normalize images to a common background value
    p2p()               # interactively measure point-to-point distances
