@@ -111,7 +111,7 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 			brush <- 2*(brush + ifelse(brush < 0, -1, 0))%/%2 + 1 # ensure odd number
 			if (brush > 0) # dilating preserves values of mask
 				mask <- dilate(mask, makeBrush(brush, "disc"))
-			else if (brush > 0) { # but eroding creates a binary object!
+			else if (brush < 0) { # but eroding creates a binary object!
 				mult <- erode(mask, makeBrush(-brush, "disc"))
 				mask <- mult * mask # converts to eroded integer mask 
 			}
