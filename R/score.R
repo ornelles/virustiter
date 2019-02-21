@@ -34,7 +34,6 @@
 #'
 #' @import
 #' EBImage
-#' genefilter
 #'
 #' @export
 #'
