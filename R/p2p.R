@@ -11,8 +11,10 @@
 #' 
 #' @return
 #' 
-#' Distances between points with locator in pixels.
-#' 
+#' Distances between points with locator in pixels. 
+#'
+#' @export
+#'
 p2p <- function(n = 512, col = "magenta", type = "o", pch = 3, ...)
 {
 	ans <- numeric()
