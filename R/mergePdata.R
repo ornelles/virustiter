@@ -28,8 +28,10 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 # for separate images in folders (multi-well)
 	if ("well" %in% names(imageData)) {
 		stopifnot("well" %in% names(phenoData))
-		phenoData$well <- factor(well.info(phenoData$well)$well) # harmonize
-		stopifnot(levels(imageData$well) %in% levels(phenoData$well))
+		pdWell <- factor(well.info(phenoData$well)$well) # harmonize
+		idWell <- factor(well.info(imageData$well)$well)
+		if (!all(levels(idWell) %in% levels(pdWell)))
+			stop("Some levels of 'well' in imageData are absent from phenoData")
 	# add row and column information to phenotype data
 		phenoData$column <- well.info(phenoData$well)$column
 		phenoData$row <- well.info(phenoData$well)$row
