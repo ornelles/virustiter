@@ -4,31 +4,31 @@
 #' graphics showing the selected background cutoff values.
 #'
 #' @param df Annotated \code{data.frame} with imaging results.
-#' @param bgnd Numeric vector of background values. If missing, \code{getBgnd()}
+#' @param bgnd Numeric vector of background values. If missing, \code{\link{getBgnd}}
 #'    will be called with parameters \code{by, param, mult,} and \code{log}.
 #' @param param Character string identifying the variable to be analyzed. Also
-#'   passed to \code{getBgnd()} if required.
+#'   passed to \code{\link{getBgnd}} if required.
 #' @param panel Optional character string defining the \code{lattice} panels,
 #'   typically \code{"well"} or \code{"file"}. 
 #' @param adjust Numeric value controlling bandwith, passed to the
-#'   \code{density()} function.
+#'   \code{\link{density}} function.
 #' @param log Optional \code{logical} or \code{numeric} value to transform
-#'   \code{'param'} values. Also passed to \code{getBgnd()} if required. 
-#' @param by,mult Additional parameters passed to \code{getBgnd()} if required.
+#'   \code{'param'} values. Also passed to \code{\link{getBgnd}} if required. 
+#' @param by,mult Additional parameters passed to \code{\link{getBgnd}} if required.
 #' @param main Optional character string to serve as plot title. If \code{NULL},
 #'   the system date will be used.
-#' @param as.table A \code{logical} value passed to \code{densityplot()}.
+#' @param as.table A \code{logical} value passed to \code{densityplot}.
 #' @param layout An optional numeric vector to specify layout of densityplot,
-#'   passed to \code{densityplot()}.
-#' @param ... Additional arguments passed to \code{densityplot()}.
+#'   passed to \code{densityplot}.
+#' @param ... Additional arguments passed to \code{densityplot}.
 #'
 #' @details
 #'
 #' A densityplot of image intensity in \code{'param'} is plotted
 #' with the selected background cutoff similar to the function
-#' \code{plotHist())}. Both functions can be used to examine the uniformity
+#' \code{\link{plotHist}}. Both functions can be used to examine the uniformity
 #' of results from an imaging experiment and to interactively check the
-#' paramaters passed to \code{getBgnd()} to determine a suitable background
+#' paramaters passed to \code{\link{getBgnd}} to determine a suitable background
 #' cutoff value. The background values are incorporated into the strip labels. 
 #'
 #' @return

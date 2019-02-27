@@ -25,6 +25,7 @@ usage <- function() {
 	"   cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI",
 	"", 
 	" Support:",
+	"   getVal(mask, tgt)   # extract single 'computeFeatures' value from tgt",
 	"   checkImages(path)   # check (and display) paired images", 
 	"   plotDens(df)        # calculate and show background values with densityplot ",
 	"   plotHist(df)        # histogram of each well with optional background values",
@@ -37,6 +38,7 @@ usage <- function() {
 	"   nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)",
 	"   trimMask(mask)      # remove objects based on size from mask",
 	"   cellMask(mask)      # expand a nuclear mask into a cell mask",
+  "   edgeObjects(mask)   # identify objects near the edge of a mask",
 	"   p2p()               # interactively measure point-to-point distances",
 	"   pnpoly(p, v)        # test if points in p are within polygon (v)",
 	"")

@@ -1,7 +1,7 @@
 #' Get Paired Microscopic Images
 #'
 #' Return a list of paired DNA and fluorescent images
-#' appropriate for \code{parseImages()}.
+#' appropriate for \code{\link{parseImages}}.
 #'
 #' @param source A character vector identifying a directory or directories
 #'   with multilayer tiff files \emph{or} subdirectories identified
@@ -17,13 +17,13 @@
 #'   \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
 #'   image such as a phase contrast image or second fluorescent color in each set.
 #' @param pattern Optional character string to serve as a \code{grep} pattern
-#'   for \code{list.files()} to select image files.
+#'   for \code{\link{list.files}} to select image files.
 #' @param verbose If \code{TRUE}, print diagnostic messages as files are read.
 #'
 #' @details
 #'
 #' Images specified in \code{source} will be checked for the proper
-#' organization of image files. The order required by \code{parseImages()}
+#' organization of image files. The order required by \code{\link{parseImages}}
 #' is the DNA image first and fluorescent viral target second. This
 #' order can be changed with the \code{which.images} argument.
 #'

@@ -12,24 +12,24 @@
 #' @param nMask An optional \code{Image} object, array, or a \code{list}
 #'   these objects containing an integer \code{Image} mask identifying nuclei.
 #'   If this value is \code{NULL}, the nuclear mask will be determined by
-#'   \code{nucMask()} with any arguments provided in \code{args.nMask}.
-#' @param args.nMask A list of arguments passed to \code{\link{nucMask()}}.
+#'   \code{\link{nucMask}} with any arguments provided in \code{args.nMask}.
+#' @param args.nMask A list of arguments passed to \code{\link{nucMask}}.
 #'   This argument is ignored if a \code{nMask} is provided.
-#' @param args.trimMask A list of arguments passed to \code{\link{trimMask()}}.
+#' @param args.trimMask A list of arguments passed to \code{\link{trimMask}}.
 #'   This argument is ignored if a \code{nMask} is provided. Otherwise, if
-#'   \code{NULL}, \code{trimMask()} will be called with default parameters.
+#'   \code{NULL}, \code{\link{trimMask}} will be called with default parameters.
 #'   If \code{FALSE}, no trimming will be performed.
 #' @param cMask An optional \code{Image} object, array, or a \code{list}
 #'   these objects containing an integer \code{Image} mask defining the
 #'   region of the image to define cell boundaries. If \code{TRUE}, the
-#'   nuclear mask will be used to generate a mask with \code{cellMask()}.
+#'   nuclear mask will be used to generate a mask with \code{\link{cellMask}}.
 #'   This larger mask will be used to measure fluorescence intensity in the
 #'   target image.
 #' @param equalize If the fluorescent target images have \emph{more background
 #'   pixels than foreground pixels} and if the background varies significantly
 #'   from image to image, this can be set to \code{TRUE} in order to equalized
 #'   the fluorescent images by subtracting the median value after applying a
-#'   median filter and gaussian blur using the function \code{bnormalize()}.
+#'   median filter and gaussian blur using the function \code{\link{bnormalize}}.
 #' @param simplify Return a single \code{data.frame} of results if \code{TRUE},
 #'   otherwise return a list of \code{data.frames} for each member of the list.
 #'
@@ -40,7 +40,7 @@
 #' This is part of a suite of tools implemented with \code{\link{EBImage}}
 #' designed to determine viral titers from sets of fluorescent micrographs.
 #' The first argument to this function can be the result of the function
-#' \code{\link{getImages()}}. Images provided to this function are pairs where
+#' \code{\link{getImages}}. Images provided to this function are pairs where
 #' the first of each pair is a DNA image and the second is a fluorescent image
 #' of the viral antigen. Because individual cells are identified by the nuclear
 #' stain, it is often beneficial to collect overexposed DNA images.
@@ -51,10 +51,10 @@
 #' moi can be expressed as virions (VP) per cell \emph{or} infectious
 #' units (IU) per cell \emph{or} a unit of volume (ml, ul, nl) per cell.
 #' These details are added to output of this function with the
-#' \code{mergePdata()} function. Images must be ordered with the nuclear
+#' \code{\link{mergePdata}} function. Images must be ordered with the nuclear
 #' (typically DAPI) image before the viral antigen image. Note that this
 #' sequence can be adjusted with \code{which.images} argument in
-#' the function \code{\link{getImages()}}.
+#' the function \code{\link{getImages}}.
 #'
 #' Images associated with each moi can be individual files in a
 #' single directory where each directory is named for the well such as
@@ -83,7 +83,7 @@
 #' sequentially modifying values in each target image with a
 #' median filter of radius 2, a Gaussian blur of radius 2, subtracting
 #' the intensity at the fifth percentile for each image
-#' (see \code{bnormalize()} for more details) and adding an offset of 0.05.
+#' (see \code{\link{bnormalize}} for more details) and adding an offset of 0.05.
 #' \emph{This may not work for images that have a very large fraction
 #' of non-background pixels.}
 #'
@@ -103,7 +103,7 @@
 #' }
 #' Results from data organized by \strong{well} will also include:
 #' \describe{
-#'   \item{\code{well}}{Harmonized well identifier from the \code{well.info()} function.}
+#'   \item{\code{well}}{Harmonized well identifier from the \code{\link{well.info}} function.}
 #'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
 #'   \item{\code{column}}{Column number as a factor.}
 #' }

@@ -1,13 +1,13 @@
 #' Interactively Measure Point-to-Point Distances
 #' 
-#' Use the \code{locator} function in base graphics to interactively
+#' Use the \code{\link{locator}} function in base graphics to interactively
 #' measure distances between pairs of points on an existing image.
 #' End the interaction pressing the \strong{Esc} key \emph{or}
 #' control-clicking.
 #' 
 #' @param n	Maximum number of pairs to measure, integer.
-#' @param col,type,pch Values handed to \code{locator()}.
-#' @param ... Additional values handed to \code{locator()}.
+#' @param col,type,pch Values handed to \code{\link{locator}}.
+#' @param ... Additional values handed to \code{\link{locator}}.
 #' 
 #' @return
 #' 

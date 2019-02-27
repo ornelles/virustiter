@@ -2,7 +2,7 @@
 #' Obtain AIC for Given Background Value
 #'
 #' Apply a given \code{bgnd} value to create a fitted model (or models) and
-#' return the Akaike's Criterion for the GLM fitted model. \code{getFit()}
+#' return the Akaike's Criterion for the GLM fitted model. \code{\link{getFit}}
 #' is called for each value of \code{bgnd}.
 #'
 #' @param df Annotated \code{data.frame} or list of \code{data.frame}s with

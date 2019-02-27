@@ -8,13 +8,13 @@
 #' @param filter A character string indicating the interpolating
 #'   sampling filter. Valid values are \code{"none"} or the default, 
 #'   \code{"bilinear"}.
-#' @param ... Arguments to be passed to \code{affine}, such as
-#'   \code{filter}, \code{output.dim}, \code{bg.col} or \code{antialias}.
+#' @param ... Arguments to be passed to \code{affine} in the
+#'   \code{EBImage} package, such as \code{filter}, \code{output.dim},
+#'   \code{bg.col} or \code{antialias}.
 #' 
 #' @details
 #' 
 #' This function is a replacement for the EBImage code of the same name. 
-#' 
 #' 
 #' @import EBImage
 #' 

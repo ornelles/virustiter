@@ -3,9 +3,9 @@
 #' Adjust images to have a common background value by simple linear shift.
 #' 
 #' @param img \code{Image} grayscale image object
-#' @param size Radius for \code{medianFilter}, integer. Default value of 2 
-#'   for typical images; use 0 to skip median filter.
-#' @param sigma Standard deviation for \code{gblur}. Default value of 2 
+#' @param size Radius for \code{\link[EBImage]{medianFilter}}, integer.
+#'   Default value of 2 for typical images; use 0 to skip median filter.
+#' @param sigma Standard deviation for \code{\link[EBImage]{gblur}}. Default value of 2 
 #'   for typical images, use 5 for finely detailed images; use 0 to skip 
 #'   Gaussian blur.
 #' @param quant Quantile to evaluate as baseline for background signal
@@ -20,8 +20,8 @@
 #' for each frame will be determined as \code{quantile(x, quant)} where
 #' \code{x} is the pixel intensity. Each image will be adjusted 
 #' to have the identical background value at this quantile. The image(s) will
-#' first be smoothed by \code{medianFilter()} with radius \code{size} then
-#' blurred by \code{gblur} with \code{sigma}. Each processed image will be 
+#' first be smoothed by \code{\link[EBImage]{medianFilter}} with radius \code{size} then
+#' blurred by \code{\link[EBImage]{gblur}} with \code{sigma}. Each processed image will be 
 #' adjusted by subtracting the background value and adding \code{offset}. Values
 #' less than 0 will be changed to 0.
 #' 

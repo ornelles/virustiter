@@ -1,6 +1,6 @@
 #' Find Objects
 #' 
-#' Identify objects in data.frame produced by \code{parseImages()} 
+#' Identify objects in data.frame produced by \code{\link{parseImages}} 
 #' as specified by the expression \code{expr}. 
 #' 
 #' @param expr An \code{expression} evaluated in \code{'df'} that returns
@@ -8,7 +8,7 @@
 #' @param mask An optional \code{Image} object in \code{Grayscale} mode or
 #'   an array containing object masks. Object masks are sets of pixels with
 #'   the same unique integer value.
-#' @param df A \code{data.frame} produced by \code{parseImages()} in which
+#' @param df A \code{data.frame} produced by \code{\link{parseImages}} in which
 #'   \code{'expr'} will be evaluated.
 #' @param invert A \code{logical} value to invert the selection determined
 #'   by \code{'expr'}.

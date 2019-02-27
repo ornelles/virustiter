@@ -11,7 +11,7 @@
 #' @param val A character string identifying the parameter
 #'   to return from the computeFeatures function \code{FUN}. The
 #'   default value of \code{"b.mean"} returns the mean intensity.
-#' @param FUN A \code{computeFeatures} function to be
+#' @param FUN A \code{\link[EBImage]{computeFeatures}} function to be
 #'   applied over \code{mask} and \code{target}, default of 
 #'   \code{computeFeatures.basic}.
 #' @param simplify If \code{TRUE} (default), the result will be
@@ -27,8 +27,9 @@
 #' 
 #' Possible functions include \code{computeFeatures.basic, 
 #' computeFeatures.shape, computeFeatures.moment}, and \code{
-#' computeFeatures.haralick}. See the help page for \code{
-#' computeFeatures} for possible values for \code{val}.
+#' computeFeatures.haralick}. See the help page for
+#' \code{\link[EBImage]{computeFeatures}} for possible values for
+#' \code{FUN} and \code{val}.
 #'
 #' @return
 #' 

@@ -9,7 +9,7 @@
 #' @param main Optional character string to serve as plot title.
 #' @param invert.y A \code{logical} value to invert y coordinates.
 #' @param layout Optional layout for lattice plot grouped by file. 
-#' @param ... Additional arguments handed to \code{xyplot} including subset.
+#' @param ... Additional arguments handed to \code{\link[lattice]{xyplot}} including subset.
 #'
 #' @import lattice
 #'

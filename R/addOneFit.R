@@ -4,22 +4,22 @@
 #'
 #' Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
 #'
-#' @param fm Fitted model or list of fitted models from \code{getFit()}.
+#' @param fm Fitted model or list of fitted models from \code{\link{getFit}}.
 #' @param pch.col Pch color passed to \code{plot}.
 #' @param line.col Color for best-fit line appropriate for \code{par("col")}.
-#' @param ... Additional arguments passed to \code{plot()}.
+#' @param ... Additional arguments passed to \code{\link{plot}}.
 #'
 #' @details
 #'
 #' Base graphics are used to add a plot to an existing plot produced by 
-#' \code{plotFit()} or \code{plotOneFit()}. The first argument is
-#' a single fitted model from \code{getFit()}. The function calls
-#' \code{getTiter()} to obtain the fit and confidence intervals.
+#' \code{\link{plotFit}} or \code{\link{plotOneFit}}. The first argument is
+#' a single fitted model from \code{\link{getFit}}. The function calls
+#' \code{\link{getTiter}} to obtain the fit and confidence intervals.
 #'
 #' @return
 #'
 #' No value is returned. This function is called for the side-effect of 
-#' adding to an existing plot with \code{points()} and \code{lines()}.
+#' adding to an existing plot with \code{\link{points}} and \code{\link{lines}}.
 #'
 #' @export
 #'  

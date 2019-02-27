@@ -5,14 +5,14 @@
 #' @param dna Fluorescent DNA \code{Image} or list of fluorescent DNA
 #'   \code{Image}s.
 #' @param width Maximum nuclear diameter (in pixels) to be used as
-#'   the \code{width} parameter for \code{thresh2}.
-#' @param offset Offset parameter for \code{thresh2}. Use 0.05
+#'   the \code{width} parameter for \code{\link{thresh2}}.
+#' @param offset Offset parameter for \code{\link{thresh2}}. Use 0.05
 #'   for typical images, use 0.01 for low contrast images.
-#' @param size Radius (in pixels) for \code{medianFilter} as an integer.
-#'   Use 2 for typical images, use 0 to skip \code{medianFilter}.
-#' @param sigma Standard deviation for \code{gblur}, use 2 for typical
+#' @param size Radius (in pixels) for \code{\link[EBImage]{medianFilter}} as an integer.
+#'   Use 2 for typical images, use 0 to skip \code{\link[EBImage]{medianFilter}}.
+#' @param sigma Standard deviation for \code{\link[EBImage]{gblur}}, use 2 for typical
 #'   images, use 5 for finely detailed images.
-#' @param radius Radius for \code{gblur}, use default value of
+#' @param radius Radius for \code{\link[EBImage]{gblur}}, use default value of
 #'   \code{2 * ceiling(3 * sigma) + 1} for typical images, use numbers
 #'   smaller than the default of 13 for images with smaller nuclei.
 #' @param gamma Exponent used for \code{DNA^gamma} transformation.
@@ -27,11 +27,11 @@
 #' adjusting the arguments, especially \code{width} and \code{offset}.
 #'
 #' The image or images will be processed sequentially by (1) an optional gamma 
-#' transformation, (2) normalization, (3) a \code{medianFilter()} with argument 
-#' \code{size} if \code{size} is non-zero, (4) the \code{gblur()} filter with
-#' arguments \code{sigma} and \code{radius}, (5) thresholding with \code{thresh2()}
-#' with arguments \code{width} and \code{offset}, (6) \code{fillHull()},
-#' (7) \code{distmap()}, and (8) \code{watershed()}. 
+#' transformation, (2) normalization, (3) a \code{\link[EBImage]{medianFilter}} with argument 
+#' \code{size} if \code{size} is non-zero, (4) the \code{\link[EBImage]{gblur}} filter with
+#' arguments \code{sigma} and \code{radius}, (5) thresholding with \code{\link{thresh2}}
+#' with arguments \code{width} and \code{offset}, (6) \code{\link[EBImage]{fillHull}},
+#' (7) \code{\link[EBImage]{distmap}}, and (8) \code{\link[EBImage]{watershed}}. 
 #'
 #' @return
 #'

@@ -4,7 +4,7 @@
 #' prefix. 
 #' 
 #' @param w Name of the well (coerced as a character).
-#' @param format Character string as \code{sprintf} format for the column portion.
+#' @param format Character string as \code{\link{sprintf}} format for the column portion.
 #' @param upper \code{logical} value to use upper case when \code{TRUE}.
 #' 
 #' @details 

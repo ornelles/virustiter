@@ -2,7 +2,7 @@
 #'
 #' Prepare a diagnostic plot of viral titer GLM fit.
 #'
-#' @param fm Fitted model or list of fitted models from \code{getFit()}.
+#' @param fm Fitted model or list of fitted models from \code{\link{getFit}}.
 #' @param line.col Color for best-fit line appropriate for \code{par("col")}.
 #' @param main List or character vectors appropriate for the plot title
 #'   of the same length as \code{fm}. If \code{NULL}, the current date will
@@ -12,7 +12,7 @@
 #'
 #' Base graphics are used to prepare the plot where the first argument is
 #' either a single fitted model or a list of fitted models from
-#' \code{getFit()}. The function calls \code{getTiter()} to obtain the fit
+#' \code{\link{getFit}}. The function calls \code{\link{getTiter}} to obtain the fit
 #' and confidence intervals.
 #'
 #' @return

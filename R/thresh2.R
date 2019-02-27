@@ -7,7 +7,7 @@
 #' @param offset Thresholding value from the averaged value.
 #' @param boundary Behavior at image border, where default is to extend the 
 #' image beyond the borders, which differs from the default for
-#' \code{filter2}.
+#' \code{\link[EBImage]{filter2}}.
 #' 
 #' @details
 #' 

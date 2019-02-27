@@ -1,20 +1,20 @@
 #' Plot One Titer Fit with more Options
 #'
-#' Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
+#' Prepare a single diagnostic plot with more labeling options than \code{\link{plotFit}}.
 #'
-#' @param fm Fitted model or list of fitted models from \code{getFit()}.
-#' @param main,xlab,ylab,pch.col,ylim Parameters passed to \code{plot}.
+#' @param fm Fitted model or list of fitted models from \code{\link{getFit}}.
+#' @param main,xlab,ylab,pch.col,ylim Parameters passed to \code{\link{plot}}.
 #' @param line.col Color for best-fit line (appropriate for \code{par("col")}.
 #' param ref.col Color for reference lines identifying key Poisson points.
 #' @param by Character vector indicating that fits are organized as a
 #'   single fit ("none") or by "column" or "row".
-#' @param ... Additional arguments passed to \code{plot()}.
+#' @param ... Additional arguments passed to \code{\link{plot}}.
 #'
 #' @details
 #'
 #' Base graphics are used to prepare the plot where the first argument is
-#' a single fitted model from \code{getFit()}. The function calls
-#' \code{getTiter()} to obtain the fit and confidence intervals.
+#' a single fitted model from \code{\link{getFit}}. The function calls
+#' \code{\link{getTiter}} to obtain the fit and confidence intervals.
 #'
 #' @return
 #'
