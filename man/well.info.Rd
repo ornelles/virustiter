@@ -9,7 +9,7 @@ well.info(w, format = "\%02d", upper = TRUE)
 \arguments{
 \item{w}{Name of the well (coerced as a character).}
 
-\item{format}{Character string as \code{sprintf} format for the column portion.}
+\item{format}{Character string as \code{\link{sprintf}} format for the column portion.}
 
 \item{upper}{\code{logical} value to use upper case when \code{TRUE}.}
 }

@@ -7,7 +7,7 @@
 plotFit(fm, line.col = 2, main = NULL)
 }
 \arguments{
-\item{fm}{Fitted model or list of fitted models from \code{getFit()}.}
+\item{fm}{Fitted model or list of fitted models from \code{\link{getFit}}.}
 
 \item{line.col}{Color for best-fit line appropriate for \code{par("col")}.}
 
@@ -25,6 +25,6 @@ Prepare a diagnostic plot of viral titer GLM fit.
 \details{
 Base graphics are used to prepare the plot where the first argument is
 either a single fitted model or a list of fitted models from
-\code{getFit()}. The function calls \code{getTiter()} to obtain the fit
+\code{\link{getFit}}. The function calls \code{\link{getTiter}} to obtain the fit
 and confidence intervals.
 }

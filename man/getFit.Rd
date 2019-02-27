@@ -7,7 +7,7 @@
 getFit(obj, by = c("sequential", "column", "row"))
 }
 \arguments{
-\item{obj}{A \code{data.frame} produced by \code{tally()} or by \code{score()}.}
+\item{obj}{A \code{data.frame} produced by \code{\link{tally}} or by \code{\link{score}}.}
 
 \item{by}{A character string indicating the organization of the results
 (see details.)}
@@ -17,26 +17,26 @@ A fitted \code{glm} model or list of models. Each fitted model has the unit
 of measure attached as an attribute with the text value from \code{unit}.
 }
 \description{
-Fit the results in a \code{data.frame} produced by either \code{tally()} or
-\code{score()}.
+Fit the results in a \code{data.frame} produced by either \code{\link{tally}} or
+\code{\link{score}}.
 }
 \details{
 This function will fit a GLM binomial model using a two-column response
 where the fit is weighted by the total numbers of cases. Data are fit by
-the \code{glm()} function using a complementary log-log model. The data
+the \code{\link{glm}} function using a complementary log-log model. The data
 can be organized as a single, sequential series of values \emph{or} by
 rows \emph{or} columns. If the argument \code{by} is \code{"sequential"},
 all the data are assumed to represent a single assay. If \code{by} is
 either \code{"row"} or \code{"column"}, fits will be generated for data
 partitioned by row or column, respectively.
 
-The argument \code{obj} must be produced either by \code{tally()} or by
-\code{score()}. If a variable named \code{"positive"} is present, the data
-are assumed to have been produced by \code{score()} and the function
-\code{tally()} will be called before proceeding. If variables named 
+The argument \code{obj} must be produced either by \code{\link{tally}} or by
+\code{\link{score}}. If a variable named \code{"positive"} is present, the data
+are assumed to have been produced by \code{\link{score}} and the function
+\code{\link{tally}} will be called before proceeding. If variables named 
 \code{"pos"} and \code{"neg"} are present, the data are assumed to be the
-product of \code{tally()}. In the case of a data frame produced by
-\code{score()}, the data must have a variable named \code{"moi"} or \code{"x"}
-representing the multiplicity of infection. Data produced by \code{tally()}
+product of \code{\link{tally}}. In the case of a data frame produced by
+\code{\link{score}}, the data must have a variable named \code{"moi"} or \code{"x"}
+representing the multiplicity of infection. Data produced by \code{\link{tally}}
 will always have a variable named \code{"x"} representing the multiplicity.
 }

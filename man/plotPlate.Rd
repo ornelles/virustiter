@@ -22,7 +22,7 @@ plotPlate(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 
 \item{layout}{Optional layout for lattice plot grouped by file.}
 
-\item{...}{Additional arguments handed to \code{xyplot} including subset.}
+\item{...}{Additional arguments handed to \code{\link[lattice]{xyplot}} including subset.}
 }
 \value{
 The plot is generated and returned as an invisible \code{lattice} object.

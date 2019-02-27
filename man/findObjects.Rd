@@ -10,7 +10,7 @@ findObjects(expr, df, mask = NULL, invert = FALSE)
 \item{expr}{An \code{expression} evaluated in \code{'df'} that returns
 a logical vector identifying objects (rows) in \code{'df'}.}
 
-\item{df}{A \code{data.frame} produced by \code{parseImages()} in which
+\item{df}{A \code{data.frame} produced by \code{\link{parseImages}} in which
 \code{'expr'} will be evaluated.}
 
 \item{mask}{An optional \code{Image} object in \code{Grayscale} mode or
@@ -26,7 +26,7 @@ with the objects selected by \code{'expr'} if \code{mask} was provided
 otherwise a nested list of integers identifying the selected objects.
 }
 \description{
-Identify objects in data.frame produced by \code{parseImages()} 
+Identify objects in data.frame produced by \code{\link{parseImages}} 
 as specified by the expression \code{expr}.
 }
 \examples{

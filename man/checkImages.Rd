@@ -25,7 +25,7 @@ indicates that the order is target first and DNA image second. A value of
 \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
 image such as a phase contrast image or second fluorescent color in each set.}
 
-\item{pattern}{Optional grep pattern as character string used by \code{list.files()}
+\item{pattern}{Optional grep pattern as character string used by \code{\link{list.files}}
 to select image files.}
 
 \item{method}{Character string specifying the method of displaying images.
@@ -69,7 +69,7 @@ a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
 If \code{'source'} is a zip file, files in the temporary directory 
-(\code{tempdir()}) will be deleted in order to receive the compressed
+(\code{\link{tempdir}}) will be deleted in order to receive the compressed
 files.
 }
 \examples{

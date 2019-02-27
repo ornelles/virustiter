@@ -16,8 +16,9 @@ in pixels or a list of the same.}
 sampling filter. Valid values are \code{"none"} or the default, 
 \code{"bilinear"}.}
 
-\item{...}{Arguments to be passed to \code{affine}, such as
-\code{filter}, \code{output.dim}, \code{bg.col} or \code{antialias}.}
+\item{...}{Arguments to be passed to \code{affine} in the
+\code{EBImage} package, such as \code{filter}, \code{output.dim},
+\code{bg.col} or \code{antialias}.}
 }
 \description{
 Replacement for \code{EBImage} function that accepts lists

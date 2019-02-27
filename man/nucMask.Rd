@@ -12,18 +12,18 @@ nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 \code{Image}s.}
 
 \item{width}{Maximum nuclear diameter (in pixels) to be used as
-the \code{width} parameter for \code{thresh2}.}
+the \code{width} parameter for \code{\link{thresh2}}.}
 
-\item{offset}{Offset parameter for \code{thresh2}. Use 0.05
+\item{offset}{Offset parameter for \code{\link{thresh2}}. Use 0.05
 for typical images, use 0.01 for low contrast images.}
 
-\item{size}{Radius (in pixels) for \code{medianFilter} as an integer.
-Use 2 for typical images, use 0 to skip \code{medianFilter}.}
+\item{size}{Radius (in pixels) for \code{\link[EBImage]{medianFilter}} as an integer.
+Use 2 for typical images, use 0 to skip \code{\link[EBImage]{medianFilter}}.}
 
-\item{sigma}{Standard deviation for \code{gblur}, use 2 for typical
+\item{sigma}{Standard deviation for \code{\link[EBImage]{gblur}}, use 2 for typical
 images, use 5 for finely detailed images.}
 
-\item{radius}{Radius for \code{gblur}, use default value of
+\item{radius}{Radius for \code{\link[EBImage]{gblur}}, use default value of
 \code{2 * ceiling(3 * sigma) + 1} for typical images, use numbers
 smaller than the default of 13 for images with smaller nuclei.}
 
@@ -44,11 +44,11 @@ Optimal conditions for detecting and segmented nuclei may require empirically
 adjusting the arguments, especially \code{width} and \code{offset}.
 
 The image or images will be processed sequentially by (1) an optional gamma 
-transformation, (2) normalization, (3) a \code{medianFilter()} with argument 
-\code{size} if \code{size} is non-zero, (4) the \code{gblur()} filter with
-arguments \code{sigma} and \code{radius}, (5) thresholding with \code{thresh2()}
-with arguments \code{width} and \code{offset}, (6) \code{fillHull()},
-(7) \code{distmap()}, and (8) \code{watershed()}.
+transformation, (2) normalization, (3) a \code{\link[EBImage]{medianFilter}} with argument 
+\code{size} if \code{size} is non-zero, (4) the \code{\link[EBImage]{gblur}} filter with
+arguments \code{sigma} and \code{radius}, (5) thresholding with \code{\link{thresh2}}
+with arguments \code{width} and \code{offset}, (6) \code{\link[EBImage]{fillHull}},
+(7) \code{\link[EBImage]{distmap}}, and (8) \code{\link[EBImage]{watershed}}.
 }
 \examples{
   f.ex <- system.file("extdata", "by_folder/b2/file003.tif",package = "virustiter")

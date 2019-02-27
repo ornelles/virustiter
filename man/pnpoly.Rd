@@ -8,10 +8,10 @@ pnpoly(points, vertices)
 }
 \arguments{
 \item{points}{Points to be tested as any form appropriate for
-\code{xy.coords()}.}
+\code{\link{xy.coords}}.}
 
 \item{vertices}{Points that define the vertices of the polygon, also
-processed by \code{xy.coords()} where the order defines the polygon
+processed by \code{\link{xy.coords}} where the order defines the polygon
 and the first and last points will be connected to close the polygon.}
 }
 \value{

@@ -8,14 +8,14 @@ plotOneFit(fm, main = NULL, xlab = NULL, ylab = NULL, ylim = NULL,
   pch.col = "black", line.col = "red", ref.col = "blue", ...)
 }
 \arguments{
-\item{fm}{Fitted model or list of fitted models from \code{getFit()}.}
+\item{fm}{Fitted model or list of fitted models from \code{\link{getFit}}.}
 
-\item{main, xlab, ylab, pch.col, ylim}{Parameters passed to \code{plot}.}
+\item{main, xlab, ylab, pch.col, ylim}{Parameters passed to \code{\link{plot}}.}
 
 \item{line.col}{Color for best-fit line (appropriate for \code{par("col")}.
 param ref.col Color for reference lines identifying key Poisson points.}
 
-\item{...}{Additional arguments passed to \code{plot()}.}
+\item{...}{Additional arguments passed to \code{\link{plot}}.}
 
 \item{by}{Character vector indicating that fits are organized as a
 single fit ("none") or by "column" or "row".}
@@ -25,10 +25,10 @@ No value is returned. This function is called for the side-effect of
 producing a plot with base graphics.
 }
 \description{
-Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
+Prepare a single diagnostic plot with more labeling options than \code{\link{plotFit}}.
 }
 \details{
 Base graphics are used to prepare the plot where the first argument is
-a single fitted model from \code{getFit()}. The function calls
-\code{getTiter()} to obtain the fit and confidence intervals.
+a single fitted model from \code{\link{getFit}}. The function calls
+\code{\link{getTiter}} to obtain the fit and confidence intervals.
 }

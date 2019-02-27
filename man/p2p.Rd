@@ -9,15 +9,15 @@ p2p(n = 512, col = "magenta", type = "o", pch = 3, ...)
 \arguments{
 \item{n}{Maximum number of pairs to measure, integer.}
 
-\item{col, type, pch}{Values handed to \code{locator()}.}
+\item{col, type, pch}{Values handed to \code{\link{locator}}.}
 
-\item{...}{Additional values handed to \code{locator()}.}
+\item{...}{Additional values handed to \code{\link{locator}}.}
 }
 \value{
 Distances between points with locator in pixels.
 }
 \description{
-Use the \code{locator} function in base graphics to interactively
+Use the \code{\link{locator}} function in base graphics to interactively
 measure distances between pairs of points on an existing image.
 End the interaction pressing the \strong{Esc} key \emph{or}
 control-clicking.

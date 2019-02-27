@@ -19,8 +19,8 @@ the cutoff limits. Either of the two values in \code{cutoff} can be
 specified as \code{NA} to use the multiplier parameter for that position.}
 
 \item{k}{Numeric value of length 2 specifying the lower and upper
-multiplier to determine the cutoff from the \code{median()} and
-\code{mad()} of the area if \code{cutoff} is \code{NULL}.}
+multiplier to determine the cutoff from the \code{\link{median}} and
+\code{\link{mad}} of the area if \code{cutoff} is \code{NULL}.}
 
 \item{border}{Objects within this many pixels of the edge will be excluded.}
 

@@ -18,7 +18,7 @@ connected pixels having the same integer value.}
 to return from the computeFeatures function \code{FUN}. The
 default value of \code{"b.mean"} returns the mean intensity.}
 
-\item{FUN}{A \code{computeFeatures} function to be
+\item{FUN}{A \code{\link[EBImage]{computeFeatures}} function to be
 applied over \code{mask} and \code{target}, default of 
 \code{computeFeatures.basic}.}
 
@@ -43,6 +43,7 @@ simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
 
 Possible functions include \code{computeFeatures.basic, 
 computeFeatures.shape, computeFeatures.moment}, and \code{
-computeFeatures.haralick}. See the help page for \code{
-computeFeatures} for possible values for \code{val}.
+computeFeatures.haralick}. See the help page for
+\code{\link[EBImage]{computeFeatures}} for possible values for
+\code{FUN} and \code{val}.
 }

@@ -10,7 +10,7 @@ cellMask(seeds, mask = NULL, brush = NULL, lambda = 1e-04)
 \item{seeds}{An \code{Image} object, array, or list of these objects
 containing the seeds of identified regions. This would typically
 be a segmented nuclear mask or list of masks such as those generated
-by \code{nucMask()}.}
+by \code{\link{nucMask}}.}
 
 \item{mask}{An optional \code{Image} object, array, or a \code{list}
 these objects containing a binary mask defining regions of the image
@@ -23,13 +23,13 @@ list of objects or arrays.}
 odd number of pixels. If this value is \code{NULL}, the mean value of 
 the semi-major axis of the nuclei will be used.}
 
-\item{lambda}{A numeric value used by \code{propagate()} determining 
+\item{lambda}{A numeric value used by \code{\link[EBImage]{propagate}} determining 
 the trade-off between the Euclidean distance in the image plane and the 
 contribution of the gradient. See \code{\link[EBImage]{propagate}}
 for details.}
 }
 \value{
-An \code{Image} object produced by \code{propagate()} containing the labeled
+An \code{Image} object produced by \code{\link[EBImage]{propagate}} containing the labeled
 objects (cells) or a \code{list} of such objects.
 }
 \description{
@@ -49,7 +49,7 @@ based on the seeds provided in \code{seeds}. Such a binary mask can be
 created by thresholding a non-specific widespread cytoplasmic signal such
 antibody labeling for actin or a diffuse membrane stain.
 
-To create a \emph{smaller} nuclear mask, use \code{trimMask()} on a nuclear
+To create a \emph{smaller} nuclear mask, use \code{\link{trimMask}} on a nuclear
 mask with a negative brush value.
 
 To create a cytoplasmic mask that excludes the nucleus, combine the 

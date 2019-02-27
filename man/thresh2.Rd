@@ -15,7 +15,7 @@ thresh2(x, width, offset, boundary = c("replicate", "circular"))
 
 \item{boundary}{Behavior at image border, where default is to extend the 
 image beyond the borders, which differs from the default for
-\code{filter2}.}
+\code{\link[EBImage]{filter2}}.}
 }
 \description{
 Threshold an image using a disc rather than rectangle.

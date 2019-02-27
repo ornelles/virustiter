@@ -19,9 +19,9 @@ be used to determine the background.}
 \item{param}{Variable name in \code{df} as a character string to evaluate, 
 typically \code{"mfi"} or \code{"y"}.}
 
-\item{mult}{Muliplier constant passed to \code{findBgnd()}.}
+\item{mult}{Muliplier constant passed to \code{\link{findBgnd}}.}
 
-\item{log}{\code{logical} flag passed to \code{findBgnd()} to use
+\item{log}{\code{logical} flag passed to \code{\link{findBgnd}} to use
 log-transformed values.}
 }
 \value{
@@ -44,7 +44,7 @@ If zero moi values are not present, the background will be determined by
 Otsu's method for the groups defined by the character string in \code{by}.
 Typically this would be \code{"well"} or \code{"file"} but can be any factor 
 variable in the data.frame \code{df}. The background value will be determined
-by the logic in \code{findBgnd()}.
+by the logic in \code{\link{findBgnd}}.
 
 The annotated data frame must have the variable identified in \code{param}
 and, if 'by' is missing, a variable named either \code{"x"} or \code{"moi"}.
