@@ -9,25 +9,26 @@ parseImages(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
   equalize = FALSE, simplify = TRUE)
 }
 \arguments{
-\item{nuc}{A list of nuclear images, \emph{or}, if the second argument
-(\code{tgt}) is \code{NULL}, a list of length 2 containing nuclear and
-target images.}
+\item{nuc}{An \code{Image} object or list of such objects representing
+nuclear images. If the second argument (\code{tgt}) is \code{NULL},
+this must be a list of length 2 containing nuclear and target images.}
 
-\item{tgt}{A list of fluorescent images corresponding to the nuclear images
-in \code{nuc}. If this argument is \code{NULL}, \code{nuc} must be a
-list of both image types.}
+\item{tgt}{An \code{Image} object or list of fluorescent images corresponding
+to the nuclear images in \code{nuc}. If this argument is \code{NULL},
+\code{nuc} is treated as a list of both image types.}
 
-\item{nMask}{An optional \code{Image} object, array, or a \code{list}
+\item{nMask}{An optional \code{Image} object or a list of
 these objects containing an integer \code{Image} mask identifying nuclei.
 If this value is \code{NULL}, the nuclear mask will be determined by
-\code{\link{nucMask}} with any arguments provided in \code{args.nMask}.}
+\code{\link{nucMask}} with the arguments provided in \code{args.nMask}.}
 
-\item{cMask}{An optional \code{Image} object, array, or a \code{list}
-these objects containing an integer \code{Image} mask defining the
-region of the image to define cell boundaries. If \code{TRUE}, the
-nuclear mask will be used to generate a mask with \code{\link{cellMask}}.
-This larger mask will be used to measure fluorescence intensity in the
-target image.}
+\item{cMask}{An optional \code{Image} object or a list of 
+these objects containing an integer \code{Image} mask identifying
+regions of the target image in which to define cell boundaries. If 
+\code{TRUE}, the nuclear mask will be used to generate an expanded mask
+with \code{\link{cellMask}}. This larger mask will be used to measure
+fluorescence intensity in the target image. If \code{FALSE} (default),
+the nuclear mask will be used to measure fluorescence intensities.}
 
 \item{args.nMask}{A list of arguments passed to \code{\link{nucMask}}.
 This argument is ignored if a \code{nMask} is provided.}
@@ -37,11 +38,10 @@ This argument is ignored if a \code{nMask} is provided. Otherwise, if
 \code{NULL}, \code{\link{trimMask}} will be called with default parameters.
 If \code{FALSE}, no trimming will be performed.}
 
-\item{equalize}{If the fluorescent target images have \emph{more background
-pixels than foreground pixels} and if the background varies significantly
-from image to image, this can be set to \code{TRUE} in order to equalized
-the fluorescent images by subtracting the median value after applying a
-median filter and gaussian blur using the function \code{\link{bnormalize}}.}
+\item{equalize}{If the background varies significantly among the fluorescent
+target images (or among the frames of target images), when \code{TRUE},
+this option adjusts the fluorescent target images to have a common
+background value with the function \code{\link{bnormalize}}.}
 
 \item{simplify}{Return a single \code{data.frame} of results if \code{TRUE},
 otherwise return a list of \code{data.frames} for each member of the list.}
@@ -81,7 +81,7 @@ fluorescent intensity in both the DNA image and the paired fluorescent image.
 This is part of a suite of tools implemented with \code{\link{EBImage}}
 designed to determine viral titers from sets of fluorescent micrographs.
 The first argument to this function can be the result of the function
-\code{\link{getImages}}. Images provided to this function are pairs where
+\code{\link{getImages}}. Images provided to this function are paired where
 the first of each pair is a DNA image and the second is a fluorescent image
 of the viral antigen. Because individual cells are identified by the nuclear
 stain, it is often beneficial to collect overexposed DNA images.
@@ -116,17 +116,6 @@ pair of images.
   df$uid <- with(df, interaction(well, frame))
   df$uid <- with(df, interaction(file, frame))
 }
-
-If the images have background values that vary from image to image or
-have significant noise and if the fluorescent images have \emph{more}
-background pixels than foreground pixels, then the argument
-\code{equalize} can be set to \code{TRUE}. This smooths the images by
-sequentially modifying values in each target image with a
-median filter of radius 2, a Gaussian blur of radius 2, subtracting
-the intensity at the fifth percentile for each image
-(see \code{\link{bnormalize}} for more details) and adding an offset of 0.05.
-\emph{This may not work for images that have a very large fraction
-of non-background pixels.}
 }
 \examples{
 # Note that execution of these examples can be rather slow...
