@@ -8,7 +8,7 @@
 #'   the same integer value.
 #' @param cutoff Optional integer value of length 2 specifying the lower 
 #'   and upper limits for the area in pixels. A value of \code{FALSE} or
-#'   \code{NA} prevents any size exclusion from occurring. A value of
+#'   \code{NA} prevents size exclusion from occurring. A value of
 #'   \code{NULL} makes use of the multiplier parameter \code{k} to determine 
 #'   the cutoff limits. Either of the two values in \code{cutoff} can be
 #'   specified as \code{NA} to use the multiplier parameter for that position.
@@ -16,9 +16,9 @@
 #'   multiplier to determine the cutoff from the \code{\link{median}} and
 #'   \code{\link{mad}} of the area if \code{cutoff} is \code{NULL}.
 #' @param border Objects within this many pixels of the edge will be excluded.
-#' @param brush Non-zero values are converted to nearest odd number for
-#'   as the argument \code{'brush'} to dilate the final mask for values > 0
-#'   and to erode the mask for values < 0. 
+#' @param brush After coercion to the nearest odd integer, values > 0
+#'   \code{\link[EBImage:morphology]{dilate}} the mask whereas values < 0
+#'   \code{\link[EBImage:morphology]{erode}} the mask. 
 #' @param ecc.max Exclude objects with elliptical eccentricity greater than
 #'   this value.
 #' 
@@ -32,7 +32,8 @@
 #' that have eccentricity greater than \code{ecc.max} will be removed. A circle
 #' has eccentricity of 0 and a straight line has eccentricity of 1. Note 
 #' that EBImage provides a poor approximation of this value. The final mask
-#' will be dilated or eroded if \code{brush} is non-zero. 
+#' will be dilated or eroded if \code{brush} is non-zero using a disc-shaped
+#' brush with size determined by the adjusted value of \code{brush}.
 #' 
 #' @return
 #'
