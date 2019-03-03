@@ -4,41 +4,33 @@
 \alias{bnormalize}
 \title{Normalize Image Background}
 \usage{
-bnormalize(img, size = 2, sigma = 2, quant = 0.05, offset = 0.05)
+bnormalize(img, inputRange, quant = 0.05, ...)
 }
 \arguments{
-\item{img}{\code{Image} grayscale image object}
+\item{img}{Grayscale \code{Image} object.}
 
-\item{size}{Radius for \code{\link[EBImage]{medianFilter}}, integer.
-Default value of 2 for typical images; use 0 to skip median filter.}
+\item{inputRange}{A numeric vector of length 2 specifying the valid
+range of intensity values.}
 
-\item{sigma}{Standard deviation for \code{\link[EBImage]{gblur}}. Default value of 2 
-for typical images, use 5 for finely detailed images; use 0 to skip 
-Gaussian blur.}
+\item{quant}{Quantile serving as the common baseline, default of 0.05.}
 
-\item{quant}{Quantile to evaluate as baseline for background signal
-(default value of 0.05, use 0.5 for median value).}
-
-\item{offset}{Value (default of 0.05) added to image after subtracting 
-baseline value.}
+\item{...}{Additional arguments are accepted but ignored in order
+to remain compatible with previous versions of this function.}
 }
 \value{
-\code{Image} object of the same size that has been smoothed, blurred 
-and linearly adjusted.
+\code{Image} object linearly scaled to have a common background.
 }
 \description{
-Adjust images to have a common background value by simple linear shift.
+Linearly adjust the intensity values of an image to a common background.
 }
 \details{
-This is meant to be applied to images with a greater number of pixels 
-representing background values than foreground values. The baseline
-for each frame will be determined as \code{quantile(x, quant)} where
-\code{x} is the pixel intensity. Each image will be adjusted 
-to have the identical background value at this quantile. The image(s) will
-first be smoothed by \code{\link[EBImage]{medianFilter}} with radius \code{size} then
-blurred by \code{\link[EBImage]{gblur}} with \code{sigma}. Each processed image will be 
-adjusted by subtracting the background value and adding \code{offset}. Values
-less than 0 will be changed to 0.
+Each frame of an \code{Image} will be linearly scaled to have an
+identical (presumably background) value at the quantile specified by
+\code{quant}. If \code{inputRange} is missing, this value will be taken
+as the actual range of \code{img}. Each frame of the image will
+be adjusted by subtracting the background value at the specified
+quantile and adding \code{quant * inputRange[2]}. Negative 
+values will be clipped to 0.
 }
 \examples{
   cell <- readImage(system.file("extdata", "by_folder/b2/file002.tif", 
