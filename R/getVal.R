@@ -25,11 +25,16 @@
 #' value specified by \code{val} will be returned as a list if \code{
 #' simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
 #' 
-#' Possible functions include \code{computeFeatures.basic, 
-#' computeFeatures.shape, computeFeatures.moment}, and \code{
-#' computeFeatures.haralick}. See the help page for
-#' \code{\link[EBImage]{computeFeatures}} for possible values for
-#' \code{FUN} and \code{val}.
+#' Allowable functions include
+#' \code{\link[EBImage:computeFeatures]{computeFeatures.basic}}, 
+#' \code{\link[EBImage:computeFeatures]{computeFeatures.shape}}, 
+#' \code{\link[EBImage:computeFeatures]{computeFeatures.moment}} and 
+#' \code{\link[EBImage:computeFeatures]{computeFeatures.haralick}}.
+#' See the \code{EBImage} help page for appropriate values for
+#' \code{FUN} and \code{val}. Note that "\code{basic quantiles}" 
+#' parameters are misnamed with an extra '0'. For example, the 5th
+#' percentile and 95th percentile values are named "\code{b.q005}"
+#' and "\code{b.q095}".
 #'
 #' @return
 #' 
