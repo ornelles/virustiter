@@ -22,9 +22,6 @@
 mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 {
 # determine data type, check arguments and harmonize well names
-#	if (!any(c("moi", "x") %in% names(phenoData)))
-#		stop('"moi" or "x" must be in "phenoData"')
-#
 # for separate images in folders (multi-well)
 	if ("well" %in% names(imageData)) {
 		stopifnot("well" %in% names(phenoData))
@@ -35,6 +32,8 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 	# add row and column information to phenotype data
 		phenoData$column <- well.info(phenoData$well)$column
 		phenoData$row <- well.info(phenoData$well)$row
+	# harmonize well names in phenodata
+		phenoData$well <- pdWell
 	}
 	else
 		stopifnot("file" %in% names(phenoData))
