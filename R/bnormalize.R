@@ -51,11 +51,15 @@ bnormalize <- function(img, inputRange, quant = 0.025, ...)
 	base <- quant * inputRange[2]
 
 	dm <- dim(img)
-	if (length(dm) == 2)
+	if (length(dm) == 2) {
 		bgnd <- quantile(img, quant)
-	else
-		bgnd <- median(apply(img, 3, quantile, quant))
-	img <- img - bgnd + base
+		img <- img - bgnd + base
+	}
+	else {
+		bgnd <- apply(img, 3, quantile, quant)
+		bgndImg <- Image(rep(bgnd, each = prod(dm[1:2])), dim = dm)
+		img <- img - bgndImg + base
+	}
 	img[img < 0] <- 0
 	return(img)
 }
