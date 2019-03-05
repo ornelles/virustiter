@@ -4,15 +4,15 @@
 \alias{bnormalize}
 \title{Normalize Image Background}
 \usage{
-bnormalize(img, inputRange, quant = 0.05, ...)
+bnormalize(img, inputRange, quant = 0.025, ...)
 }
 \arguments{
 \item{img}{Grayscale \code{Image} object.}
 
-\item{inputRange}{A numeric vector of length 2 specifying the valid
+\item{inputRange}{A numeric vector of 2 values specifying the expected
 range of intensity values.}
 
-\item{quant}{Quantile serving as the common baseline, default of 0.05.}
+\item{quant}{Quantile serving as the common baseline, default of 0.025.}
 
 \item{...}{Additional arguments are accepted but ignored in order
 to remain compatible with previous versions of this function.}
@@ -25,12 +25,13 @@ Linearly adjust the intensity values of an image to a common background.
 }
 \details{
 Each frame of an \code{Image} will be linearly scaled to have an
-identical (presumably background) value at the quantile specified by
-\code{quant}. If \code{inputRange} is missing, this value will be taken
-as the actual range of \code{img}. Each frame of the image will
-be adjusted by subtracting the background value at the specified
-quantile and adding \code{quant * inputRange[2]}. Negative 
-values will be clipped to 0.
+identical value at the specified quantile. If \code{inputRange} is missing,
+it will be taken as the actual range of values in \code{img}.
+Each frame of the image will be adjusted by subtracting the median value at
+the specified quantile and adding \code{quant * inputRange[2]}. Negative 
+values will be clipped to 0. \emph{Note that if \code{inputRange}
+is not specified, the different image objects will not necessarily share
+the same background value.}
 }
 \examples{
   cell <- readImage(system.file("extdata", "by_folder/b2/file002.tif", 

@@ -3,21 +3,22 @@
 #' Linearly adjust the intensity values of an image to a common background.
 #' 
 #' @param img Grayscale \code{Image} object.
-#' @param inputRange A numeric vector of length 2 specifying the valid
+#' @param inputRange A numeric vector of 2 values specifying the expected
 #'   range of intensity values.
-#' @param quant Quantile serving as the common baseline, default of 0.05.
+#' @param quant Quantile serving as the common baseline, default of 0.025.
 #' @param ... Additional arguments are accepted but ignored in order
 #'   to remain compatible with previous versions of this function.
 #' 
 #' @details
 #' 
 #' Each frame of an \code{Image} will be linearly scaled to have an
-#' identical (presumably background) value at the quantile specified by
-#' \code{quant}. If \code{inputRange} is missing, this value will be taken
-#' as the actual range of \code{img}. Each frame of the image will
-#' be adjusted by subtracting the background value at the specified
-#' quantile and adding \code{quant * inputRange[2]}. Negative 
-#' values will be clipped to 0.
+#' identical value at the specified quantile. If \code{inputRange} is missing,
+#' it will be taken as the actual range of values in \code{img}.
+#' Each frame of the image will be adjusted by subtracting the median value at
+#' the specified quantile and adding \code{quant * inputRange[2]}. Negative 
+#' values will be clipped to 0. \emph{Note that if \code{inputRange}
+#' is not specified, the different image objects will not necessarily share
+#' the same background value.} 
 #' 
 #' @return
 #' 
@@ -39,7 +40,7 @@
 #' 
 #' @export
 #' 
-bnormalize <- function(img, inputRange, quant = 0.05, ...)
+bnormalize <- function(img, inputRange, quant = 0.025, ...)
 {
 	if (!is(img, "Image") || colorMode(img) != 0)
 		stop("grayscale image required")
@@ -50,15 +51,11 @@ bnormalize <- function(img, inputRange, quant = 0.05, ...)
 	base <- quant * inputRange[2]
 
 	dm <- dim(img)
-	if (length(dm) == 2) {
+	if (length(dm) == 2)
 		bgnd <- quantile(img, quant)
-		img <- img - bgnd + base
-	}
-	else {
-		bgnd <- apply(img, 3, quantile, quant)
-		bgndImg <- Image(rep(bgnd, each = prod(dm[1:2])), dim = dm)
-		img <- img - bgndImg + base
-	}
+	else
+		bgnd <- median(apply(img, 3, quantile, quant))
+	img <- img - bgnd + base
 	img[img < 0] <- 0
 	return(img)
 }
