@@ -59,6 +59,6 @@ brush with size determined by the adjusted value of \code{brush}.
   xm3 <- trimMask(xm, border = 24)
   xm4 <- trimMask(xm, ecc.max = 0.75)
   plot(colorLabels(combine(xm, xm2, xm3, xm4)), all = TRUE)
-  sapply(list(xm, xm2, xm3, xm4), apply, 3, max) # how many remain?
+  sapply(list(xm, xm2, xm3, xm4), max) # how many remain?
 
 }
