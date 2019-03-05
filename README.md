@@ -49,8 +49,8 @@ An example with images in individual files in folders is shown here. `parseImage
   df <- parseImages(img)
   pd <- read.csv(fpd)
   df <- mergePdata(pd, df)
-  cut <- getCut(df)  # this is less than optimal, see the analysis below
-  df <- score(df, cut)
+  bg <- getBgnd(df)  # this is less than optimal, see the analysis below
+  df <- score(df, bg)
   res <- tally(df)
   fm <- getFit(res)
   plotFit(fm)
@@ -62,16 +62,16 @@ An example with stacked images in a single folder is shown here. Repeat the abov
 ```
 Typical workflow:
 ```
-   img <- getImages()    # read paired images with EBImage
-   df <- parseImages()   # extract nuclear information and target mfi
+   img <- getImages()     # read paired images with EBImage
+   df <- parseImages(img) # extract nuclear information and target mfi
 
    pd <- data.frame(well = well.info(levels(df$well)), moi = moi, unit = unit)
    ...or...
    pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)
 
    df  <- mergePdata(pd, df) # merge with phenotype data in 'pd'
-   cut <- getCut(df)     # determine cutoff by control (or well, row, or column)
-   df  <- score(df, cut) # assign positive values from cutoff
+   bg <- getBgnd(df)     # determine background level by control
+   df  <- score(df, bg)  # assign positive values from bg
    res <- tally(df)      # tally positives and negatives and return data.frame
    fm  <- getFit(res)    # get model fit(s) from either res or scored data frame
    cf  <- getTiter(fm)   # get value in units required for MOI of 1 and 95% CI
@@ -79,33 +79,34 @@ Typical workflow:
 Supporting functions include these as well as others:
 ```
    checkImages(path)   # check (and optionally display) paired images
-   plotDens(df)        # show cutoff values with densityplot 
-   plotHist(df)        # show cutoff values with histogram
+   plotDens(df)        # show default cutoff values with densityplot 
+   plotHist(df)        # show default cutoff values with histogram
    plotPlate(df)       # plot entire plate showing positives
-   plotWell(df, well)  # plot a schematic of each image in a given well(s) or file(s)
+   plotWell(well, df)  # plot a schematic of each image in a given well(s) or file(s)
    plotFit(fm)         # plot fit(s) with calculated values using base graphics
    plotOneFit(fm)      # plot fit with more options to adjust colors
    addOneFit(fm)       # add another best-fit line and points to an existing plot
-   getAIC(df, cut, by) # evaluate fitted model(s) from df at cut values
+   getAIC(df, bg, by)  # evaluate fitted model(s) from df at various background values
    nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)
-   trimMask(mask, TRUE) # remove objects based on size from image mask
+   trimMask(mask)      # remove objects based on size from image mask
    cellMask(mask)      # expand a nuclear mask into a cell image mask
    bnormalize(img)     # normalize images to a common background value
    p2p()               # interactively measure point-to-point distances
-   pnpoly(p, v)        # test if points in p are within polygon (v)
+   pnpoly(p, v)        # test if points in p are within polygon v
 ```
-Often the cutoff value needs to be optimized with parameters provided to `getCut()` as well as those initially used such as `width` in `getImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate the choice of cutoff values.
+Often the background value needs to be optimized with parameters provided to `getBgnd()` as well as those provided to `parseImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate different choices of background values.
 
-The sample data provided here yields a less than ideal cutoff using default settings. The control values (moi of 0) are so tight that the default value of `mult = 3` for the 'mad' multiplier is too generous.
+The sample data provided here yields a less than ideal cutoff value for the background when using default settings. The control values (moi of 0) are so tight that the default value of `mult = 2.5` for the 'mad' multiplier is too generous.
 
-The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible cutoffs but the results from `plotHist()` show that the value with `mult` = 2.6 is just a little better than the default of 2.5.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible background values. The results from `plotHist()` show that the values with `mult` = 1.55 or 1.95 may be better than the default value of 2.5.
 ```
-  mm <- seq(2, 3, 0.05)
-  cuts <- sapply(mm, function(m) getCut(df, mult = m))
-  aic <- getAIC(df, cuts)
+  mm <- seq(1, 2.5, 0.05)
+  bg <- sapply(mm, function(m) getBgnd(df, mult = m))
+  aic <- getAIC(df, bg)
   plot(mm, aic, type = "b")	# by AIC, the best mult value is 2.65
-  plotHist(df, cuts[mm == 3], main = sprintf("Cutoff = %0.4f", cuts[mm == 2.5]))
-  plotHist(df, cuts[mm == 2.6], main = sprintf("Cutoff = %0.4f", cuts[mm == 2.65]))
+  plotHist(df, bg[mm == 2.5], main = "Default 'mult' value = 2.5")
+  opt.mm <- mm[which.min(aic)]
+  plotHist(df, bg[opt.mm], main = sprintf("Optimal 'mult' value = %0.2f", opt.mm))
 ```  
 ## License
 GPL-3
