@@ -1,11 +1,12 @@
 #' Normalize Image Background
 #' 
-#' Linearly adjust the intensity values of an image to a common background.
+#' Adjust values of an image to a common background.
 #' 
 #' @param img Grayscale \code{Image} object.
 #' @param inputRange A numeric vector of 2 values specifying the expected
 #'   range of intensity values.
-#' @param quant Quantile serving as the common baseline, default of 0.025.
+#' @param quant Quantile to serve as the common baseline, default of 0.025.
+#' @param nonzero Should zero values be ignored in quantile calculation?
 #' @param ... Additional arguments are accepted but ignored in order
 #'   to remain compatible with previous versions of this function.
 #' 
@@ -40,7 +41,7 @@
 #' 
 #' @export
 #' 
-bnormalize <- function(img, inputRange, quant = 0.025, ...)
+bnormalize <- function(img, inputRange, quant = 0.025, nonzero = FALSE, ...)
 {
 	if (!is(img, "Image") || colorMode(img) != 0)
 		stop("grayscale image required")
@@ -52,12 +53,18 @@ bnormalize <- function(img, inputRange, quant = 0.025, ...)
 
 	dm <- dim(img)
 	if (length(dm) == 2) {
-		bgnd <- quantile(img, quant)
-		img <- img - bgnd + base
+		if (nonzero == TRUE)
+			setpoint <- quantile(img[img > 0], quant)
+		else
+			setpoint <- quantile(img, quant)
+		img <- img - setpoint + base
 	}
 	else {
-		bgnd <- apply(img, 3, quantile, quant)
-		bgndImg <- Image(rep(bgnd, each = prod(dm[1:2])), dim = dm)
+		if (nonzero == TRUE)
+			setpoint <- apply(img, 3, function(v) quantile(v[v > 0], quant))
+		else
+			setpoint <- apply(img, 3, quantile, quant)
+		bgndImg <- Image(rep(setpoint, each = prod(dm[1:2])), dim = dm)
 		img <- img - bgndImg + base
 	}
 	img[img < 0] <- 0

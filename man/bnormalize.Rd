@@ -4,7 +4,7 @@
 \alias{bnormalize}
 \title{Normalize Image Background}
 \usage{
-bnormalize(img, inputRange, quant = 0.025, ...)
+bnormalize(img, inputRange, quant = 0.025, nonzero = FALSE, ...)
 }
 \arguments{
 \item{img}{Grayscale \code{Image} object.}
@@ -12,7 +12,9 @@ bnormalize(img, inputRange, quant = 0.025, ...)
 \item{inputRange}{A numeric vector of 2 values specifying the expected
 range of intensity values.}
 
-\item{quant}{Quantile serving as the common baseline, default of 0.025.}
+\item{quant}{Quantile to serve as the common baseline, default of 0.025.}
+
+\item{nonzero}{Should zero values be ignored in quantile calculation?}
 
 \item{...}{Additional arguments are accepted but ignored in order
 to remain compatible with previous versions of this function.}
@@ -21,7 +23,7 @@ to remain compatible with previous versions of this function.}
 \code{Image} object linearly scaled to have a common background.
 }
 \description{
-Linearly adjust the intensity values of an image to a common background.
+Adjust values of an image to a common background.
 }
 \details{
 Each frame of an \code{Image} will be linearly scaled to have an
