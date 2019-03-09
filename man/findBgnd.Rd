@@ -31,11 +31,15 @@ The maximum of this population is determined from a kernel density estimate
 and the \emph{left} half of the distribution is fit to a Gaussian
 distribution. The value returned is the position of the peak +
 \code{mult} times the standard deviation of the distribution.
-Note that fluorescent values are typically log-transformed before analysis.
-The parameter \code{mult} must be empirically determined.
+Because fluorescent values are typically log-transformed before analysis,
+the values are log transformed before analysis. This can be turned off
+with the \code{log} parameter. Typically, the parameter \code{mult}
+must be empirically determined. Note that with \code{mult = 0}, the mean
+value of the background intensity will be returned.
 
 This code replaces a previous version that used the \code{half.range.mode()}
-function in the \code{genefilter} package.
+function in the \code{genefilter} package. This version uses the
+\code{\link[MASS]{fitdistr}} function.
 }
 \examples{
   x <- c(rlnorm(200), rlnorm(120, 4))
