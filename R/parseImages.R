@@ -280,11 +280,11 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 				ww <- names(nucImages)[idx]
 				res <- rbind(res, data.frame(well = well.info(ww)$well,
 					row = well.info(ww)$row, column = well.info(ww)$column,
-					frame = i, xm = xm, ym = xm, area, dna, mfi))
+					frame = i, xm = xm, ym = ym, area, dna, mfi))
 			}
 			else # imageType == "byFile"
 				res <- rbind(res, data.frame(file = names(nucImages)[idx],
-					frame = i, xm = xm, ym = xm,
+					frame = i, xm = xm, ym = ym,
 					area, dna, mfi))
 		}
 		rownames(res) <- NULL
