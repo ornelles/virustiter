@@ -41,8 +41,9 @@
 #' @examples
 #'   x <- c(rlnorm(200), rlnorm(120, 4))
 #'   plot(density(log(x)))
-#'   abline(v = log(findBgnd(x, mult = 0)), col = 4) # peak
-#'   abline(v = log(findBgnd(x)), col = 2) # background limit
+#'   bg <- sapply(0:4, function(m) findBgnd(x, mult = m))
+#'   abline(v = log(bg), col = 1:5) # background limit
+#'   legend("topleft", legend = 0:4, title = "mult", lty = 1, col = 1:5)
 #'
 #' @export
 #' 
