@@ -65,7 +65,7 @@ Typical workflow:
    img <- getImages()     # read paired images with EBImage
    df <- parseImages(img) # extract nuclear information and target mfi
 
-   pd <- data.frame(well = well.info(levels(df$well)), moi = moi, unit = unit)
+   pd <- data.frame(well.info(levels(df$well)), moi = moi, unit = unit)
    ...or...
    pd <- data.frame(file = levels(df$file), moi = moi, unit = unit)
 
