@@ -105,10 +105,12 @@ getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE)
 		idx[sel] <- TRUE
 		temp <- do.call(rbind, Map(function(v, s) v[s, ], spl, idx))[c(by, param)]
 		names(temp) <- c("g", "y")
+		levels(temp$g) <- factor(temp$g, levels = unique(temp$g))
 	}
 	else {
 		temp <- df[c(by, param)]
 		names(temp) <- c("g", "y")
+		levels(temp$g) <- levels(df[[by]])
 	}
 	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult = mult, log = log))
 	ret <- c(res[["y"]])
