@@ -38,15 +38,19 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"))
 	else
 		stopifnot("file" %in% names(phenoData))
 
-# check value for unit and assign control wells
+# check for 'unit' variable and assign if needed
 	if (!"unit" %in% names(phenoData))
 		phenoData$unit <- "[no unit]"
-	type <- rep("standard", nrow(phenoData))
-	if ("moi" %in% names(phenoData))
-		type[phenoData$moi == 0] <- "control"
-	else if ("x" %in% names(phenoData))
-		type[phenoData$x == 0] <- "control"
-	phenoData$type <- type
+
+# check for 'type' variable and assign if needed
+	if (!"type" %in% names(phenoData)) {
+		type <- rep("standard", nrow(phenoData))
+		if ("moi" %in% names(phenoData))
+			type[phenoData$moi == 0] <- "control"
+		else if ("x" %in% names(phenoData))
+			type[phenoData$x == 0] <- "control"
+		phenoData$type <- type
+	}
 
 # remove any variables in imageData that are present in phenoData EXCEPT
 # for variables used to merge data frames: 'file' and/or 'well'
