@@ -11,7 +11,7 @@ Additional information about the experiment must be provided in a "phenotype" da
 Individual cells are identified by a DNA stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
 
 ## Installation
-This is the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
+This is a revision of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
 
 First, the supporting package `EBImage` must be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
@@ -91,6 +91,8 @@ Supporting functions include these as well as others:
    trimMask(mask)      # remove objects based on size from image mask
    cellMask(mask)      # expand a nuclear mask into a cell image mask
    bnormalize(img)     # normalize images to a common background value
+   getZero(img)        # determine the background (zero value) pixel
+   setZero(img, zero)  # normalize images to a common zero value
    p2p()               # interactively measure point-to-point distances
    pnpoly(p, v)        # test if points in p are within polygon v
 ```
