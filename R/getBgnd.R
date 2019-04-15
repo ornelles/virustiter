@@ -2,39 +2,43 @@
 #'
 #' Determine the optimum background value between "positive" and "negative"
 #' values in the argument \code{param}. The group used to determine the
-#' background is specified by the argument \code{by}.  
+#' background is specified with the argument \code{by}.  
 #'
 #' @param df Annotated \code{data.frame} with fluorescent values to evaluate.
-#' @param by Character string identifying the grouping factor in \code{'df'}
+#' @param by Character string identifying the grouping factor in \code{df}
 #'   used to determine background values. Values of "row" or "column" will
 #'   split the data by row or column before identifying background values.
-#'   If missing or if specified as "row" or "column", values associated with
-#'   \code{type == "control"} or \code{moi == 0} or \code{x == 0} will
-#'   be used to determine the background.
+#'   If \code{by} is "row" or "column" or if \code{by} is not provided, 
+#'   values associated with \code{type == "control"}, \code{moi == 0} or
+#'   \code{x == 0} will be used to determine the background. To override the
+#'   search for control values in each row or column, change the variable
+#'   name of interest to something other than "row" or "column." 
 #' @param param Variable name in \code{df} as a character string to evaluate, 
 #'   typically \code{"mfi"} or \code{"y"}.
-#' @param mult Muliplier constant passed to \code{\link{findBgnd}}.
+#' @param mult Multiplier constant passed to \code{\link{findBgnd}}.
 #' @param log \code{logical} flag passed to \code{\link{findBgnd}} to use
 #'   log-transformed values.
 #'
 #' @details
-#' #'
+#'
 #' The value between positive and negative values in \code{param} will be 
 #' determined according to \code{by}. If this value is "control" or is missing,
 #' all values identified as \code{type == "control"} or with \code{x/moi == 0}
 #' will be treated as background. If this value is "row" or "column", 
 #' any values with \code{type == "control"} or with \code{x/moi == 0} in each
 #' row or column will be used to define the background for that row or column.
-#' If zero moi values are not present, the background will be determined by
-#' Otsu's method for the groups defined by the character string in \code{by}.
+#' If true zero moi values are not present, the background will be determined
+#' by Otsu's method for the groups defined with the variable \code{by}.
 #' Typically this would be \code{"well"} or \code{"file"} but can be any factor 
 #' variable in the data.frame \code{df}. The background value will be determined
 #' by the logic in \code{\link{findBgnd}}.
 #' 
 #' The annotated data frame must have the variable identified in \code{param}
 #' and, if 'by' is missing, a variable named either \code{"x"} or \code{"moi"}.
-#' If 'by' is provided, this must exist as a factor in the in the argument
-#' \code{df}.
+#' If 'by' is provided, variable of this name must exist as a factor in the
+#' argument \code{df}.
+#'
+#' @seealso \code{link{getZero}}
 #'
 #' @return
 #'
@@ -98,14 +102,14 @@ getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE)
 			stop("\n", "If 'by' is missing or is specified as \"control\"",
 				"\n", "type == \"control\" or 'x/moi' == 0 values must be present")
 	}
-	else if (by %in% c("column", "row")) { # try to select moi == 0 cases
+	else if (by %in% c("column", "row")) { # use moi == 0 cases if ALL have it
 		spl <- split(df, df[[by]])
 		idx <- lapply(spl, function(v) which(v[[moi]] == 0))
-		sel <- which(lengths(idx) == 0)
-		idx[sel] <- TRUE
+		sel <- which(lengths(idx) == 0) # identify those without true control
+		idx[sel] <- TRUE # include all values without true controls
 		temp <- do.call(rbind, Map(function(v, s) v[s, ], spl, idx))[c(by, param)]
 		names(temp) <- c("g", "y")
-		levels(temp$g) <- factor(temp$g, levels = unique(temp$g))
+		levels(temp$g) <- levels(factor(temp$g, levels = unique(temp$g)))
 	}
 	else {
 		temp <- df[c(by, param)]
