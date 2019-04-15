@@ -49,3 +49,6 @@ function in the \code{genefilter} package. This version uses the
   legend("topleft", legend = 0:4, title = "mult", lty = 1, col = 1:5)
 
 }
+\seealso{
+\code{\link{getZero}}
+}

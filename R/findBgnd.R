@@ -28,6 +28,8 @@
 #' function in the \code{genefilter} package. This version uses the
 #' \code{\link[MASS]{fitdistr}} function. 
 #' 
+#' @seealso \code{\link{getZero}}
+#'
 #' @return
 #' 
 #' The value estimated as position of the background peak + mult * standard
