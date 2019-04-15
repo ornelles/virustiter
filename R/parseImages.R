@@ -29,7 +29,8 @@
 #' @param equalize If the background varies significantly among the fluorescent
 #'   target images (or among the frames of target images), when \code{TRUE},
 #'   this option adjusts the fluorescent target images to have a common
-#'   background value with the function \code{\link{bnormalize}}.
+#'   background value with the default options in \code{\link{bnormalize}}
+#'   and using the entire range of target images for the expected range.
 #' @param simplify Return a single \code{data.frame} of results if \code{TRUE},
 #'   otherwise return a list of \code{data.frames} for each member of the list.
 #'
@@ -163,10 +164,11 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		message("Unable to determine organization of images, using 'file'")
 	}
  
-# smooth and equalize tgt images
+# optionally equalize tgt images using the range of all tgt values
 	if (equalize == TRUE) {
 		message("Equalizing target images...", appendLF = FALSE)
-		tgtImages <- lapply(tgtImages, bnormalize)
+		tgtRange <- range(sapply(tgt, range))
+		tgtImages <- lapply(tgtImages, bnormalize, inputRange = tgtRange)
 		message("done"); flush.console()
 	}
 

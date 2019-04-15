@@ -41,7 +41,8 @@ If \code{FALSE}, no trimming will be performed.}
 \item{equalize}{If the background varies significantly among the fluorescent
 target images (or among the frames of target images), when \code{TRUE},
 this option adjusts the fluorescent target images to have a common
-background value with the function \code{\link{bnormalize}}.}
+background value with the default options in \code{\link{bnormalize}}
+and using the entire range of target images for the expected range.}
 
 \item{simplify}{Return a single \code{data.frame} of results if \code{TRUE},
 otherwise return a list of \code{data.frames} for each member of the list.}
