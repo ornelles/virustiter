@@ -5,7 +5,7 @@
 #' @param img Grayscale \code{Image} object.
 #' @param inputRange A numeric vector of 2 values specifying the expected
 #'   range of intensity values.
-#' @param quant Quantile to serve as the common baseline, default of 0.025.
+#' @param quant Quantile to serve as the common baseline, default of 0.005.
 #' @param nonzero Should zero values be ignored in quantile calculation?
 #' @param ... Additional arguments are accepted but ignored in order
 #'   to remain compatible with previous versions of this function.
@@ -41,7 +41,7 @@
 #' 
 #' @export
 #' 
-bnormalize <- function(img, inputRange, quant = 0.025, nonzero = FALSE, ...)
+bnormalize <- function(img, inputRange, quant = 0.005, nonzero = FALSE, ...)
 {
 	if (!is(img, "Image") || colorMode(img) != 0)
 		stop("grayscale image required")

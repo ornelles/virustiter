@@ -4,7 +4,7 @@
 \alias{bnormalize}
 \title{Normalize Image Background}
 \usage{
-bnormalize(img, inputRange, quant = 0.025, nonzero = FALSE, ...)
+bnormalize(img, inputRange, quant = 0.005, nonzero = FALSE, ...)
 }
 \arguments{
 \item{img}{Grayscale \code{Image} object.}
@@ -12,7 +12,7 @@ bnormalize(img, inputRange, quant = 0.025, nonzero = FALSE, ...)
 \item{inputRange}{A numeric vector of 2 values specifying the expected
 range of intensity values.}
 
-\item{quant}{Quantile to serve as the common baseline, default of 0.025.}
+\item{quant}{Quantile to serve as the common baseline, default of 0.005.}
 
 \item{nonzero}{Should zero values be ignored in quantile calculation?}
 
