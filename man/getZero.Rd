@@ -2,36 +2,42 @@
 % Please edit documentation in R/getZero.R
 \name{getZero}
 \alias{getZero}
-\title{Find Background (Zero Value) Pixel}
+\title{Find Baseline (Zero) Pixel Value}
 \usage{
-getZero(img, frac = 0.5)
+getZero(x, frac = 1)
 }
 \arguments{
-\item{img}{An array object or list of array objects, where each
-is typically a grayscale \code{Image} object.}
+\item{x}{A numeric vector or array \emph{or} list of such objects, where
+each object is typically a grayscale \code{Image} object.}
 
 \item{frac}{Number between 0 and 1 specifying the fraction of
-values to consider.}
+values to include in the search for the most common value.}
 }
 \value{
 A numeric vector or list of numeric vectors with the most
 common non-zero pixel for each frame.
 }
 \description{
-Find the most common non-zero pixel in the lower fraction
-of each frame of an image.
+Find the most common non-zero pixel in each frame of an image.
 }
 \details{
-This function is meant to be applied to images that have more
-background pixels than foreground pixels. The most common
-value among the lower half (as specified by \code{frac})
-of intensity values is sought as the true 'zero' value.
+Identify the  most common pixel value in each frame of an image
+to serve as the true 'zero' value.
 
 Intensity values greater than the minimum and less than
 \code{frac * maximum} are processed by the \code{\link{density}}
 function to determine the most common pixel. The minimum pixel
 value is excluded to avoid skewing the density estimate if an
-undersaturated image is used.
+undersaturated image is used. If the image has many bright pixels,
+limit the search to the lower fraction of values by setting
+\code{frac} to a value such as \code{0.5}.
+}
+\examples{
+set.seed(123)
+z <- c(rnorm(200, 1, 0.1), rnorm(200, 2, 1))
+plot(density(z))
+abline(v = getZero(z), col = 2)
+
 }
 \seealso{
 \code{\link{bnormalize}}, \code{\link{setZero}},

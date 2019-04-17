@@ -1,25 +1,24 @@
-#' Find Background (Zero Value) Pixel
+#' Find Baseline (Zero) Pixel Value
 #'
-#' Find the most common non-zero pixel in the lower fraction
-#' of each frame of an image.
+#' Find the most common non-zero pixel in each frame of an image.
 #'
-#' @param img An array object or list of array objects, where each
-#'   is typically a grayscale \code{Image} object.
+#' @param x A numeric vector or array \emph{or} list of such objects, where
+#'   each object is typically a grayscale \code{Image} object.
 #' @param frac Number between 0 and 1 specifying the fraction of
-#'   values to consider.
+#'   values to include in the search for the most common value.
 #'
 #' @details
 #' 
-#' This function is meant to be applied to images that have more
-#' background pixels than foreground pixels. The most common
-#' value among the lower half (as specified by \code{frac})
-#' of intensity values is sought as the true 'zero' value.
+#' Identify the  most common pixel value in each frame of an image
+#' to serve as the true 'zero' value.
 #' 
 #' Intensity values greater than the minimum and less than
 #' \code{frac * maximum} are processed by the \code{\link{density}}
 #' function to determine the most common pixel. The minimum pixel
 #' value is excluded to avoid skewing the density estimate if an
-#' undersaturated image is used.
+#' undersaturated image is used. If the image has many bright pixels,
+#' limit the search to the lower fraction of values by setting
+#' \code{frac} to a value such as \code{0.5}. 
 #'
 #' @seealso \code{\link{bnormalize}}, \code{\link{setZero}},
 #'   \code{\link{getBgnd}}, \code{\link{findBgnd}}
@@ -29,32 +28,39 @@
 #' A numeric vector or list of numeric vectors with the most
 #' common non-zero pixel for each frame.
 #'
+#' @examples
+#' set.seed(123)
+#' z <- c(rnorm(200, 1, 0.1), rnorm(200, 2, 1))
+#' plot(density(z))
+#' abline(v = getZero(z), col = 2)
+#'
 #' @export
 #'
-getZero <- function(img, frac = 0.5)
+getZero <- function(x, frac = 1)
 {
 # argument check
 	stopifnot(frac <= 1, frac >= 0)
 
 # working function
-	.getZero <- function(img, frac) {
-		dm <- dim(img)
-		if (length(dm) == 2) dim(img) <- c(dm, 1)
-		xmax <- apply(img, 3, function(v) frac*diff(range(v)))
-		xmin <- apply(img, 3, min)
-		sapply(seq_len(dim(img)[3]), function(i) {
-			valid <- img[,,i] > xmin[i] & img[,,i] < xmax[i]
-			d <- density(img[,,i][valid])
+	.getZero <- function(x, frac) {
+		dm <- dim(x)
+		if (is.null(dm)) dim(x) <- c(length(x), 1, 1)
+		else if (length(dm) == 2) dim(x) <- c(dm, 1)
+		xmax <- apply(x, 3, function(v) frac*diff(range(v)))
+		xmin <- apply(x, 3, min)
+		sapply(seq_len(dim(x)[3]), function(i) {
+			valid <- x[,,i] > xmin[i] & x[,,i] < xmax[i]
+			d <- density(x[,,i][valid])
 			d$x[which.max(d$y)]})
 	}
 
 # dispatch
 	# dispatch
-	if (is(img, "list") & all(sapply(img, is.array)))
-		ans <- lapply(img, .getZero, frac = frac)
-	else if (is(img, "array"))
-		ans <- .getZero(img, frac = frac)
+	if (is(x, "list") & all(sapply(x, is.numeric)))
+		ans <- lapply(x, .getZero, frac = frac)
+	else if (is.numeric(x))
+		ans <- .getZero(x, frac = frac)
 	else
-		stop("require an array or list of array objects")
+		stop("require a numeric vector, numeric array or list of such objects")
 	return(ans)
 }
