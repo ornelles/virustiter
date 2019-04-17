@@ -1,22 +1,20 @@
 #' Normalize Image to Given Zero Value
 #'
-#' Linearly scale an image to re-zero at the given zero value.
+#' Scale an image and crop at the given zero value.
 #'
-#' @param img An array object or list of array objects, where each
-#'   is typically a grayscale \code{Image} object.
-#' @param zero Number between 0 and 1 for the new zero value.
-#' @param bit.depth Integer between 1 and 64 specifying the
-#'   bit-depth of the image, typically 8 or 16.
-#' @param nonzero Logical value, if \code{TRUE}, the minimum value will
-#'  adjusted to \code{2^-bit.depth}, otherwise the minimum value
-#'  will be set to 0.
+#' @param x A numeric vector or array \emph{or} list of such objects, where
+#'   each object is typically a grayscale \code{Image} object.
+#' @param zero Numeric value or list of values specifying the
+#'   zero value pixel for each frame.
+#' @param min.value Numeric value or list of values to be the
+#'   new minimum value in the transformed image, default of 0.
 #'
 #' @details
 #' 
-#' Each frame of the argument will be linearly scaled to have a
-#' minimum at \code{zero} by subtraction. Negative values will
-#' be clipped to 0 if \code{nonzero} is \code{FALSE} otherwise the
-#' minimum value will be set to \code{2^-bit.depth}. 
+#' Each frame of the argument will be linearly scaled by subtracting
+#' \code{zero}. Values less than \code{min.value} will be set to
+#' \code{min.value}. Values of \code{0, NULL, or NA} for \code{min.value}
+#' will be treated as the value 0. 
 #'
 #' This function will probably replace \code{\link{bnormalize}}
 #' soon. This function is typically applied after using
@@ -26,29 +24,32 @@
 #'
 #' @return
 #'
-#' An array or list of the same size that has been linearly scaled.
+#' An object of the same structure as the argument \code{x} that has been
+#' linearly scaled and cropped.
 #'
 #' @export
 #'
-setZero <- function(img, zero, bit.depth = 16, nonzero = TRUE)
+setZero <- function(x, zero, min.value = 0)
 {
 # argument check
-	stopifnot(bit.depth >= 1, bit.depth <= 64)
+	if (missing(min.value) || is.na(min.value) || is.null(min.value))
+		min.value <- 0
+	if (min.value > 1 | min.value < 0)
+		warning("'min.value' outside of the range [0,1]")
 
 # working function
-	.setZero <- function(img, zero, bit.depth, nonzero) {
-		img <- img - rep(zero, each = prod(dim(img)[1:2]))
-		min.value <- if(nonzero) 1/2^as.integer(bit.depth) else 0
-		img[img < zero] <- min.value
-		return(img)
+	.setZero <- function(x, zero, min.value) {
+		x <- x - zero
+		x[x < min.value] <- min.value
+		return(x)
 	}
 
 # dispatch
-	if (is(img, "list") & all(sapply(img, is.array)))
-		ans <- Map(.setZero, img, zero, bit.depth = bit.depth, nonzero = nonzero)
-	else if (is(img, "array"))
-		ans <- .setZero(img, zero, bit.depth, nonzero)
+	if (is(x, "list") & all(sapply(x, is.numeric)))
+		ans <- Map(.setZero, x, zero, min.value)
+	else if (is.numeric(x))
+		ans <- .setZero(x, zero, min.value)
 	else
-		stop("require an array or list of array objects")
+		stop("require a numeric vector, numeric array or list of such objects")
 	return(ans)
 }

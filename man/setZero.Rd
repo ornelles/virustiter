@@ -4,32 +4,30 @@
 \alias{setZero}
 \title{Normalize Image to Given Zero Value}
 \usage{
-setZero(img, zero, bit.depth = 16, nonzero = TRUE)
+setZero(x, zero, min.value = 0)
 }
 \arguments{
-\item{img}{An array object or list of array objects, where each
-is typically a grayscale \code{Image} object.}
+\item{x}{A numeric vector or array \emph{or} list of such objects, where
+each object is typically a grayscale \code{Image} object.}
 
-\item{zero}{Number between 0 and 1 for the new zero value.}
+\item{zero}{Numeric value or list of values specifying the
+zero value pixel for each frame.}
 
-\item{bit.depth}{Integer between 1 and 64 specifying the
-bit-depth of the image, typically 8 or 16.}
-
-\item{nonzero}{Logical value, if \code{TRUE}, the minimum value will
-adjusted to \code{2^-bit.depth}, otherwise the minimum value
-will be set to 0.}
+\item{min.value}{Numeric value or list of values to be the
+new minimum value in the transformed image, default of 0.}
 }
 \value{
-An array or list of the same size that has been linearly scaled.
+An object of the same structure as the argument \code{x} that has been
+linearly scaled and cropped.
 }
 \description{
-Linearly scale an image to re-zero at the given zero value.
+Scale an image and crop at the given zero value.
 }
 \details{
-Each frame of the argument will be linearly scaled to have a
-minimum at \code{zero} by subtraction. Negative values will
-be clipped to 0 if \code{nonzero} is \code{FALSE} otherwise the
-minimum value will be set to \code{2^-bit.depth}. 
+Each frame of the argument will be linearly scaled by subtracting
+\code{zero}. Values less than \code{min.value} will be set to
+\code{min.value}. Values of \code{0, NULL, or NA} for \code{min.value}
+will be treated as the value 0. 
 
 This function will probably replace \code{\link{bnormalize}}
 soon. This function is typically applied after using
