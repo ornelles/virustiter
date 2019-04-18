@@ -4,17 +4,20 @@
 \alias{setZero}
 \title{Normalize Image to Given Zero Value}
 \usage{
-setZero(x, zero, min.value = 0)
+setZero(x, zero, min.value = 0, ...)
 }
 \arguments{
 \item{x}{A numeric vector or array \emph{or} list of such objects, where
 each object is typically a grayscale \code{Image} object.}
 
 \item{zero}{Numeric value or list of values specifying the
-zero value pixel for each frame.}
+zero value pixel for each frame. If missing, this will be determined
+with \code{\link{getZero}}.}
 
 \item{min.value}{Numeric value or list of values to be the
 new minimum value in the transformed image, default of 0.}
+
+\item{...}{Values passed to \code{link{getZero}} such as \code{frac}.}
 }
 \value{
 An object of the same structure as the argument \code{x} that has been
@@ -25,9 +28,9 @@ Scale an image and crop at the given zero value.
 }
 \details{
 Each frame of the argument will be linearly scaled by subtracting
-\code{zero}. Values less than \code{min.value} will be set to
-\code{min.value}. Values of \code{0, NULL, or NA} for \code{min.value}
-will be treated as the value 0. 
+\code{zero}. If \code{zero} is missing, \code{\link{getZero}} will be
+called to determine default zero values. Pixel values less than
+\code{min.value} will be set to \code{min.value}. 
 
 This function will probably replace \code{\link{bnormalize}}
 soon. This function is typically applied after using

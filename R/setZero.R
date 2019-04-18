@@ -5,16 +5,18 @@
 #' @param x A numeric vector or array \emph{or} list of such objects, where
 #'   each object is typically a grayscale \code{Image} object.
 #' @param zero Numeric value or list of values specifying the
-#'   zero value pixel for each frame.
+#'   zero value pixel for each frame. If missing, this will be determined
+#'   with \code{\link{getZero}}. 
 #' @param min.value Numeric value or list of values to be the
 #'   new minimum value in the transformed image, default of 0.
+#' @param ... Values passed to \code{link{getZero}} such as \code{frac}.
 #'
 #' @details
 #' 
 #' Each frame of the argument will be linearly scaled by subtracting
-#' \code{zero}. Values less than \code{min.value} will be set to
-#' \code{min.value}. Values of \code{0, NULL, or NA} for \code{min.value}
-#' will be treated as the value 0. 
+#' \code{zero}. If \code{zero} is missing, \code{\link{getZero}} will be
+#' called to determine default zero values. Pixel values less than
+#' \code{min.value} will be set to \code{min.value}. 
 #'
 #' This function will probably replace \code{\link{bnormalize}}
 #' soon. This function is typically applied after using
@@ -29,13 +31,15 @@
 #'
 #' @export
 #'
-setZero <- function(x, zero, min.value = 0)
+setZero <- function(x, zero, min.value = 0, ...)
 {
 # argument check
 	if (missing(min.value) || is.na(min.value) || is.null(min.value))
 		min.value <- 0
 	if (min.value > 1 | min.value < 0)
-		warning("'min.value' outside of the range [0,1]")
+		warning("'min.value' is outside of the range [0,1]")
+	if (missing(zero))
+		zero <- getZero(x, ...)
 
 # working function
 	.setZero <- function(x, zero, min.value) {
