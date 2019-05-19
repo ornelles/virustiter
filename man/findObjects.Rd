@@ -7,8 +7,8 @@
 findObjects(expr, df, mask = NULL, invert = FALSE)
 }
 \arguments{
-\item{expr}{An \code{expression} evaluated in \code{'df'} that returns
-a logical vector identifying objects (rows) in \code{'df'}.}
+\item{expr}{An \code{expression} evaluated in the data frame \code{df}
+that returns a logical vector identifying objects (rows) in \code{df}.}
 
 \item{df}{A \code{data.frame} produced by \code{\link{parseImages}} in which
 \code{'expr'} will be evaluated.}
@@ -18,16 +18,23 @@ an array containing object masks. Object masks are sets of pixels with
 the same unique integer value.}
 
 \item{invert}{A \code{logical} value to invert the selection determined
-by \code{'expr'}.}
+by \code{expr}.}
 }
 \value{
 Either an integer \code{Image} mask or list of integer \code{Image} masks
-with the objects selected by \code{'expr'} if \code{mask} was provided
-otherwise a nested list of integers identifying the selected objects.
+with the objects selected by \code{expr} if a \code{mask} was provided.
+If no \code{mask} was provided to the function, a nested list of integers
+identifying the objects satisfying the argument in \code{expr} which is
+as long as the longer of the levels in \code{frame} or \code{well}.
 }
 \description{
 Identify objects in data.frame produced by \code{\link{parseImages}} 
 as specified by the expression \code{expr}.
+}
+\details{
+The data frame must have the variable \code{frame} and either \code{well}
+\code{file}. If both \code{well} and \code{file} are present, the longer 
+of these two factors will be used to split the data to find objects.
 }
 \examples{
   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))

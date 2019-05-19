@@ -3,21 +3,29 @@
 #' Identify objects in data.frame produced by \code{\link{parseImages}} 
 #' as specified by the expression \code{expr}. 
 #' 
-#' @param expr An \code{expression} evaluated in \code{'df'} that returns
-#'   a logical vector identifying objects (rows) in \code{'df'}.
+#' @param expr An \code{expression} evaluated in the data frame \code{df}
+#'   that returns a logical vector identifying objects (rows) in \code{df}.
 #' @param mask An optional \code{Image} object in \code{Grayscale} mode or
 #'   an array containing object masks. Object masks are sets of pixels with
 #'   the same unique integer value.
 #' @param df A \code{data.frame} produced by \code{\link{parseImages}} in which
 #'   \code{'expr'} will be evaluated.
 #' @param invert A \code{logical} value to invert the selection determined
-#'   by \code{'expr'}.
+#'   by \code{expr}.
 #' 
+#' @details
+#'
+#' The data frame must have the variable \code{frame} and either \code{well}
+#' \code{file}. If both \code{well} and \code{file} are present, the longer 
+#' of these two factors will be used to split the data to find objects.
+#'
 #' @return
 #'
 #' Either an integer \code{Image} mask or list of integer \code{Image} masks
-#' with the objects selected by \code{'expr'} if \code{mask} was provided
-#' otherwise a nested list of integers identifying the selected objects.
+#' with the objects selected by \code{expr} if a \code{mask} was provided.
+#' If no \code{mask} was provided to the function, a nested list of integers
+#' identifying the objects satisfying the argument in \code{expr} which is
+#' as long as the longer of the levels in \code{frame} or \code{well}.
 #' 
 #' @examples
 #'   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))
@@ -52,14 +60,21 @@ findObjects <- function(expr, df, mask = NULL, invert = FALSE)
 	vname <- tail(make.unique(c(names(df), "var")), 1)
 	df[[vname]] <- sel
 
-# split 'var' according to 'well/file' and 'frame' in 'df'
-	if ("well" %in% names(df))
+# split 'var' according to the greater of 'well/file' and 'frame' in 'df'
+	if (all(c("well", "file") %in% names(df)))
+		group <- ifelse(nlevels(df$file) > nlevels(df$well), "file", "well")
+	else if ("well" %in% names(df))
    group <- "well"
 	else if ("file" %in% names(df))
 		group <- "file"
+	else
+		stop("can't be here: failed to find 'file' or 'well'")
+
+# split data frame by group, then split expression value by frame within each
 	spl.1 <- split(df, df[[group]], drop = FALSE)
 	spl.2 <- lapply(spl.1, function(v) split(v[[vname]], v[["frame"]], drop = TRUE))
 
+# enumerate negative and positive expression values
 	neg <- lapply(spl.2, function(v) lapply(v, function(x) which(x == FALSE)))
 	pos <- lapply(spl.2, function(v) lapply(v, function(x) which(x == TRUE)))
 
