@@ -63,7 +63,7 @@
 				stop("'mask' and 'target' must be Image objects or lists of Image objects")
 			if (length(mask) != length(target))
 				stop("'mask' and 'target' must of the same length")
-			if (!identical(sapply(mask, dim), sapply(target, dim)))
+			if (!identical(unname(sapply(mask, dim)), unname(sapply(target, dim))))
 				stop("'mask' and 'target' have different dimensions")
 			ans <- Map(.proc, mask, target, val, list(FUN)) # list() needed 
 		}
