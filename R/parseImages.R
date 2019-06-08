@@ -151,7 +151,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		tgtImages <- tgt
 	}
 
-# determine imageType as "well" or "file"
+# determine imageType as either "byWell" or "byFile"
 	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", names(nucImages),
 		ignore.case = TRUE)
 	if (length(sel) > 0 && all(sel))
@@ -236,11 +236,12 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	if (!identical(dm.nuc, dm.tgt)) stop("nuc and tgt are mismatched")
 	if (!identical(dm.nuc, dm.nm)) stop("nuc and nMask are mismatched")
 	if (!identical(dm.nuc, dm.cm)) stop("nuc and cMask are mismatched")
-	if (!identical(dm.nm, dm.cm)) stop("uh oh...this can't happen")
+	if (!identical(dm.nm, dm.cm))
+		stop("uh oh...dm and cm dimensions mismatch? Can't happen!")
 
 # initialize variable to collect results
-	nImages <- length(nucImages)
-	ans <- rep(list(NULL), nImages)
+	nGroups <- length(nucImages)
+	ans <- rep(list(NULL), nGroups)
 
 # initialize progress bar
 	if (imageType == "byWell")
@@ -248,48 +249,55 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	else
 		message("Processing images by 'file'")
 	flush.console()
-	showProgress <- ifelse(nImages > 1, TRUE, FALSE)
+	showProgress <- ifelse(nGroups > 1, TRUE, FALSE)
 	if (showProgress)
-		pb <- txtProgressBar(min = 1, max = nImages, style = 3)
+		pb <- txtProgressBar(min = 1, max = nGroups, style = 3)
 
 ################################################################################
 #
-# process each group of images - FAILING if one in set is two dimensional...
+# process each group of images - revised in version 0.2.3 to eliminate for loops
 #
-	for (idx in seq_len(nImages)) {
+	for (idx in seq_len(nGroups)) {
 		if (showProgress) setTxtProgressBar(pb, idx)
 
-	# extract appropriate element from lists
-		myNuc <- nucImages[[idx]]; myTgt <- tgtImages[[idx]]
-		myNmask <- nmask[[idx]]; myCmask <- cmask[[idx]]
+	# extract appropriate elements (masks, images) from current group
+		cmFrames <- getFrames(cmask[[idx]])
+		nmFrames <- getFrames(nmask[[idx]])
+		dnaFrames <- getFrames(nucImages[[idx]])
+		tgtFrames <- getFrames(tgtImages[[idx]])
 
-	# ensure that images have three dimensions
-		dm <- dim(myNuc)
-		if (length(dm) == 2)
-			 dim(myNuc) <- dim(myTgt) <- dim(myCmask) <- dim(myNmask) <- c(dm, 1)
-		nframes <- dim(myNmask)[3]
+	# apply appropriate computeFeatures family of functions
+		FS <- lapply(cmFrames, computeFeatures.shape)
+		FM <- lapply(nmFrames, computeFeatures.moment)
+		FD <- Map(computeFeatures.basic, nmFrames, dnaFrames)
+		FT <- Map(computeFeatures.basic, cmFrames, tgtFrames)
 
-	# measure and assemble data for the group indexed by 'idx'
-		res <- data.frame()
-		for (i in seq_len(nframes)) {
-			area <- computeFeatures.shape(myCmask[,,i])[,1]
-			XY <- computeFeatures.moment(myNmask[,,i])[,1:2]
-			xm <- if(is.null(XY)) NULL else XY[,1]
-			ym <- if(is.null(XY)) NULL else XY[,2]
-			dna <- computeFeatures.basic(myNmask[,,i], myNuc[,,i])[,1]
-			mfi <- computeFeatures.basic(myCmask[,,i], myTgt[,,i])[,1]
-			if (imageType == "byWell") {
-				ww <- names(nucImages)[idx]
-				res <- rbind(res, data.frame(well = well.info(ww)$well,
-					row = well.info(ww)$row, column = well.info(ww)$column,
-					frame = i, xm = xm, ym = ym, area, dna, mfi))
-			}
-			else # imageType == "byFile"
-				res <- rbind(res, data.frame(file = names(nucImages)[idx],
-					frame = i, xm = xm, ym = ym,
-					area, dna, mfi))
-		}
-		rownames(res) <- NULL
+	# extract properties as lists
+		area <- lapply(FS, function(v) v[, "s.area"])
+		xm <- lapply(FM, function(v) v[, "m.cx"])
+		ym <- lapply(FM, function(v) v[, "m.cy"])
+		dna <- lapply(FD, function(v) v[, "b.mean"])
+		mfi <- lapply(FT, function(v) v[, "b.mean"])
+		props <- list(area=area, xm=xm, ym=ym, dna=dna, mfi=mfi)
+
+	# count cells, perform error check and assemble in one list
+		ncells <- lapply(props, lengths)
+		if (length(unique.default(ncells)) != 1)
+			stop("different lengths found at group idx:", "\narea = ", ncells[1],
+				"\n  xm = ", ncells[2], "\n  ym = ", ncells[3],
+				"\n dna = ", ncells[4], "\n mfi = ", ncells[5], "\n")
+		else
+			ncells <- ncells[[1]]
+		props <- c(frame = list(rep(seq_along(ncells), ncells)), props)
+
+	# create data.frame of results based on imageType
+		myName <- names(nucImages)[idx]
+		if (imageType == "byWell")
+			res <- data.frame(well.info(myName), lapply(props, unlist))
+		else # imageType == "byFile"
+			res <- data.frame(file = myName, lapply(props, unlist))
+
+	# accumulate in ans
 		ans[[idx]] <- res
 	}
 	names(ans) <- names(nucImages)
