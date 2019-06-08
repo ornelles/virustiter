@@ -1,8 +1,8 @@
 ## Synopsis
-This is a suite of tools in R to determine viral titers from fluorescent micrograph sets where one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages.
+This is a suite of imaging tools developed to determine viral titers from fluorescent micrographs. In typical use, one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages.
 
 ## Overview
-The tools in this package have primarily been developed to process fluorescent virus titers performed in multi-well plates. Typically, pairs of images are collected at different multiplicities of infection or moi. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order expects the nuclear (DAPI) image file to come before the corresponding viral antigen image file, different orders can be accommodated.
+The tools in this package have primarily been developed to perform fluorescent viral titers in multi-well culture dishes. Typically, pairs of images are collected at different multiplicities of infection or **moi**. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order has the nuclear (DAPI) image file before the corresponding viral antigen image file, different orders can be accommodated.
 
 The sets of images associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
 
@@ -11,7 +11,7 @@ Additional information about the experiment must be provided in a "phenotype" da
 Individual cells are identified by a DNA stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
 
 ## Installation
-This is a revision of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
+This is revision 3 of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
 
 First, the supporting package `EBImage` must be installed from the Bioconductor using the latest version of `biocLite.R`. Be sure to have the latest version of R installed before using `biocLite`.
 ```
