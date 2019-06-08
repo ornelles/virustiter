@@ -3,11 +3,11 @@
 #' Replacement for \code{EBImage} function that accepts lists
 #' 
 #' @param x An \code{Image} object or array or list of the same.
-#' @param adj A vector of 2 numbers denoting the translation vector
+#' @param v A vector of 2 numbers denoting the translation vector
 #'   in pixels or a list of the same. 
 #' @param filter A character string indicating the interpolating
 #'   sampling filter. Valid values are \code{"none"} or the default, 
-#'   \code{"bilinear"}.
+#'   which has been changed to \code{"bilinear"}.
 #' @param ... Arguments to be passed to \code{affine} in the
 #'   \code{EBImage} package, such as \code{filter}, \code{output.dim},
 #'   \code{bg.col} or \code{antialias}.
@@ -20,25 +20,35 @@
 #' 
 #' @export
 #'
-translate <- function (x, adj, filter = c("bilinear", "none"), ...) 
+translate <- function (x, v, filter = c("bilinear", "none"), ...) 
 {
 	filter <- match.arg(filter)
-# ensure adj is a list
-	if(!is.list(adj))
-		adj <- list(adj)
-# ensure image has 3 dimensions
-	dm <- dim(x)
-	if (length(dm) == 2)
-		dim(x) <- c(dm, 1)
-# check on compatibility of image and translations
-	if(length(adj) != dim(x)[3])
-		stop("'adj' is not the correct length for 'x'")
-# process as three dimensional array
-	m <- rbind(c(1, 0), c(0, 1), unlist(adj))
-	dim(m) <- c(3L, 2L, dim(x)[3])
-	ans <- Image(NA, dim = dim(x))
-	for (i in seq_len(dim(x)[3]))
-		ans[,,i] <- affine(x = x[,,i], m = m[,,i], filter = filter, ...)
-	dim(ans) <- dm
-	return(ans)
+# determine number of rendering frames
+	nf <- numberOfFrames(x, type = "render")
+# check for match between x and v
+	if (nf == 1) {
+		if (is.numeric(v))
+			v <- list(v)
+		v <- v[1]
+	}
+# adjust v if nf > 1
+	if (nf > 1) {
+		if (!is.list(v))
+			stop("'v' must be a list of length ", nf, " for 'x'")
+		else if (length(v) == 1) 
+			v <- rep(v, nf)	
+		else if (length(v) != nf){
+			v <- rep(v, nf)[1:nf]
+			warning("'v' replicated an uneven number of times")
+		}
+	}
+# process each frame
+	m <- rbind(c(1, 0), c(0, 1), unlist(v)) 
+	dim(m) <- c(3L, 2L, nf) # 3 x 2 x nf matrix
+	ans <- lapply(seq.int(nf), function(i)
+		affine(x = getFrame(x,i, type = "render"), m = m[,,i], filter = filter, ...))
+	if (length(ans) == 1)
+		return(ans[[1]])
+	else
+		return(combine(ans))
 }

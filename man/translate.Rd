@@ -4,17 +4,17 @@
 \alias{translate}
 \title{Linear Spatial Translation}
 \usage{
-translate(x, adj, filter = c("bilinear", "none"), ...)
+translate(x, v, filter = c("bilinear", "none"), ...)
 }
 \arguments{
 \item{x}{An \code{Image} object or array or list of the same.}
 
-\item{adj}{A vector of 2 numbers denoting the translation vector
+\item{v}{A vector of 2 numbers denoting the translation vector
 in pixels or a list of the same.}
 
 \item{filter}{A character string indicating the interpolating
 sampling filter. Valid values are \code{"none"} or the default, 
-\code{"bilinear"}.}
+which has been changed to \code{"bilinear"}.}
 
 \item{...}{Arguments to be passed to \code{affine} in the
 \code{EBImage} package, such as \code{filter}, \code{output.dim},
