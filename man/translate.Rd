@@ -26,3 +26,13 @@ Replacement for \code{EBImage} function that accepts lists
 \details{
 This function is a replacement for the EBImage code of the same name.
 }
+\examples{
+
+x <- readImage(system.file("images", "sample-color.png", package = "EBImage"))
+y <- untile(x, c(4, 4), lwd = 0)
+plot(y, all = TRUE, nx = 4)
+v <- sample(-20:20, 4*4*2, replace = TRUE)
+v <- split(v, gl(4*4, 2)) # 16 pairs of translations
+plot(translate(y, v), all = TRUE, nx = 4)
+
+}
