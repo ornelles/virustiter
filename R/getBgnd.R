@@ -38,7 +38,7 @@
 #' If 'by' is provided, variable of this name must exist as a factor in the
 #' argument \code{df}.
 #'
-#' @seealso \code{link{getZero}}
+#' @seealso \code{\link{getZero}}
 #'
 #' @return
 #'

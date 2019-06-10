@@ -63,5 +63,5 @@ argument \code{df}.
 
 }
 \seealso{
-\code{link{getZero}}
+\code{\link{getZero}}
 }
