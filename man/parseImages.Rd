@@ -5,7 +5,7 @@
 \title{Parse Paired Microscopic Images}
 \usage{
 parseImages(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
-  args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
+  args.nucMask = NULL, args.trimMask = NULL, args.cMask = NULL,
   equalize = FALSE, simplify = TRUE)
 }
 \arguments{
@@ -20,7 +20,7 @@ to the nuclear images in \code{nuc}. If this argument is \code{NULL},
 \item{nMask}{An optional \code{Image} object or a list of
 these objects containing an integer \code{Image} mask identifying nuclei.
 If this value is \code{NULL}, the nuclear mask will be determined by
-\code{\link{nucMask}} with the arguments provided in \code{args.nMask}.}
+\code{\link{nucMask}} with the arguments provided in \code{args.nucMask}.}
 
 \item{cMask}{An optional \code{Image} object or a list of 
 these objects containing an integer \code{Image} mask identifying
@@ -30,7 +30,7 @@ with \code{\link{cellMask}}. This larger mask will be used to measure
 fluorescence intensity in the target image. If \code{FALSE} (default),
 the nuclear mask will be used to measure fluorescence intensities.}
 
-\item{args.nMask}{A list of arguments passed to \code{\link{nucMask}}.
+\item{args.nucMask}{A list of arguments passed to \code{\link{nucMask}}.
 This argument is ignored if a \code{nMask} is provided.}
 
 \item{args.trimMask}{A list of arguments passed to \code{\link{trimMask}}.
