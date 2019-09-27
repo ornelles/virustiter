@@ -74,13 +74,12 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 # process function
 	.proc <- function(mask, cutoff, k, border, brush, ecc.max)
 	{
-	# ensure three dimensions are present
-		dm <- dim(mask)
-		if (length(dm) == 2) dim(mask) <- c(dm, 1)
-		nframes <- dim(mask)[3]
+	# check on mask type
+		if (colorMode(mask) != 0)
+			stop("'mask' must be a grayscale Image")
 	# trim by area
 		if (!identical(cutoff, FALSE) && !identical(cutoff, NA)) {
-			area <- lapply(seq_len(nframes), function(i) computeFeatures.shape(mask[,,i])[,1])
+			area <- lapply(getFrames(mask), function(v) computeFeatures.shape(v)[,"s.area"])
 			xmed <- median(unlist(area))
 			xmad <- mad(unlist(area))
 			if (is.null(cutoff)) cutoff <- c(NA, NA)
@@ -101,8 +100,8 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 		}
 	# trim by eccentricity
 		if (ecc.max != 1) {
-			ecc <- lapply(seq_len(nframes),
-				function(i) computeFeatures.moment(mask[,,i])[,"m.eccentricity"])
+			ecc <- lapply(getFrames(mask),
+				function(v) computeFeatures.moment(v)[,"m.eccentricity"])
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
 			mask <- rmObjects(mask, sel, reenumerate = TRUE)
 		}
@@ -117,8 +116,7 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 				mask <- mult * mask # converts to eroded integer mask 
 			}
 		}
-	# return mask to original dimensions 
-		dim(mask) <- dm
+	# return modified mask 
 		return(mask)
 	}
 
