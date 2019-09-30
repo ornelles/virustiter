@@ -1,38 +1,48 @@
 ## Synopsis
-This is a suite of imaging tools developed to determine viral titers from fluorescent micrographs. In typical use, one image is a DNA image and another a fluorescent image representing the viral signal. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages.
+This is a suite of imaging code to determine viral titers from fluorescent micrographs. In a typical application, paired fluorescent images of the cell nucleus and a viral antigen are collected analyzed. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages and can make use of the (private) `EBImageExtra` package.
 
 ## Overview
-The tools in this package have primarily been developed to perform fluorescent viral titers in multi-well culture dishes. Typically, pairs of images are collected at different multiplicities of infection or **moi**. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. Although the default order has the nuclear (DAPI) image file before the corresponding viral antigen image file, different orders can be accommodated.
+The tools in this package have primarily been developed to determine viral titers from multi-well culture dishes. Typically, pairs of images are collected at different multiplicities of infection or **moi**. The moi can be expressed as virions (VP) per cell *or* infectious units (IU) per cell *or* a volume (ml, ul, nl) per cell. The expected order of images is the nucleus (typically DAPI) image file before the corresponding viral antigen image file. However, different orders can be accommodated with optional arguments.
 
-The sets of images associated with each moi can occur either as individual image files in a single directory where each directory is named for the well such as A1, A2, and so on and the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the pairs of images can be part of a multi-layered TIFF file for each moi where each set of images includes the DNA and viral antigen images.
+The sets of images associated with each moi can occur in two forms. Most typically, they are collected as individual image files in separate directories where each directory is named for the well such as A1, A2, and so on. In this case, the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the paired images for each moi can be a set of multi-layered TIFF file where the member of each set includes the DNA and viral antigen images.
 
-Additional information about the experiment must be provided in a "phenotype" data frame that describes the conditions of the experiment and includes the moi and unit of measure (as VP,  ml, ul, nl, etc). These data are merged with the image data for further analysis.
+Additional information about the experiment must be provided in a "phenotype" data frame that **must** contain the moi and unit of measure (as VP,  ml, ul, nl, etc). This data frame can contain additional information describing the experiment. The "phenotype" data are merged with the image data for further analysis.
 
-Individual cells are identified by a DNA stain which is used to generate a nuclear mask. This mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
+Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
+
+## Revision Notes
+This is revision 4 of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. 
 
 ## Installation
-This is revision 4 of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. A few steps are necessary to install it and related packages before use.
-
-First, the supporting package `EBImage` must be installed from the Bioconductor. As of R.3.6, this is done with `BiocManager` as follows. Be sure to have the latest version of R installed before using `BiocManager`.
+A few steps are necessary to install this code from github and related packages before use. First, the supporting package `EBImage` must be installed from the Bioconductor. As of R.3.6, this is done with `BiocManager` as follows. Be sure to have the latest version of R installed before using `BiocManager`.
 ```
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("EBImage")
+	if (!requireNamespace("BiocManager", quietly = TRUE))
+		install.packages("BiocManager")
+	BiocManager::install("EBImage")
 ```
 Second, ensure that the `devtools` and `latticeExtra` packages are installed.
 ```
-install.packages("devtools")
-install.packages("latticeExtra")
+	install.packages("devtools")
+	install.packages("latticeExtra")
 ```
 Finally, the `virustiter` package can be installed from GitHub.
 ```
-library(devtools)
-install_github("ornelles/virustiter")
+	library(devtools)
+	install_github("ornelles/virustiter")
+```
+Optionally, it may be useful to install the tools in `EBImageExtra` from Github although this is still under development.
+```
+	require(devtools)
+	install_github("ornelles/EBImageExtra")
+```
+Once the necessary packages are installed, the need to be loaded like a typical R package.
+```
+	library(virustiter)
+	library(EBImageExtra) # If desired/needed
 ```
 
 ## Working notes
-Phenotype date should be a data frame with the following variables:
+Phenotype data must be a data frame with the following variables:
 ```
   moi   A numeric value, which can be named 'x', indicating the multiplicity
   unit  A character string identifying the units per cell such as "VP "IU "ul or "ml"
@@ -42,7 +52,7 @@ and must include *either* `well` *or* `file` *but not both*:
   well  A character string indicated the well such as "A1" or "a01" or "a0001"
   file	The filename as a character string of the multi-layered TIFF file
 ```
-An example with images in individual files in folders is shown here. `parseImages(path)` will examine the folder specified by `path` in order to determine if it contains multi-layered tiff files or additional folders with individual image files and process the files accordingly. 
+An example with images in individual files in folders is shown here. `parseImages(path)` will examine the folder specified by `path` in order to determine if it contains multi-layered tiff files or additional folders with individual image files and process the files accordingly. `checkImages(path)` performs the same logic without processing the data. This function is useful to ensure that the images are organized appropriately before analysis.
 ```
   path <- system.file("extdata", "by_folder", package = "virustiter")
   fpd <- system.file("extdata", "by_folder/phenoData.csv", package = "virustiter")
@@ -81,8 +91,8 @@ Typical workflow:
 Supporting functions include these as well as others:
 ```
    checkImages(path)   # check (and optionally display) paired images
-   plotDens(df)        # show default cutoff values with densityplot 
    plotHist(df)        # show default cutoff values with histogram
+   plotDens(df)        # show default cutoff values with densityplot 
    plotPlate(df)       # plot entire plate showing positives
    plotWell(well, df)  # plot a schematic of each image in a given well(s) or file(s)
    plotFit(fm)         # plot fit(s) with calculated values using base graphics
@@ -96,7 +106,6 @@ Supporting functions include these as well as others:
    getZero(img)        # determine the background (zero value) pixel
    setZero(img, zero)  # normalize images to a common zero value
    p2p()               # interactively measure point-to-point distances
-   pnpoly(p, v)        # test if points in p are within polygon v
 ```
 Often the background value needs to be optimized with parameters provided to `getBgnd()` as well as those provided to `parseImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate different choices of background values.
 
@@ -112,5 +121,12 @@ The following code demonstrates one method of exploring values near the optimal 
   opt.mm <- mm[which.min(aic)]
   plotHist(df, bg[opt.mm], main = sprintf("Optimal 'mult' value = %0.2f", opt.mm))
 ```  
+## Stuff to do
+- Develop a workflow for determining the optimal nuclear mask
+- Edit the text of this to be a useful stand-alone instruction
+- Develop a good vignette that illustrates all this stuff
+- Consider showing how the `EBImageExtra` package can be of helpful
+- Clean up and simplify code performing background normalization (`bnormalize` may be defunct)
+
 ## License
 GPL-3
