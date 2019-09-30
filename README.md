@@ -16,29 +16,29 @@ This is revision 4 of the second "release" of a package that can be installed fr
 ## Installation
 A few steps are necessary to install this code from github and related packages before use. First, the supporting package `EBImage` must be installed from the Bioconductor. As of R.3.6, this is done with `BiocManager` as follows. Be sure to have the latest version of R installed before using `BiocManager`.
 ```
-	if (!requireNamespace("BiocManager", quietly = TRUE))
-		install.packages("BiocManager")
-	BiocManager::install("EBImage")
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+  BiocManager::install("EBImage")
 ```
 Second, ensure that the `devtools` and `latticeExtra` packages are installed.
 ```
-	install.packages("devtools")
-	install.packages("latticeExtra")
+  install.packages("devtools")
+  install.packages("latticeExtra")
 ```
 Finally, the `virustiter` package can be installed from GitHub.
 ```
-	library(devtools)
-	install_github("ornelles/virustiter")
+  library(devtools)
+  install_github("ornelles/virustiter")
 ```
 Optionally, it may be useful to install the tools in `EBImageExtra` from Github although this is still under development.
 ```
-	require(devtools)
-	install_github("ornelles/EBImageExtra")
+  require(devtools)
+  install_github("ornelles/EBImageExtra")
 ```
 Once the necessary packages are installed, the need to be loaded like a typical R package.
 ```
-	library(virustiter)
-	library(EBImageExtra) # If desired/needed
+  library(virustiter)
+  library(EBImageExtra) # If desired/needed
 ```
 
 ## Working notes
@@ -50,7 +50,7 @@ Phenotype data must be a data frame with the following variables:
 and must include *either* `well` *or* `file` *but not both*:
 ```
   well  A character string indicated the well such as "A1" or "a01" or "a0001"
-  file	The filename as a character string of the multi-layered TIFF file
+  file  The filename as a character string of the multi-layered TIFF file
 ```
 An example with images in individual files in folders is shown here. `parseImages(path)` will examine the folder specified by `path` in order to determine if it contains multi-layered tiff files or additional folders with individual image files and process the files accordingly. `checkImages(path)` performs the same logic without processing the data. This function is useful to ensure that the images are organized appropriately before analysis.
 ```
@@ -116,7 +116,7 @@ The following code demonstrates one method of exploring values near the optimal 
   mm <- seq(1, 2.5, 0.05)
   bg <- sapply(mm, function(m) getBgnd(df, mult = m))
   aic <- getAIC(df, bg)
-  plot(mm, aic, type = "b")	# by AIC, the best mult value is 2.65
+  plot(mm, aic, type = "b") # by AIC, the best mult value is 2.65
   plotHist(df, bg[mm == 2.5], main = "Default 'mult' value = 2.5")
   opt.mm <- mm[which.min(aic)]
   plotHist(df, bg[opt.mm], main = sprintf("Optimal 'mult' value = %0.2f", opt.mm))
