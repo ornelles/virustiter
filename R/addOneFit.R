@@ -14,7 +14,7 @@
 #' Base graphics are used to add a plot to an existing plot produced by 
 #' \code{\link{plotFit}} or \code{\link{plotOneFit}}. The first argument is
 #' a single fitted model from \code{\link{getFit}}. The function calls
-#' \code{\link{getTiter}} to obtain the fit and confidence intervals.
+#' \code{\link{getEC63}} to obtain the fit and confidence intervals.
 #'
 #' @return
 #'
@@ -27,7 +27,7 @@ addOneFit <- function(fm, line.col=4, ref.col=4, pch.col=line.col, ...) {
 	moi <- exp(fm$model[[2]])		# model data.frame holds values used for fit
 	y <- prop.table(fm$model[[1]],1)[,1]
 	res <- fm$data  # entire data.frame handed to glm()
-	cf <- getTiter(fm)
+	cf <- getEC63(fm)
 
 	xlo <- min(moi[moi > 0])
 	xhi <- max(moi)

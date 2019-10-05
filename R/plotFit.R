@@ -12,7 +12,7 @@
 #'
 #' Base graphics are used to prepare the plot where the first argument is
 #' either a single fitted model or a list of fitted models from
-#' \code{\link{getFit}}. The function calls \code{\link{getTiter}} to obtain the fit
+#' \code{\link{getFit}}. The function calls \code{\link{getEC63}} to obtain the fit
 #' and confidence intervals.
 #'
 #' @return
@@ -39,7 +39,7 @@ plotFit <-function(fm, line.col = 2, main = NULL)
 
 		moi <- exp(fm$model[[2]]) # model data.frame holds values used for fit
 		y <- prop.table(fm$model[[1]],1)[,1]
-		cf <- getTiter(fm)
+		cf <- getEC63(fm)
 
 		res <- fm$data	# entire set provided to glm()
 		unit <- levels(res$unit)[1]

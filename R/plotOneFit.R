@@ -14,7 +14,7 @@
 #'
 #' Base graphics are used to prepare the plot where the first argument is
 #' a single fitted model from \code{\link{getFit}}. The function calls
-#' \code{\link{getTiter}} to obtain the fit and confidence intervals.
+#' \code{\link{getEC63}} to obtain the fit and confidence intervals.
 #'
 #' @return
 #'
@@ -28,7 +28,7 @@ plotOneFit <- function(fm, main = NULL, xlab = NULL, ylab = NULL, ylim = NULL,
 {
 	moi <- exp(fm$model[[2]])      # model data.frame holds values used for fit
 	y <- prop.table(fm$model[[1]],1)[,1]
-	cf <- getTiter(fm)
+	cf <- getEC63(fm)
 	info <- try(sapply(well.info(rownames(fm$model)),unique), silent = TRUE)
 	if (class(info) != "try-error") {
 		info.len <- sapply(info, length)

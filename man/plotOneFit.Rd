@@ -30,5 +30,5 @@ Prepare a single diagnostic plot with more labeling options than \code{\link{plo
 \details{
 Base graphics are used to prepare the plot where the first argument is
 a single fitted model from \code{\link{getFit}}. The function calls
-\code{\link{getTiter}} to obtain the fit and confidence intervals.
+\code{\link{getEC63}} to obtain the fit and confidence intervals.
 }

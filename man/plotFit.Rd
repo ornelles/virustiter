@@ -25,6 +25,6 @@ Prepare a diagnostic plot of viral titer GLM fit.
 \details{
 Base graphics are used to prepare the plot where the first argument is
 either a single fitted model or a list of fitted models from
-\code{\link{getFit}}. The function calls \code{\link{getTiter}} to obtain the fit
+\code{\link{getFit}}. The function calls \code{\link{getEC63}} to obtain the fit
 and confidence intervals.
 }

@@ -30,5 +30,5 @@ Prepare a single diagnostic plot with more labeling options than \code{plotFit()
 Base graphics are used to add a plot to an existing plot produced by 
 \code{\link{plotFit}} or \code{\link{plotOneFit}}. The first argument is
 a single fitted model from \code{\link{getFit}}. The function calls
-\code{\link{getTiter}} to obtain the fit and confidence intervals.
+\code{\link{getEC63}} to obtain the fit and confidence intervals.
 }
