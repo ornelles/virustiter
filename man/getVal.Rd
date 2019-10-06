@@ -4,27 +4,31 @@
 \alias{getVal}
 \title{Get Value from ComputeFeatures.xxx Function}
 \usage{
-getVal(mask, target, val = "b.mean", FUN = computeFeatures.basic,
-  simplify = TRUE)
+getVal(mask, ref = NULL, val = "b.mean", FUN = NULL,
+  simplify = TRUE, ...)
 }
 \arguments{
 \item{mask}{An object mask or list of objects masks with
 connected pixels having the same integer value.}
 
-\item{target}{A fluorescent \code{Image} object or list of
-\code{Image}s corresponding to the objects in \code{mask}.}
+\item{ref}{A fluorescent \code{Image} object or list of
+\code{Image}s corresponding to the objects in \code{mask}
+or \code{NULL} for \code{computeFeatures.shape}.}
 
 \item{val}{A character string identifying the parameter
 to return from the computeFeatures function \code{FUN}. The
 default value of \code{"b.mean"} returns the mean intensity.}
 
 \item{FUN}{A \code{\link[EBImage]{computeFeatures}} function to be
-applied over \code{mask} and \code{target}, default of 
-\code{computeFeatures.basic}.}
+applied over \code{mask} and \code{ref}. The default of 
+\code{NULL} uses the value in \code{val} to identify the
+appropriate function.}
 
 \item{simplify}{If \code{TRUE} (default), the result will be
 collapsed into a vector. Otherwise, a vector for each member of 
-the list \code{mask} and \code{target} will be returned.}
+the list \code{mask} and \code{ref} will be returned.}
+
+\item{...}{additional parameters are passed to code{FUN}.}
 }
 \value{
 A vector if \code{simplify} is\code{TRUE} or a list of values obtained
@@ -36,12 +40,17 @@ functions using a mask or a list of masks and target image
 or list of images.
 }
 \details{
-Objects identified in \code{mask} will be projected onto \code{target} 
+Objects identified in \code{mask} will be projected onto \code{ref} 
 and quantified with the function specified in \code{FUN}. The single 
 value specified by \code{val} will be returned as a list if \code{
 simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
 
-Allowable functions include
+Common usages include getting the mean intensity from a \code{mask}
+and reference image in \code{target} by \code{getVal(mask, ref)} or
+getting the area of objects from an object mask in code{mask} by
+\code{getVal(mask, val = "area")}.
+
+Functions that can be explicitly specified include 
 \code{\link[EBImage:computeFeatures]{computeFeatures.basic}}, 
 \code{\link[EBImage:computeFeatures]{computeFeatures.shape}}, 
 \code{\link[EBImage:computeFeatures]{computeFeatures.moment}} and 
