@@ -25,7 +25,6 @@ usage <- function() {
 	"   cf  <- getTiter(fm)   # get titer infectious units per ml +/- 95% CI",
 	"", 
 	" Support:",
-	"   getVal(mask, tgt)   # extract single 'computeFeatures' value (b.mean) from tgt",
 	"   checkImages(path)   # check (and display) paired images", 
 	"   plotHist(df)        # histogram of each well with optional background values",
 	"   plotDens(df)        # calculate and show background values with densityplot ",
@@ -34,12 +33,14 @@ usage <- function() {
 	"   plotFit(fm)         # plot fit(s) with calculated values using base graphics",
 	"   plotOneFit(fm)      # plot fit with options to adjust colors",
 	"   addOneFit(fm)       # add best-fit line to existing base graph",
-  "   getEC63(fm)         # get volume required for 1 infectious units +/- 95% CI",
 	"   getAIC(df, bg)      # evaluate fitted model(s) from df at bg values",
+	"   getTiter(fm)        # get titer as IU per ml (if volume units were used)",
+  "   getEC63(fm)         # get volume required for 1 infectious units +/- 95% CI",
 	"   nucMask(dapi)       # extract nuclear mask from dapi image(s) or file(s)",
 	"   trimMask(mask)      # remove objects based on size from mask",
 	"   cellMask(mask)      # expand a nuclear mask into a cell mask",
   "   edgeObjects(mask)   # identify objects near the edge of a mask",
+	"   getVal(mask, tgt)   # extract single 'computeFeatures' value (b.mean) from tgt",
 	"   p2p()               # interactively measure point-to-point distances",
 	"")
 	ft <- tempfile()
