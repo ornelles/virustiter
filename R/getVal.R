@@ -1,6 +1,6 @@
 #' Get Value from ComputeFeatures.xxx Function
 #' 
-#' Extract a value from one of the 'computeFeatures' family of
+#' Extract a value from one of the \code{computeFeatures} family of
 #' functions using a mask or a list of masks and target image
 #' or list of images.  
 #'
@@ -14,12 +14,12 @@
 #'   default value of \code{"b.mean"} returns the mean intensity.
 #' @param FUN A \code{\link[EBImage]{computeFeatures}} function to be
 #'   applied over \code{mask} and \code{ref}. The default of 
-#'   \code{NULL} uses the value in \code{val} to identify the
-#'   appropriate function.
+#'   \code{NULL} uses the character string in \code{val} to identify
+#'   the appropriate function.
 #' @param simplify If \code{TRUE} (default), the result will be
 #'   collapsed into a vector. Otherwise, a vector for each member of 
 #'   the list \code{mask} and \code{ref} will be returned.
-#' @param ... additional parameters are passed to code{FUN}.
+#' @param ... additional parameters are passed to \code{FUN}.
 #' 
 #' @details
 #'
@@ -29,8 +29,8 @@
 #' simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
 #'
 #' Common usages include getting the mean intensity from a \code{mask}
-#' and reference image in \code{target} by \code{getVal(mask, ref)} or
-#' getting the area of objects from an object mask in code{mask} by
+#' and reference image in \code{ref} by \code{getVal(mask, ref)} or
+#' getting the area of objects from an object mask in \code{mask} by
 #' \code{getVal(mask, val = "area")}.
 #' 
 #' Functions that can be explicitly specified include 
@@ -46,15 +46,14 @@
 #'
 #' @return
 #' 
-#' A vector if \code{simplify} is\code{TRUE} or a list of values obtained
-#' from \code{FUN}.  
+#' A vector if \code{simplify} is \code{TRUE} or a list of values obtained
+#' from \code{FUN}.
 #' 
 #' @import EBImage  
 #' 
 #' @export
 #'
-getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL,
-	simplify = TRUE, ...)
+getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE, ...)
 {
 # current variables from computeFeatures functions
 	varList <- list(
