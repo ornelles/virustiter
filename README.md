@@ -11,7 +11,7 @@ Additional information about the experiment must be provided in a "phenotype" da
 Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
 
 ## Revision Notes
-This is revision 4 of the second "release" of a package that can be installed from github. Functions previously embedded in `parseImages()` are now split between `getImages()` and `parseImages()`. 
+This is revision 0.0.3.1 of a package that can be installed from github. In version 0.0.3.x, `getTiter` has been changed to actually report the titer as infectious units per ml (if the unit attribute is a known volume unit). The previous functionality is preserved in `getEC63`. The `getVal` function has been simplified with logic to assign the `computeFeatures` function according to the parameter being measured. The arguments for `parseImages` have been shortened (back) to `args.nMask` and `args.cMask`
 
 ## Installation
 A few steps are necessary to install this code from github and related packages before use. First, the supporting package `EBImage` must be installed from the Bioconductor. As of R.3.6, this is done with `BiocManager` as follows. Be sure to have the latest version of R installed before using `BiocManager`.
@@ -90,6 +90,8 @@ Typical workflow:
 ```
 Supporting functions include these as well as others:
 ```
+   usage()             # display a text window showing the major functions
+   getVal(mask, ref)   # extract one value with a computeFeature function (default of `b.mean`)
    checkImages(path)   # check (and optionally display) paired images
    plotHist(df)        # show default cutoff values with histogram
    plotDens(df)        # show default cutoff values with densityplot 
