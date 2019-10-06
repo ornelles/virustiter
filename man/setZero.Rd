@@ -17,7 +17,7 @@ with \code{\link{getZero}}.}
 \item{min.value}{Numeric value or list of values to be the
 new minimum value in the transformed image, default of 0.}
 
-\item{...}{Values passed to \code{link{getZero}} such as \code{frac}.}
+\item{...}{Values passed to \code{\link{getZero}} such as \code{frac}.}
 }
 \value{
 An object of the same structure as the argument \code{x} that has been

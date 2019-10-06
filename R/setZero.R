@@ -9,7 +9,7 @@
 #'   with \code{\link{getZero}}. 
 #' @param min.value Numeric value or list of values to be the
 #'   new minimum value in the transformed image, default of 0.
-#' @param ... Values passed to \code{link{getZero}} such as \code{frac}.
+#' @param ... Values passed to \code{\link{getZero}} such as \code{frac}.
 #'
 #' @details
 #' 
