@@ -12,8 +12,8 @@
 #' @param nMask An optional \code{Image} object or a list of
 #'   these objects containing an integer \code{Image} mask identifying nuclei.
 #'   If this value is \code{NULL}, the nuclear mask will be determined by
-#'   \code{\link{nucMask}} with the arguments provided in \code{args.nucMask}.
-#' @param args.nucMask A list of arguments passed to \code{\link{nucMask}}.
+#'   \code{\link{nucMask}} with the arguments provided in \code{args.nMask}.
+#' @param args.nMask A list of arguments passed to \code{\link{nucMask}}.
 #'   This argument is ignored if a \code{nMask} is provided.
 #' @param args.trimMask A list of arguments passed to \code{\link{trimMask}}.
 #'   This argument is ignored if a \code{nMask} is provided. Otherwise, if
@@ -126,7 +126,7 @@
 #' @export
 #'
 parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
-	args.nucMask = NULL, args.trimMask = NULL, args.cMask = NULL,
+	args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
 	equalize = FALSE, simplify = TRUE)
 {
 # requires EBImage, ensure appropriate values for parameters
@@ -172,15 +172,15 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		message("done"); flush.console()
 	}
 
-# process nMask with additional arguments in args.nucMask
+# process nMask with additional arguments in args.nMask
 	if (is.null(nMask)) { 
 		message("Creating nuclear masks...", appendLF = FALSE)
 		arg.list <- formals("nucMask")
 		arg.list$dna <- nucImages
-		nms <- names(args.nucMask)
+		nms <- names(args.nMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
-		arg.list <- c(arg.list[!sel], args.nucMask[nms])
+		arg.list <- c(arg.list[!sel], args.nMask[nms])
 		nmask <- do.call("nucMask", arg.list)
 		message("done"); flush.console()
 	}
