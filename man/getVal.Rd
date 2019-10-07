@@ -13,7 +13,9 @@ connected pixels having the same integer value.}
 
 \item{ref}{A fluorescent \code{Image} object or list of
 \code{Image} objects corresponding to the objects in \code{mask}
-or \code{NULL} if a reference image is not required.}
+or \code{NULL} if a reference image is not required. If \code{ref}
+is a character string, it is \emph{assumed} to be the value
+for \code{val} and will be used in place of the default.}
 
 \item{val}{A character string identifying the parameter
 to return from the \code{computeFeatures} function assigned

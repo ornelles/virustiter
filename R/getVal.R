@@ -7,7 +7,9 @@
 #'   connected pixels having the same integer value. 
 #' @param ref A fluorescent \code{Image} object or list of
 #'   \code{Image} objects corresponding to the objects in \code{mask}
-#'   or \code{NULL} if a reference image is not required.
+#'   or \code{NULL} if a reference image is not required. If \code{ref}
+#'   is a character string, it is \emph{assumed} to be the value
+#'   for \code{val} and will be used in place of the default.
 #' @param val A character string identifying the parameter
 #'   to return from the \code{computeFeatures} function assigned
 #'   to \code{FUN}. The default value of \code{"b.mean"} returns the
@@ -94,6 +96,13 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 	dots <- list(...)
 	if (length(dots) == 0) dots <- list(NULL)
 
+# allow for lazy use of 'val' as unnamed second argument...
+	SwapRef <- FALSE
+	if (!is(ref, "NULL") && is(ref, "character") && identical(val, "b.mean")) {
+		val <- ref
+		ref <- NULL
+		SwapRef <- TRUE
+	}
 # error check on 'val'
 	if(!(is(val, "character") && length(val) == 1))
 		stop("'val' must be a single character string")
@@ -102,9 +111,9 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 	if (is.null(FUN)) { # identify function from 'val'
 		sel <- lapply(varList, function(v) grep(val, v, ignore.case = TRUE, value = TRUE))
 		if (sum(lengths(sel)) == 0)
-			stop("unable to match ", val, " with a computeFeatures function")
+			stop("unable to match \"", val, "\" with a computeFeatures function")
 		if (sum(lengths(sel)) > 1)
-			stop(val, " does not identify a unique computeFeatures variable")
+			stop("\"", val, "\" does not identify a unique computeFeatures variable")
 		val <- unlist(sel)
 		FUN <- switch(names(val),
 			basic = EBImage::computeFeatures.basic,
@@ -142,7 +151,12 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 		ans <- Map(.proc, mask, ref, val, list(FUN), list(dots)) # list() needed 
 	}
 	else 
-			stop("unable to handle combination of 'mask' and 'ref'")
+			stop("unable to handle this combination of 'mask' and 'ref'")
+
+# report on substitution of ref for val if needed
+	if (SwapRef)
+		warning("used \"", val, "\" as the character string for 'val'")
+
 # unlist the results if simplify is TRUE
 	if (simplify == TRUE)
 		ans <- unlist(ans)
