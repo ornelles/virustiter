@@ -94,20 +94,24 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 	dots <- list(...)
 	if (length(dots) == 0) dots <- list(NULL)
 
+# error check on 'val'
+	if(!(is(val, "character") && length(val) == 1))
+		stop("'val' must be a single character string")
+
 # assign computeFeatures function and variable
 	if (is.null(FUN)) { # identify function from 'val'
 		sel <- lapply(varList, function(v) grep(val, v, ignore.case = TRUE, value = TRUE))
 		if (sum(lengths(sel)) == 0)
-			stop("unable to match 'val' with computeFeatures function")
+			stop("unable to match ", val, " with a computeFeatures function")
 		if (sum(lengths(sel)) > 1)
-			stop("'val' does not identify a unique computeFeatures variable")
+			stop(val, " does not identify a unique computeFeatures variable")
 		val <- unlist(sel)
 		FUN <- switch(names(val),
 			basic = EBImage::computeFeatures.basic,
 			shape = EBImage::computeFeatures.shape,
 			moment = EBImage::computeFeatures.moment)
 	}
-# assign 'ref' for case of computeFeatures.shape
+# assign 'ref' to 'NULL' for case of computeFeatures.shape
 	if (identical(FUN, EBImage::computeFeatures.shape)) {
 		if (is(mask, "list"))
 			ref <- rep(list(NULL), length(mask))
