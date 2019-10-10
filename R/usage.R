@@ -43,6 +43,7 @@ usage <- function() {
 	"   trimMask(mask)      # remove objects based on size from mask",
 	"   cellMask(mask)      # expand a nuclear mask into a cell mask",
   "   edgeObjects(mask)   # identify objects near the edge of a mask",
+  "   findObjects(expr, df) # find objects in data.frame identified by expr",
 	"   getVal(mask, tgt)   # extract single 'computeFeatures' value (b.mean) from tgt",
 	"   p2p()               # interactively measure point-to-point distances",
 	"")
