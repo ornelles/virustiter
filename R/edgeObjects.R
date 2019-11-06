@@ -26,11 +26,13 @@
 edgeObjects <- function (x, border = 1)
 {
 # parameter check
-	if (colorMode(x) != 0 || !is.integer(imageData(x)))
+	if (colorMode(x) != 0)
 		stop("grayscale integer mask needed")
+	if (max(x) <= 1)
+		warning("may not be an integer mask (max <= 1)")
 	border <- as.integer(border)
 
-# prepare answer in case that no objects are found
+# prepare NULL answer for silly border values
 	dm <- dim(x)
 	if (length(dm) == 2)
 		ans <- numeric(0)
@@ -49,8 +51,8 @@ edgeObjects <- function (x, border = 1)
 	.edge <- function(v, border) {
 		nx <- dim(v)[1]
 		ny <- dim(v)[2]
-		ans <- unique(c(v[1:border,], v[(nx-border):nx,], v[,1:border], v[,(ny-border):ny]))
-		return(ans[ans!=0])
+		ans <- unique(c(v[1:border,], v[(nx-border+1):nx,], v[,1:border], v[,(ny-border+1):ny]))
+		return(sort(ans[ans!=0]))
 	}
 
 # dispatch on the dimensions of the argument
