@@ -55,7 +55,6 @@ getZero <- function(x, frac = 1)
 	}
 
 # dispatch
-	# dispatch
 	if (is(x, "list") & all(sapply(x, is.numeric)))
 		ans <- lapply(x, .getZero, frac = frac)
 	else if (is.numeric(x))
