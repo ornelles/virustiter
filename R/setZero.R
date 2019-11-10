@@ -52,7 +52,7 @@ setZero <- function(x, zero, min.value = 0, ...)
 	}
 
 # dispatch
-	if (is(x, "list") & all(sapply(x, is, "Image")))
+	if (is(x, "list") && all(sapply(x, is, "Image")))
 		ans <- Map(.setZero, x, zero, min.value)
 	else if (is(x, "Image"))
 		ans <- .setZero(x, zero, min.value)
