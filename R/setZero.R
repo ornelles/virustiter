@@ -2,11 +2,11 @@
 #'
 #' Scale an image and crop at the given zero value.
 #'
-#' @param x A numeric vector or array \emph{or} list of such objects, where
-#'   each object is typically a grayscale \code{Image} object.
-#' @param zero Numeric value or list of values specifying the
-#'   zero value pixel for each frame. If missing, this will be determined
-#'   with \code{\link{getZero}}. 
+#' @param x Grayscale \code{Image} object \emph{or} a list
+#'   of such objects.
+#' @param zero Numeric vector or list of vectors specifying the
+#'   zero value pixel for each frame. If missing, this will be
+#'   determined with \code{\link{getZero}}. 
 #' @param min.value Numeric value or list of values to be the
 #'   new minimum value in the transformed image, default of 0.
 #' @param ... Values passed to \code{\link{getZero}} such as \code{frac}.
@@ -43,17 +43,20 @@ setZero <- function(x, zero, min.value = 0, ...)
 
 # working function
 	.setZero <- function(x, zero, min.value) {
+		nf <- numberOfFrames(x)
+		zero <- rep(zero, nf)[seq_len(nf)] # replicate for each frame
+		zero <- rep(zero, each = prod(dim(x)[1:2])) # replicate for each pixel
 		x <- x - zero
 		x[x < min.value] <- min.value
 		return(x)
 	}
 
 # dispatch
-	if (is(x, "list") & all(sapply(x, is.numeric)))
+	if (is(x, "list") & all(sapply(x, is, "Image")))
 		ans <- Map(.setZero, x, zero, min.value)
-	else if (is.numeric(x))
+	else if (is(x, "Image"))
 		ans <- .setZero(x, zero, min.value)
 	else
-		stop("require a numeric vector, numeric array or list of such objects")
+		stop("require an Image or list of Images")
 	return(ans)
 }
