@@ -7,12 +7,12 @@
 setZero(x, zero, min.value = 0, ...)
 }
 \arguments{
-\item{x}{A numeric vector or array \emph{or} list of such objects, where
-each object is typically a grayscale \code{Image} object.}
+\item{x}{Grayscale \code{Image} object \emph{or} a list
+of such objects.}
 
-\item{zero}{Numeric value or list of values specifying the
-zero value pixel for each frame. If missing, this will be determined
-with \code{\link{getZero}}.}
+\item{zero}{Numeric vector or list of vectors specifying the
+zero value pixel for each frame. If missing, this will be
+determined with \code{\link{getZero}}.}
 
 \item{min.value}{Numeric value or list of values to be the
 new minimum value in the transformed image, default of 0.}
