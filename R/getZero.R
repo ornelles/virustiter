@@ -46,12 +46,20 @@ getZero <- function(x, frac = 1)
 		dm <- dim(x)
 		if (is.null(dm)) dim(x) <- c(length(x), 1, 1)
 		else if (length(dm) == 2) dim(x) <- c(dm, 1)
-		xmax <- apply(x, 3, function(v) frac*diff(range(v)))
 		xmin <- apply(x, 3, min)
+		xdif <- apply(x, 3, function(v) frac*diff(range(v)))
+		xmax <- xmin + xdif
 		sapply(seq_len(dim(x)[3]), function(i) {
 			valid <- x[,,i] > xmin[i] & x[,,i] < xmax[i]
-			d <- density(x[,,i][valid])
-			d$x[which.max(d$y)]})
+			if (sum(valid) == 0) { # diff(range) is 0
+				warning("frame ", i, " has diff(range) of 0", call. = FALSE)
+				return(median(x[,,i]))
+			}
+			else {
+				d <- density(x[,,i][valid])
+				return(d$x[which.max(d$y)])
+			}
+		})
 	}
 
 # dispatch
