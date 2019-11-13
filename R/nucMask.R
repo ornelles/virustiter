@@ -54,18 +54,10 @@ nucMask <- function(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
 		usage <- c("nucMask argument hints:",
 			'  dna: fluorescent DNA image or list of images',
 			'  width: maximum nuclear diameter',
-      '  other argments passed to thresh2(), medianFilter() and gblur()')
+      '  other arguments passed to thresh2(), medianFilter() and gblur()')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
-# internal function to exclude edge objects 
-	.edge <- function(v, border) {
-		nx <- dim(v)[1]
-		ny <- dim(v)[2]
-		ans <- unique(c(v[1:border,], v[(nx-border):nx,], v[,1:border], v[,(ny-border):ny]))
-		return(ans[ans != 0])
-	}
-
 # internal main process function
 	.proc <- function(x, width, offset, size, sigma, radius, gamma, border)
 	{
