@@ -26,11 +26,11 @@ usage <- function() {
 	"", 
 	" Support:",
 	"   checkImages(path)   # check (and display) paired images", 
-  "   listImages(path)    # list image files in the given path",
+  "   list.images(path)   # list image files in the given path",
 	"   getZero(x)          # find most common non-zero pixel in each image frame",
-	"   setZero(x)          # scale and trim each image frame to a give zero value",
+	"   setZero(x)          # rescale each image frame to the most common zero value",
 	"   plotHist(df)        # histogram of each well with optional background values",
-	"   plotDens(df)        # calculate and show background values with densityplot ",
+	"   plotDens(df)        # calculate and show background values with densityplot",
 	"   plotPlate(df)       # plot plate showing positives",
 	"   plotWell(df, well)  # plot each cell in a well showing positives and sizes",
 	"   plotFit(fm)         # plot fit(s) with calculated values using base graphics",
@@ -44,7 +44,7 @@ usage <- function() {
 	"   cellMask(mask)      # expand a nuclear mask into a cell mask",
   "   edgeObjects(mask)   # identify objects near the edge of a mask",
   "   findObjects(expr, df) # find objects in data.frame identified by expr",
-	"   getVal(mask, tgt)   # extract single 'computeFeatures' value (b.mean) from tgt",
+	"   getVal(mask, ref)   # extract one 'computeFeatures' value using mask and ref",
 	"   p2p()               # interactively measure point-to-point distances",
 	"")
 	ft <- tempfile()
