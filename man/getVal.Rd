@@ -52,8 +52,11 @@ value specified by \code{val} will be returned as a list if \code{
 simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
 
 Common usages include getting the mean intensity from an object mask
-and reference image  or getting the area of objects from an object mask
-as shown below.
+and reference image or getting the area of objects from an object mask
+as shown below. The code has been accelerated by a factor of 8 
+for getting the area by using the \code{\link{tabulate}} function
+rather than the \code{computeFeatures.shape} function.
+
 \preformatted{
 # To extract the mean intensity:
   mfi <- getVal(mask, ref) # uses default parameter "b.mean"
@@ -78,9 +81,10 @@ value to \code{FUN}. This value can be explicitly assigned as one of
 \code{\link[EBImage:computeFeatures]{computeFeatures.shape}}, 
 \code{\link[EBImage:computeFeatures]{computeFeatures.moment}} and 
 \code{\link[EBImage:computeFeatures]{computeFeatures.haralick}}.
+
 See the \code{EBImage} help page for appropriate values for
-\code{FUN} and \code{val}. Note that "\code{basic quantiles}" 
-parameters are mislabeled with an extra '0'. For example, the 5th
+\code{FUN} and \code{val} but \strong{note} that "\code{basic quantiles}" 
+parameters are mislabeled with an extra '\code{0}'. For example, the 5th
 percentile and 95th percentile values are named "\code{b.q005}"
 and "\code{b.q095}", respectively.
 }

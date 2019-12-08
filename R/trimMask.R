@@ -6,8 +6,9 @@
 #' 
 #' @param mask Object mask or list of masks with connected pixels having
 #'   the same integer value.
-#' @param cutoff Optional integer value of length 2 specifying the lower 
-#'   and upper limits for the area in pixels. A value of \code{FALSE} or
+#' @param cutoff Optional integer value of length 1 or 2 specifying the
+#'   limits for the area in pixels. If only one value is provided, it
+#'   is assumed to be the lower limit. A value of \code{FALSE} or
 #'   \code{NA} prevents size exclusion from occurring. A value of
 #'   \code{NULL} makes use of the multiplier parameter \code{k} to determine 
 #'   the cutoff limits. Either of the two values in \code{cutoff} can be
@@ -61,7 +62,7 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 		usage <- c("trimMask argument hints:",
 			'  k = c(3,5) to drop objects < 3x mad(area) and > 5x mad(area)',
 			'  cutoff = NULL will  use values in k to trim',
-      '  cutoff = c(100, Inf) to drop objects < 100 pixels',
+      '  cutoff = 100 to drop objects < 100 pixels',
       '  brush = -5 to erode mask with disc of radius 5 pixels',
       '  brush = 5 to dilate mask with disc of radius 5 pixels',
 			'  border = 2 to drop objects within 2 pixels of image border',
@@ -69,7 +70,6 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
-
 
 # process function
 	.proc <- function(mask, cutoff, k, border, brush, ecc.max)
@@ -79,10 +79,12 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 			stop("'mask' must be a grayscale Image")
 	# trim by area
 		if (!identical(cutoff, FALSE) && !identical(cutoff, NA)) {
-			area <- lapply(getFrames(mask), function(v) computeFeatures.shape(v)[,"s.area"])
+			if (is.null(cutoff)) cutoff <- c(NA, NA)
+			if (length(cutoff) == 1) cutoff <- c(cutoff, Inf)
+			area <- lapply(getFrames(mask), function(x) tabulate(x[x > 0])) # fast
+ #  	area <- lapply(getFrames(mask), function(v) computeFeatures.shape(v)[,"s.area"])
 			xmed <- median(unlist(area))
 			xmad <- mad(unlist(area))
-			if (is.null(cutoff)) cutoff <- c(NA, NA)
 			if (is.na(cutoff[1])) cutoff[1] <- xmed - k[1] * xmad
 			if (is.na(cutoff[2])) cutoff[2] <- xmed + k[2] * xmad
 			lower <- max(cutoff[1], min(unlist(area)))

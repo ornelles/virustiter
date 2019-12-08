@@ -11,8 +11,9 @@ trimMask(mask, cutoff = FALSE, k = c(1.5, 3), border = 0,
 \item{mask}{Object mask or list of masks with connected pixels having
 the same integer value.}
 
-\item{cutoff}{Optional integer value of length 2 specifying the lower 
-and upper limits for the area in pixels. A value of \code{FALSE} or
+\item{cutoff}{Optional integer value of length 1 or 2 specifying the
+limits for the area in pixels. If only one value is provided, it
+is assumed to be the lower limit. A value of \code{FALSE} or
 \code{NA} prevents size exclusion from occurring. A value of
 \code{NULL} makes use of the multiplier parameter \code{k} to determine 
 the cutoff limits. Either of the two values in \code{cutoff} can be
