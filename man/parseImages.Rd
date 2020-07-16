@@ -4,9 +4,17 @@
 \alias{parseImages}
 \title{Parse Paired Microscopic Images}
 \usage{
-parseImages(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
-  args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
-  equalize = FALSE, simplify = TRUE)
+parseImages(
+  nuc,
+  tgt = NULL,
+  nMask = NULL,
+  cMask = FALSE,
+  args.nMask = NULL,
+  args.trimMask = NULL,
+  args.cMask = NULL,
+  equalize = FALSE,
+  simplify = TRUE
+)
 }
 \arguments{
 \item{nuc}{An \code{Image} object or list of such objects representing

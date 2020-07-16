@@ -4,8 +4,13 @@
 \alias{getImages}
 \title{Get Paired Microscopic Images}
 \usage{
-getImages(source, type = "tiff", which.images = c(1, 2, 2),
-  pattern = NULL, verbose = FALSE)
+getImages(
+  source,
+  type = "tiff",
+  which.images = c(1, 2, 2),
+  pattern = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{source}{A character vector identifying a directory or directories

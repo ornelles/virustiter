@@ -4,9 +4,16 @@
 \alias{checkImages}
 \title{Check Paired Microscopic Images}
 \usage{
-checkImages(source, type = "tiff", which.images = c(1, 2, 2),
-  pattern = NULL, method = c("none", "raster", "browser"),
-  ask = TRUE, separate = FALSE, nx = 2)
+checkImages(
+  source,
+  type = "tiff",
+  which.images = c(1, 2, 2),
+  pattern = NULL,
+  method = c("none", "raster", "browser"),
+  ask = TRUE,
+  separate = FALSE,
+  nx = 2
+)
 }
 \arguments{
 \item{source}{A character vector identifying a directory or directories

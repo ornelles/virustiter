@@ -4,9 +4,14 @@
 \alias{list.images}
 \title{List Image Files}
 \usage{
-list.images(path = ".", type = c("tiff", "jpeg", "jpg", "png"),
-  pattern = NULL, full.names = TRUE, recursive = TRUE,
-  ignore.case = TRUE)
+list.images(
+  path = ".",
+  type = c("tiff", "jpeg", "jpg", "png"),
+  pattern = NULL,
+  full.names = TRUE,
+  recursive = TRUE,
+  ignore.case = TRUE
+)
 }
 \arguments{
 \item{path}{A character vector of path names.}

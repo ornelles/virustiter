@@ -4,8 +4,14 @@
 \alias{trimMask}
 \title{Remove Objects by Size, Proximity to Edge and Eccentricity}
 \usage{
-trimMask(mask, cutoff = FALSE, k = c(1.5, 3), border = 0,
-  brush = 0, ecc.max = 1)
+trimMask(
+  mask,
+  cutoff = FALSE,
+  k = c(1.5, 3),
+  border = 0,
+  brush = 0,
+  ecc.max = 1
+)
 }
 \arguments{
 \item{mask}{Object mask or list of masks with connected pixels having

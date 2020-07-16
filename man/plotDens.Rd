@@ -4,9 +4,20 @@
 \alias{plotDens}
 \title{Show Density Plot of Mean Fluorescence Intensity with Background Cutoff}
 \usage{
-plotDens(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
-  by = NULL, mult = NULL, main = NULL, as.table = TRUE,
-  layout = NULL, ...)
+plotDens(
+  df,
+  bgnd,
+  param = "mfi",
+  panel,
+  adjust = 1,
+  log = TRUE,
+  by = NULL,
+  mult = NULL,
+  main = NULL,
+  as.table = TRUE,
+  layout = NULL,
+  ...
+)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with imaging results.}

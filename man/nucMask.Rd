@@ -4,8 +4,15 @@
 \alias{nucMask}
 \title{Generate Nuclear Mask from DNA Image}
 \usage{
-nucMask(dna, width = 36, offset = 0.05, size = 2, sigma = 2,
-  radius = NULL, gamma = 1)
+nucMask(
+  dna,
+  width = 36,
+  offset = 0.05,
+  size = 2,
+  sigma = 2,
+  radius = NULL,
+  gamma = 1
+)
 }
 \arguments{
 \item{dna}{Fluorescent DNA \code{Image} or list of fluorescent DNA

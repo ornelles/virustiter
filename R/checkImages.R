@@ -75,19 +75,23 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("The 'EBImage' package must be installed with biocLite")
 	method <- match.arg(method)
 
+# provide immediate warnings
+	owarn <- options(warn = 1)
+	on.exit(options(owarn))
+	
 # verify source files or directories
 	if (length(source) == 1 && !file.exists(source))
 		stop("unable to find '", deparse(substitute(source)), "'")
 	if (length(source) > 1 && !all(file.exists(source)))
-		stop("not all files named in '", deparse(substitute(source)), "' exist")
+		warning("not all files named in '", deparse(substitute(source)), "' exist")
 
 # verify and adjust 'which.images' argument
 	if (length(which.images) == 2)
 			which.images <- c(which.images, max(which.images))
 	if (length(which.images) != 3)
-		stop("'which.images' must be an integer vector of length 2 or 3")
+		warning("'which.images' must be an integer vector of length 2 or 3")
 	if (which.images[3] != max(which.images))
-		stop("the third value in 'which.images' must be the largest")
+		warning("the third value in 'which.images' must be the largest")
 
 # assign 'method'
 	if (method == "browser") {
@@ -113,7 +117,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # provide status messages
 	nff <- length(ff)
-	txt <- paste0("Found ", nff, " image file", ifelse(nff == 1, " ", "s "))
+	txt <- paste0("\nFound ", nff, " image file", ifelse(nff == 1, " ", "s "))
 	message(txt, appendLF = FALSE)
 	flush.console()
 
@@ -167,10 +171,10 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	n <- sapply(img, function(x) dim(x)[3])
 	bad <- which(n %% n_field != 0)
 	if (length(bad > 1))
-		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
+		warning("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
 			" are not multiples of ", n_field)
 	else if (length(bad == 1))
-		stop("\nThe number of images in ", deparse(substitute(source)),
+		warning("\nThe number of images in ", deparse(substitute(source)),
 			" is not a multiple of ", n_field)
 
 # extract dna images and adjust to 3 dimensions to use "["
@@ -198,7 +202,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	for (IDX in seq_along(ffsplit)) {
 		nimg <- dim(dnaImages[[IDX]])[3]
 		if(is.na(nimg)) nimg <- 1
-		message(sprintf("%3d: %d in ", IDX, nimg), names(ffsplit)[IDX])
+		message(sprintf("%3d: %2d in %s", IDX, nimg, names(ffsplit)[IDX]))
 		if (method != "none") {
 			myDna <- normalize(dnaImages[[IDX]], separate = separate)
 			myTgt <- normalize(tgtImages[[IDX]], separate = separate)

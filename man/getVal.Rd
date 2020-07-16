@@ -4,8 +4,7 @@
 \alias{getVal}
 \title{Get Value from ComputeFeatures.xxx Function}
 \usage{
-getVal(mask, ref = NULL, val = "b.mean", FUN = NULL,
-  simplify = TRUE, ...)
+getVal(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE, ...)
 }
 \arguments{
 \item{mask}{An object mask or list of objects masks with
