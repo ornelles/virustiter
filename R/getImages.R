@@ -3,40 +3,54 @@
 #' Return a list of paired DNA and fluorescent images
 #' appropriate for \code{\link{parseImages}}.
 #'
-#' @param source A character vector identifying a directory or directories
-#'   with multilayer tiff files \emph{or} subdirectories identified
-#'   by well with separate, paired images \emph{or} a character vector
-#'   of image files \emph{or} a \code{.zip} file with the above.
+#' @param source A character vector identifying the source of images.
+#'   The source can be a directory with subdirectories, each of which 
+#'   contains images organized as specified by \code{which.images}. In 
+#'   typical use, each subdirectory is the name of the well from a multi-
+#'   well dish suchg as A1, C03, d003, etc. Alternatively, the source can be 
+#'   a character string of a \code{.zip} file or character vector of image
+#'   files organized as indicated by \code{which.images}. 
 #' @param type A character string identifying the type of image files to parse
-#'   ("tif", "tiff", "jpeg", "jpg" or "png".)
-#' @param which.images An integer of length 2 or 3. The first two numbers indicate
-#'   the relative position of the DNA image and the target in each field. The optional
-#'   third number specifies the total number of images for each field. A value of
-#'   \code{c(1, 2)} indicates DNA first and target second. A value of \code{c(2, 1)}
-#'   indicates that the order is target first and DNA image second. A value of
-#'   \code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
-#'   image such as a phase contrast image or second fluorescent color in each set.
-#' @param pattern Optional character string to serve as a \code{grep} pattern
-#'   for \code{\link{list.files}} to select image files.
+#'   ("tif", tiff", jpeg", jpg or png").
+#' @param which.images An integer of length 2 or 3 or \code{NULL}. The first 
+#'   number indicates the position of the DNA image. The second number 
+#'   indicates the position of "target" image. The optional third number 
+#'   specifies the total number of images for each field. If this is not 
+#'   specified, the maxmimum of \code{which.images[1:2]} will be used 
+#'   for this value. If \code{NULL}, no order is assumed and no consistency
+#'   checks are performed. The default of \code{c(1, 2)} indicates a DNA image 
+#'   followed by target image. A value of \code{c(2, 1)} indicates that 
+#'   the target image is followed by the DNA image in pairs of images. A 
+#'   value of \code{c(1, 2, 4)} indicates a DNA image, a target image, 
+#'   and two additional images, which are ignored, in each set of four 
+#'   images. 
+#' @param pattern Optional grep pattern as character string used by
+#'   \code{\link{list.files}} to select image files.
 #' @param verbose If \code{TRUE}, print diagnostic messages as files are read.
 #'
 #' @details
 #'
-#' Images specified in \code{source} will be checked for the proper
-#' organization of image files. The order required by \code{\link{parseImages}}
-#' is the DNA image first and fluorescent viral target second. This
-#' order can be changed with the \code{which.images} argument.
+#' Images specified in \code{source} will be evaluated with the same logic in
+#' \code{\link{checkImages}} to determine if the proper number of files are
+#' present. The order required by \code{\link{parseImages}} is the DNA
+#' image first and the fluorescent viral target second. The position of
+#' the DNA image and the target image within each set of images can be changed
+#' with the \code{which.images} argument.
 #'
 #' Images associated with each multiplicity of infection can be individual
 #' files in a single directory where each directory named as the well such as
 #' \code{A1}, \code{A2}, etc. and the files within are identified as
 #' \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 #' can be in upper or lower case and can contain leading zeros such as
-#' \code{c0003/file12.tif}.
+#' \code{c0003/file12.tif} as well as a numeric prefix such as \code{1A3}.
 #'
 #' Alternatively, each group of images associated with a given moi can be
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
+#'
+#' If \code{'source'} is one or more zip files, files in the temporary directory 
+#' (\code{\link{tempdir}}) will be deleted in order to receive the compressed
+#' files. 
 #'
 #' @return
 #'
@@ -68,6 +82,8 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("not all files named in '", deparse(substitute(source)), "' exist")
 
 # verify and adjust 'which.images' argument
+	if (is.null(which.images))
+		stop("Use 'readImage' directly to read a series of images")
 	if (length(which.images) == 2)
 			which.images <- c(which.images, max(which.images))
 	if (length(which.images) != 3)
@@ -94,12 +110,16 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	spl <- strsplit(ff, "/")
 	field1 <- sapply(spl, tail, 1)
 	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", field2, ignore.case = TRUE)
+	pat1 <- "^[[:digit:]]{0,3}"
+	pat2 <- "[abcdefghijklmnop][[:digit:]]+$"
+	pat <- paste0(pat1, pat2)
+	sel <- grepl(pat, field2, ignore.case = TRUE)
 
-# assign variables to direct processing
-	if (all(sel)) {
+# assign value to imageType as "byWell" or "byFile" and complete message
+	if (all(sel)) { # extract well and numeric optional prefix
 		imageType <- "byWell"
-		well <- field2
+		prefix <- sub(paste0("(^", pat1, ").*$"), "\\1", field2)
+		well <- sub(paste0(pat1, "(.*$)"), "\\1", field2)
 		filename <- NULL
 	}
 	else if (!any(sel)) {
@@ -108,55 +128,60 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		filename <- field1
 	}
 	else
-		stop("unable to use mixture of image files in ", source, '"')
+		stop("unable to use mixture of image files in ",
+			deparse(substitute(source)), '"')
 
-# split image paths into related groups (by well or by file)
+# split image paths into related groups (by field2 or by file)
 	if (imageType == "byWell")
-		ffsplit <- split(ff, well)
+		ffsplit <- split(ff, field2)
 	else if (imageType == "byFile")
 		ffsplit <- split(ff, filename)
 	else
-		stop("internal error: unexpected value for 'imageType'")
+		stop("CAN'T HAPPEN! Unexpected value for 'imageType'")
 
 # read all images as a list and coerce to grayscale with a warning
 	if (verbose)
 		message("Reading images grouped by ", ifelse(imageType == "byWell", "well", "file"))
 	img <- lapply(ffsplit, function(f) suppressWarnings(readImage(f)))
 	if (any(sapply(img, colorMode) != 0)) {
-		warning("images have been converted to grayscale by uniform RGB averaging")
+		warning("images have been converted to grayscale by uniform RGB averaging",
+			call. = FALSE)
 		img <- lapply(img, channel, "gray")
 	}
 
-# check for expected numbers of images
+# perform check for expected numbers of images
 	n_dna <- which.images[1]
-	n_mfi <- which.images[2]
+	n_tgt <- which.images[2]
 	n_field <- which.images[3]
 
 # are total images in each group sensible?
-	n <- sapply(img, function(x) dim(x)[3])
+	n <- sapply(img, numberOfFrames)
+	bad <- n < n_dna | n < n_tgt | n < n_field
+	if (all(bad))
+		stop("All ", sum(bad), " images have fewer frames than specified", 
+		" in 'which.images'")
+	if (any(bad))
+		stop(sum(bad), " of ", length(bad),
+			"had fewer frames than specified in 'which.images'")
+
+# are total images in each group a multiple of field size?
 	bad <- which(n %% n_field != 0)
-	if (length(bad > 1))
-		stop("\nThe number of images in ", paste(names(img)[bad], collapse = ", "),
-			" are not multiples of ", n_field)
+	if (length(bad > 10))
+		warning("many images in ", deparse(substitute(source)),
+			" are not multiples of ", n_field, call. = FALSE)
+	else if (length(bad > 1))
+		warning("the number of images in:\n", paste(names(img)[bad], collapse = ", "),
+			" are not multiples of ", n_field, call. = FALSE)
 	else if (length(bad == 1))
-		stop("\nThe number of images in ", deparse(substitute(source)), 
-				" is not a multiple of ", n_field)
+		warning("the number of images in ", deparse(substitute(source)),
+			" is not a multiple of ", n_field, call. = FALSE)
 
-# extract dna images
-	dnaImages <- lapply(img, function(x, first = n_dna, by = n_field) {
-		dm <- dim(x)
-		if (length(dm) == 2)
-			dim(x) <- c(dm, 1)
-		N <- dim(x)[3]
-		x[,,seq(first, N, by), drop = TRUE]})
+	# extract dna and target images
+		idx <- lapply(n, function(N) seq(n_dna, N, n_field))
+		dnaImages <- Map(function(x, i) x[,,i], img, idx)
 
-# extract mfi images and adjust to 3 dimensions
-	mfiImages <- lapply(img, function(x, first = n_mfi, by = n_field) {
-		dm <- dim(x)
-		if (length(dm) == 2)
-			dim(x) <- c(dm, 1)
-		N <- dim(x)[3]
-		x[,,seq(first, N, by), drop = TRUE]})
+		idx <- lapply(n, function(N) seq(n_tgt, N, n_field))
+		tgtImages <- Map(function(x, i) x[,,i], img, idx)
 
 # count and report on the number of groups to display
 	nff <- length(ffsplit)
@@ -173,5 +198,5 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	}
 
 # return image pairs
-	return(list(nuc = dnaImages, tgt = mfiImages))
+	return(list(nuc = dnaImages, tgt = tgtImages))
 }

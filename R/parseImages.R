@@ -62,7 +62,8 @@
 #' \code{A1}, \code{A2}, etc. and the files within are identified as
 #' \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 #' can be in upper or lower case and can contain leading zeros such as
-#' \code{c0003/file12.tif}.
+#' \code{c0003/file12.tif}/ The well identifier also can contain a leading
+#' numeric prefix such as \code{1A2} or \code{02h012}.
 #'
 #' Alternatively, each group of images associated with a given moi can be
 #' a multi-layered tiff file where the sequence of images in the file is
@@ -93,7 +94,9 @@
 #' }
 #' Results from data organized by \strong{well} will also include:
 #' \describe{
-#'   \item{\code{well}}{Harmonized well identifier from the \code{\link{well.info}} function.}
+#'   \item{\code{prefix}}{Optional prefix if present}
+#'   \item{\code{well}}{Harmonized well identifier from the
+#'     \code{\link{well.info}} function.}
 #'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
 #'   \item{\code{column}}{Column number as a factor.}
 #' }
@@ -128,7 +131,7 @@
 parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
 	equalize = FALSE, simplify = TRUE)
-{
+{image
 # requires EBImage, ensure appropriate values for parameters
 	if (!require(EBImage))
 		stop("The 'EBImage' package must be installed with biocLite")
@@ -151,18 +154,32 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		tgtImages <- tgt
 	}
 
-# determine imageType as either "byWell" or "byFile"
-	sel <- grepl("^[abcdefghijklmnop][[:digit:]]+$", names(nucImages),
-		ignore.case = TRUE)
-	if (length(sel) > 0 && all(sel))
+# extract fields to determine if images are organized by well or stack
+	spl <- strsplit(ff, "/")
+	field1 <- sapply(spl, tail, 1)
+	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
+	pat1 <- "^[[:digit:]]{0,3}"
+	pat2 <- "[abcdefghijklmnop][[:digit:]]+$"
+	pat <- paste0(pat1, pat2)
+	sel <- grepl(pat, field2, ignore.case = TRUE)
+
+# assign value to imageType as "byWell" or "byFile" and complete message
+	if (all(sel)) { # extract well and numeric optional prefix
 		imageType <- "byWell"
-	else if (length(sel) > 0 && all(!sel))
-		imageType <- "byFile"
-	else {
-		imageType <- "byFile"
-		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
-		message("Unable to determine organization of images, using 'file'")
+		prefix <- sub(paste0("(^", pat1, ").*$"), "\\1", field2)
+		well <- sub(paste0(pat1, "(.*$)"), "\\1", field2)
+		filename <- NULL
 	}
+	else if (!any(sel)) {
+		imageType <- "byFile"
+		well <- NULL
+		filename <- field1
+		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
+		message("Treating organization of images as 'file'")
+	}
+	else
+		stop("unable to use mixture of image files in ",
+			deparse(substitute(source)), '"')
  
 # optionally equalize tgt images using the range of all tgt values
 	if (equalize == TRUE) {
