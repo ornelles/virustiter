@@ -13,19 +13,38 @@
 #'
 #' @details
 #'
-#' This function performs a \code{data.frame} merge with additional checks.
+#' This function performs a \code{data.frame} merge with additional checks. It
+#' does not (yet) respect the 'plate' variable and only merges according to the
+#' \code{well} or \code{file} variables. For now, it is necessary to split
+#' the phenoData and imageData by \code{plate}, merge each separately,
+#' and then join the data back together. The following might work:
+#'
+#' \preformatted{
+#'   g <- pd$plate
+#'   pd <- split(pd, g)
+#'   df <- split(df, df$plate)
+#'   df <- Map(mergePdata, pd, df)
+#'   df <- do.call(rbind, df)
+#'   rownames(df) <- NULL
+#'   pd <- unsplit(pd, g)
+#' }
 #'
 #' @return
 #'
 #' Merged \code{data.frame} with harmonized well information (if appropriate)
-#' and additional data provided in \code{phenoData}. Note that \code{row},
-#' \code{column} will be factors. 
+#' and additional data provided in \code{phenoData}. The variables \code{row},
+#' \code{column}, and \code{well} are expected to be factors. 
 #'
 #' @export
 #'
 mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 	stringsAsFactors = TRUE)
 {
+# intercept data with 'plate' present
+	if ("plate" %in% names(phenoData) | "plate" %in% names(imageData)) {
+		msg <- c("mergePdata() ignores the 'plate' variable, see ?mergePdata.")
+		warning(msg, call. = FALSE)
+	}
 # process and check data according to the presence of "well"
 	if ("well" %in% names(imageData) && !"well" %in% names(phenoData))
 		stop("'well' found in ", deparse(substitute(imageData)),
