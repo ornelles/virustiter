@@ -158,11 +158,15 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	}
 
 # filenames to determine if images are organized by well or stack
-	spl <- strsplit(names(nucImages), "/")
-	field1 <- sapply(spl, tail, 1) # last field, file name
-	field2 <- sapply(spl, function(x) head(tail(x, 2), 1)) # potential well name
-	wellpat <- "[[:alpha:]][[:digit:]]+$" # pattern for 'well' at end of string
-	sel <- grepl(wellpat, field2)
+	if (is(names(nucImages), "character")) {
+		spl <- strsplit(names(nucImages), "/")
+		field1 <- sapply(spl, tail, 1) # last field, file name
+		field2 <- sapply(spl, function(x) head(tail(x, 2), 1)) # potential well name
+		wellpat <- "[[:alpha:]][[:digit:]]+$" # pattern for 'well' at end of string
+		sel <- grepl(wellpat, field2)
+	}
+	else
+		sel <- c(TRUE, FALSE) # to assign "names" to images
 
 # assign value to imageType as "byWell" or "byFile" and complete message
 	if (all(sel)) { # extract well and numeric optional prefix
@@ -177,6 +181,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 #		filename <- field1
 	}
 	else {
+		imageType <- "byFile"
 		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
 		message("Treating organization of images as 'file'")
 	}
