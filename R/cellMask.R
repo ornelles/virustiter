@@ -8,19 +8,19 @@
 #'   containing the seeds of identified regions. This would typically
 #'   be a segmented nuclear mask or list of masks such as those generated
 #'   by \code{\link{nucMask}}.
-#' @param mask An optional \code{Image} object, array, or a \code{list}
+#' @param mask An optional \code{Image} object, array, or a \code{list} of
 #'   these objects containing a binary mask defining regions of the image
 #'   to be segmented. If this value is \code{NULL}, the nuclear mask
 #'   (\code{seeds}) will be expanded for Voronoi segmentation. If the
-#'   first argument \code{seeds} is a list, \code{mask} must be a similar
-#'   list of objects or arrays.
+#'   first argument \code{seeds} is a list, \code{mask} must be a
+#'   list of identical size with \code{Image} binary objects or arrays.
 #' @param brush Size of the brush to expand the nuclear mask as an 
 #'   odd number of pixels. If this value is \code{NULL}, the mean value of 
 #'   the semi-major axis of the nuclei will be used.
-#' @param lambda A numeric value used by \code{\link[EBImage]{propagate}} determining 
-#'   the trade-off between the Euclidean distance in the image plane and the 
-#'   contribution of the gradient. See \code{\link[EBImage]{propagate}}
-#'   for details. 
+#' @param lambda A numeric value used by \code{\link[EBImage]{propagate}}  
+#'   determining the trade-off between the Euclidean distance in the image  
+#'   plane and the contribution of the gradient to define the boundary during
+#'   Voronoi segmentation. See \code{\link[EBImage]{propagate}} for details. 
 #'
 #' @details
 #'
@@ -35,11 +35,11 @@
 #' created by thresholding a non-specific widespread cytoplasmic signal such
 #' antibody labeling for actin or a diffuse membrane stain.
 #'
-#' To create a \emph{smaller} nuclear mask, use \code{\link{trimMask}} on a nuclear
-#' mask with a negative brush value.
+#' To create a \emph{smaller} nuclear mask, use \code{\link{trimMask}} on a 
+#' nuclear mask with a negative brush value.
 #'
-#' To create a cytoplasmic mask that excludes the nucleus, combine the 
-#' nuclear mask \code{nmask} and cell mask as shown below. 
+#' To create a cytoplasmic mask that excludes the nucleus, generate a 
+#' cell mask and combine this with the nuclear mask \code{nmask} as shown below. 
 #'
 #' \preformatted{
 #' # When both are single objects:
@@ -51,8 +51,8 @@
 #'
 #' @return
 #' 
-#' An \code{Image} object produced by \code{\link[EBImage]{propagate}} containing the labeled
-#' objects (cells) or a \code{list} of such objects.
+#' An \code{Image} object produced by \code{\link[EBImage]{propagate}} 
+#' containing the labeled objects (cells) or a \code{list} of such objects.
 #'
 #' @examples
 #'   x <- readImage(system.file("extdata", "by_folder/a4/file001.tif", package = "virustiter"))
@@ -83,7 +83,8 @@ cellMask <- function(seeds, mask = NULL, brush = NULL, lambda = 1e-4)
 	if (is(seeds, "list")) {
 		sel <- sapply(seeds, function(x) is.integer(imageData(x)))
 		if (!all(sel))
-			stop("'", deparse(substitute(seeds)), "' is a list but not all are integer Image masks")
+			stop("'", deparse(substitute(seeds)),
+				"' is a list but not all are integer Image masks")
 		dim.seeds <- sapply(seeds, function(v) dim(v)[3])
 	}
 	else if (!is.integer(imageData(seeds)))
