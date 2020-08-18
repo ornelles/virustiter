@@ -177,8 +177,9 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	}
 	else if (!any(sel)) {
 		imageType <- "byFile"
-#		well <- NULL
-#		filename <- field1
+		myNames <- names(nucImages)
+		empty <- which(myNames == "")
+		names(nucImages)[empty] <- sprintf("image%04d", empty)
 	}
 	else {
 		imageType <- "byFile"
