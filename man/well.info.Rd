@@ -2,39 +2,56 @@
 % Please edit documentation in R/well.info.R
 \name{well.info}
 \alias{well.info}
-\title{Extract Prefix, Row and Column from Well Label}
+\title{Extract ID, Plate, Well, Row and Column Label}
 \usage{
-well.info(w, format = "\%02d", upper = TRUE)
+well.info(w, format = "\%02d", upper = TRUE, drop.levels = TRUE)
 }
 \arguments{
-\item{w}{Name of the well (coerced as a character).}
+\item{w}{Label for the well (coerced to a character).}
 
-\item{format}{Character string as \code{\link{sprintf}} format for the column portion.}
+\item{format}{Character string as \code{\link{sprintf}} format for the
+column (default of \code{"\%02d"}).}
 
-\item{upper}{\code{logical} value to use upper case when \code{TRUE}.}
+\item{upper}{to use upper case when \code{TRUE}.}
+
+\item{drop.levels}{\code{logical} value to drop unused levels in
+\code{row} and \code{column}.}
 }
 \value{
-A named list of length three or four:
+A named list of length four or five. 
 \itemize{
-	\item prefix, the prefix if present; otherwise this is not returned
-	\item well, uniform character representation of the well
-	\item row, single character for the row
-	\item column, column number as a factor
+ \item label, harmonized character representation of the entire label
+   including any prefix
+	\item plate, prefix as a character string if present, otherwise
+   this is not returned
+	\item well, harmonized well name as a factor
+	\item row, row as a factor with levels A-P (or a-p)
+	\item column, column number as a factor with levels 1-24
 }
 }
 \description{
-Create a uniform representation for a well with an optional 
-prefix.
+Create a uniform representation for a multi-titer well with an optional 
+prefix extracted as plate
 }
 \details{
-Parse the value in \code{w} into an optional arbitrary prefix followed by a 
-single character for the well, followed by the column number formatted
-as per \code{format}. The code will fail if the row value is not one of the 26
-letters or if the column number is not in the range of 1 to 384.
+This function will parse the \code{character} string in \code{w}
+into a "harmonized" label with an optional arbitrary prefix used to
+identify the plate, followed by a single character for the well,
+followed by the  column number formatted as per \code{format}.
+The code will fail if the row  value is not one of the 16 letters from
+A to P or if the column number is not in the range of 1 to 384.
+
+The prefix must contain only alphanumeric characters (0-9, a-z, A-Z), the
+underscore character, or the hyphen.
+
+This function is also used to \emph{harmonize} well information generated
+by different processes that may differ by the lower or upper case or the
+use of leading zeros for the column number.
 }
 \examples{
-  well.info("2a6") # default settings
-  well.info("2a6", format = "\%d", upper = TRUE)
-  well.info("b92", format = "\%05d")
+  well.info("a6") # default settings
+  well.info("a6", format = "\%d", upper = TRUE)
+  well.info("Plate_2b92", format = "\%05d")
+  well.info("Plate_2b92", format = "\%05d", drop.levels = FALSE)
 
 }

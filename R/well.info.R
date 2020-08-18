@@ -4,9 +4,11 @@
 #' prefix extracted as plate 
 #' 
 #' @param w Label for the well (coerced to a character).
-#' @param format Character string as \code{\link{sprintf}}
-#'   format for the column (default of \code{"%02d"}). 
-#' @param upper \code{logical} value to use upper case when \code{TRUE}.
+#' @param format Character string as \code{\link{sprintf}} format for the
+#'   column (default of \code{"\%02d"}). 
+#' @param upper to use upper case when \code{TRUE}.
+#' @param drop.levels \code{logical} value to drop unused levels in
+#'   \code{row} and \code{column}.
 #' 
 #' @details 
 #' 
@@ -41,13 +43,16 @@
 #'   well.info("a6") # default settings
 #'   well.info("a6", format = "%d", upper = TRUE)
 #'   well.info("Plate_2b92", format = "%05d")
+#'   well.info("Plate_2b92", format = "%05d", drop.levels = FALSE)
 #' 
 #' @export
 #' 
-well.info <- function(w, format = "%02d", upper = TRUE)
+well.info <- function(w, format = "%02d", upper = TRUE, drop.levels = TRUE)
 {
-# coerce to character
+# coerce to character, ensure logical values
 	w <- as.character(w)
+	upper <- as.logical(upper)
+	drop.levels <- as.logical(drop.levels)
 
 # grep pattern for 'well' at end of string
 	wellpat <- "[[:alpha:]][[:digit:]]+$"
@@ -58,8 +63,8 @@ well.info <- function(w, format = "%02d", upper = TRUE)
 # extract information in well position: row and column
 	ww <- sub(paste0("^.*(", wellpat, ")"), "\\1", w)
 	ww <- toupper(as.character(ww))
-	row <- substr(ww, 1, 1)	# row must be first position
-	column <- substr(ww, 2, 12) # column must be 2nd position to end
+	row <- substring(ww, 1, 1)	# row must be first position
+	column <- substring(ww, 2) # column must be 2nd position to end
 	column <- as.integer(column)
 
 # error checking
@@ -80,21 +85,27 @@ well.info <- function(w, format = "%02d", upper = TRUE)
 	}
 	else
 		row <- factor(row, levels = LETTERS[1:16])
-	
-# create harmonized well
+
+# create harmonized well as factor with default levels
 	well <- paste(row, sprintf(format, column), sep = "")
 	well <- factor(well)
 
 # format column
-	column <- factor(column, levels = 1:24)
+	column <- factor(column, levels = 1:384)
 
 # create harmonized label 
 	label <- paste(plate, well, sep = "")
 
+# drop levels from row and column?
+	if (drop.levels) {
+		row <- droplevels(row)
+		column <- droplevels(column)
+	}
+
 # assemble list with or without prefix value
 	if (all(plate == ""))
-		ans <- list(label = label, well = well, row = row, column = column)
+		ans <- list(label=label, well=well, row=row, column=column)
 	else
-		ans <- list(label = label, plate = plate, well = well, row = row, column = column)
+		ans <- list(label=label, plate=plate, well=well, row=row, column=column)
 	return(ans)
 }
