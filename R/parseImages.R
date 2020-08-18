@@ -63,17 +63,19 @@
 #' \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 #' can be in upper or lower case and can contain leading zeros such as
 #' \code{c0003/file12.tif}/ The well identifier also can contain a leading
-#' numeric prefix such as \code{1A2} or \code{02h012}.
+#' alphanumeric prefix such as \code{1A2} or \code{02h012}.
 #'
 #' Alternatively, each group of images associated with a given moi can be
 #' a multi-layered tiff file where the sequence of images in the file is
 #' specified by the argument \code{which.images}.
 #'
 #' A unique ID for each image can be created from a combination of
-#' \code{frame} and either \code{well} or \code{file}. This can be useful
+#' \code{frame} and either \code{label}. This can be useful
 #' if it is necessary to determine a separate background value for each
 #' pair of images.
 #' \preformatted{
+#'   df$uid <- with(df, interaction(label, frame))
+#'     or if no prefix/plate is used
 #'   df$uid <- with(df, interaction(well, frame))
 #'   df$uid <- with(df, interaction(file, frame))
 #' }
@@ -94,11 +96,12 @@
 #' }
 #' Results from data organized by \strong{well} will also include:
 #' \describe{
-#'   \item{\code{prefix}}{Optional prefix if present}
+#'   \item{\code{label}}{Harmonized, original well label}
+#'   \item{\code{plate}}{From optional prefix (if present)}
 #'   \item{\code{well}}{Harmonized well identifier from the
-#'     \code{\link{well.info}} function.}
-#'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
-#'   \item{\code{column}}{Column number as a factor.}
+#'     \code{\link{well.info}} function}
+#'   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor}
+#'   \item{\code{column}}{Column number as a factor}
 #' }
 #' Results from data organized as multi-layered tiff files (or stacks)
 #' will include:
@@ -154,33 +157,30 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		tgtImages <- tgt
 	}
 
-# extract fields to determine if images are organized by well or stack
-	spl <- strsplit(ff, "/")
-	field1 <- sapply(spl, tail, 1)
-	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	pat1 <- "^[[:digit:]]{0,3}"
-	pat2 <- "[abcdefghijklmnop][[:digit:]]+$"
-	pat <- paste0(pat1, pat2)
-	sel <- grepl(pat, field2, ignore.case = TRUE)
+# filenames to determine if images are organized by well or stack
+	spl <- strsplit(names(nucImages), "/")
+	field1 <- sapply(spl, tail, 1) # last field, file name
+	field2 <- sapply(spl, function(x) head(tail(x, 2), 1)) # potential well name
+	wellpat <- "[[:alpha:]][[:digit:]]+$" # pattern for 'well' at end of string
+	sel <- grepl(wellpat, field2)
 
 # assign value to imageType as "byWell" or "byFile" and complete message
 	if (all(sel)) { # extract well and numeric optional prefix
 		imageType <- "byWell"
-		prefix <- sub(paste0("(^", pat1, ").*$"), "\\1", field2)
-		well <- sub(paste0(pat1, "(.*$)"), "\\1", field2)
-		filename <- NULL
+#		plate <- well.info(field2)$plate
+#		well <- well.info(field2)$well
+#		filename <- NULL
 	}
 	else if (!any(sel)) {
 		imageType <- "byFile"
-		well <- NULL
-		filename <- field1
+#		well <- NULL
+#		filename <- field1
+	}
+	else {
 		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
 		message("Treating organization of images as 'file'")
 	}
-	else
-		stop("unable to use mixture of image files in ",
-			deparse(substitute(source)), '"')
- 
+
 # optionally equalize tgt images using the range of all tgt values
 	if (equalize == TRUE) {
 		message("Equalizing target images...", appendLF = FALSE)
