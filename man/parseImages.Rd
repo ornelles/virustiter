@@ -70,9 +70,12 @@ data. \strong{Each} data.frame will have the following variables:
 }
 Results from data organized by \strong{well} will also include:
 \describe{
-  \item{\code{well}}{Harmonized well identifier from the \code{\link{well.info}} function.}
-  \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor.}
-  \item{\code{column}}{Column number as a factor.}
+  \item{\code{label}}{Harmonized, original well label}
+  \item{\code{plate}}{From optional prefix (if present)}
+  \item{\code{well}}{Harmonized well identifier from the
+    \code{\link{well.info}} function}
+  \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor}
+  \item{\code{column}}{Column number as a factor}
 }
 Results from data organized as multi-layered tiff files (or stacks)
 will include:
@@ -111,17 +114,20 @@ single directory where each directory is named for the well such as
 \code{A1}, \code{A2}, etc. and the files within are identified as
 \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 can be in upper or lower case and can contain leading zeros such as
-\code{c0003/file12.tif}.
+\code{c0003/file12.tif}/ The well identifier also can contain a leading
+alphanumeric prefix such as \code{1A2} or \code{02h012}.
 
 Alternatively, each group of images associated with a given moi can be
 a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
 A unique ID for each image can be created from a combination of
-\code{frame} and either \code{well} or \code{file}. This can be useful
+\code{frame} and either \code{label}. This can be useful
 if it is necessary to determine a separate background value for each
 pair of images.
 \preformatted{
+  df$uid <- with(df, interaction(label, frame))
+    or if no prefix/plate is used
   df$uid <- with(df, interaction(well, frame))
   df$uid <- with(df, interaction(file, frame))
 }

@@ -16,24 +16,32 @@ checkImages(
 )
 }
 \arguments{
-\item{source}{A character vector identifying a directory or directories
-with multilayer tiff files \emph{or} subdirectories identified
-by well with separate, paired images per well \emph{or} a character vector
-of image files \emph{or} a \code{.zip} file with the above.}
+\item{source}{A character vector identifying the source of images.
+The source can be a directory with subdirectories, each of which 
+contains images organized as specified by \code{which.images}. In 
+typical use, each subdirectory is the name of the well from a multi-
+well dish suchg as A1, C03, d003, etc. Alternatively, the source can be 
+a character string of a \code{.zip} file or character vector of image
+files organized as indicated by \code{which.images}.}
 
 \item{type}{A character string identifying the type of image files to parse
-("tif", "tiff", "jpeg", "jpg" or "png".)}
+("tif", tiff", jpeg", jpg or png").}
 
-\item{which.images}{An integer of length 2 or 3. The first two numbers indicate
-the relative position of the DNA image and the target image in each field. The optional
-third number specifies the total number of images for each field. A value of
-\code{c(1, 2)} indicates DNA first and target second. A value of \code{c(2, 1)}
-indicates that the order is target first and DNA image second. A value of
-\code{c(1, 2, 3)} indicates a DNA image, a target image, and a third (ignored)
-image such as a phase contrast image or second fluorescent color in each set.}
+\item{which.images}{An integer of length 2 or 3 or \code{NULL}. The first 
+number indicates the position of the DNA image. The second number 
+indicates the position of "target" image. The optional third number 
+specifies the total number of images for each field. If this is not 
+specified, the maxmimum of \code{which.images[1:2]} will be used 
+for this value. If \code{NULL}, no order is assumed and no consistency
+checks are performed. The default of \code{c(1, 2)} indicates a DNA image 
+followed by target image. A value of \code{c(2, 1)} indicates that 
+the target image is followed by the DNA image in pairs of images. A 
+value of \code{c(1, 2, 4)} indicates a DNA image, a target image, 
+and two additional images, which are ignored, in each set of four 
+images.}
 
-\item{pattern}{Optional grep pattern as character string used by \code{\link{list.files}}
-to select image files.}
+\item{pattern}{Optional grep pattern as character string used by
+\code{\link{list.files}} to select image files.}
 
 \item{method}{Character string specifying the method of displaying images.
 Default of \code{"none"} simply summarizes the images. A value of \code{"raster"}
@@ -43,10 +51,10 @@ uses R raster graphics and \code{"browser"} attempts to use a browser.
 \item{ask}{Logical value to use \code{par(ask = TRUE)} if \code{method = "raster"}.}
 
 \item{separate}{Logical value to normalize each frame separately if
-\code{TRUE}. Aplies only if \code{display} is not \code{"none"}.}
+\code{TRUE}. Aplies only if \code{method} is \code{"raster"} or \code{"browser"}.}
 
-\item{nx}{Integer value passed to \code{display{}} that specifies the number of
-images in a column if \code{display} is not \code{"none"}.}
+\item{nx}{Integer value passed to the \code{display} function that specifies
+the number of images in a column if \code{method} is not \code{"none"}.}
 }
 \value{
 An \code{invisible} character vector of image files, diagnostic messages
@@ -57,25 +65,25 @@ Check validity of paired DNA and a fluorescent images
 appropriate for \code{parseImages()}.
 }
 \details{
-Images specified in \code{source} will be evaluated with the same logic in
+If \code{which.images} is not \code{NULL}, the images specified in
+\code{source} will be evaluated with the same logic in
 \code{\link{getImages}} to determine if the proper number of files are
-present and report on the number and form of the image files. 
-The default value of the \code{which.images} argument treats the first of each
-pair a DNA image and the second as a fluorescent 
-image of the viral target.
+present and report on the number and form of the image files. If
+\code{which.images} is \code{NULL}, no check will be performed. 
 
 Images associated with each multiplicity of infection can be individual
-files in a single directory where each directory named as the well such as
-\code{A1}, \code{A2}, etc. and the files within are identified as
+files in a single directory where each directory is named for the well
+such as \code{A1}, \code{A2}, etc. and the files within are identified as
 \code{A1/file001.tif}, \code{A1/file002.tif}, etc. The well identifier
 can be in upper or lower case and can contain leading zeros such as
-\code{c0003/file12.tif}.
+\code{c0003/file12.tif}/ The well identifier also can contain a leading
+prefix designating the plate such as in \code{1A2} or \code{Plate_1B6}.
 
 Alternatively, each group of images associated with a given moi can be
 a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
-If \code{'source'} is a zip file, files in the temporary directory 
+If \code{'source'} is one or more zip files, files in the temporary directory 
 (\code{\link{tempdir}}) will be deleted in order to receive the compressed
 files.
 }
