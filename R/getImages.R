@@ -108,18 +108,16 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 # extract fields to determine if images are organized by well or stack
 	spl <- strsplit(ff, "/")
-	field1 <- sapply(spl, tail, 1)
-	field2 <- sapply(spl, function(x) head(tail(x, 2), 1))
-	pat1 <- "^[[:digit:]]{0,3}"
-	pat2 <- "[abcdefghijklmnop][[:digit:]]+$"
-	pat <- paste0(pat1, pat2)
-	sel <- grepl(pat, field2, ignore.case = TRUE)
+	field1 <- sapply(spl, tail, 1) # last field, file name
+	field2 <- sapply(spl, function(x) head(tail(x, 2), 1)) # potential well name
+	wellpat <- "[[:alpha:]][[:digit:]]+$" # pattern for 'well' at end of string
+	sel <- grepl(wellpat, field2)
 
 # assign value to imageType as "byWell" or "byFile" and complete message
 	if (all(sel)) { # extract well and numeric optional prefix
 		imageType <- "byWell"
-		prefix <- sub(paste0("(^", pat1, ").*$"), "\\1", field2)
-		well <- sub(paste0(pat1, "(.*$)"), "\\1", field2)
+		plate <- well.info(field2)$plate
+		well <- well.info(field2)$well
 		filename <- NULL
 	}
 	else if (!any(sel)) {
