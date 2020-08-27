@@ -16,16 +16,18 @@
 #' @details
 #'
 #' The data frame must have the variable \code{frame} and either \code{well}
-#' \code{file}. If both \code{well} and \code{file} are present, the longer 
-#' of these two factors will be used to split the data to find objects.
+#' \code{file} or \code{label}. If more than one these three variables are
+#' present, the longest of these three factors will be used to split the data
+#' before finding objects.
 #'
 #' @return
 #'
-#' Either an integer \code{Image} mask or list of integer \code{Image} masks
-#' with the objects selected by \code{expr} if a \code{mask} was provided.
-#' If no \code{mask} was provided to the function, a nested list of integers
-#' identifying the objects satisfying the argument in \code{expr} which is
-#' as long as the longer of the levels in \code{frame} or \code{well}.
+#' If a \code{mask} was provided, the function will return an integer
+#' \code{Image} mask or list of integer \code{Image} masks
+#' with the objects selected by \code{expr}.
+#' If no \code{mask} was provided, a nested list of integers will be
+#' returned that identifies the objects satisfying the argument in \code{expr}
+#' which is as long as the longer of the levels in \code{frame} or \code{well}.
 #' 
 #' @examples
 #'   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))
@@ -52,23 +54,23 @@ findObjects <- function(expr, df, mask = NULL, invert = FALSE)
 	if (!is(df, "data.frame"))
 		stop("'", deparse(substitute(df)), "' must be a data.frame")
 	dnames <- names(df)
-	if (!("frame" %in% dnames & ("well" %in% dnames | "file" %in% dnames)))
-		stop('"frame" and either "well" or "file" must be in ', deparse(substitute(df)))
+	if (!("frame" %in% dnames &
+			("label" %in% dnames |"well" %in% dnames | "file" %in% dnames)))
+		stop('"frame" and either "label", "well" or "file" must be in ',
+			deparse(substitute(df)))
 
 # evaluate expression and assign to original data.frame
 	sel <- eval(substitute(expr), df)
 	vname <- tail(make.unique(c(names(df), "var")), 1)
 	df[[vname]] <- sel
 
-# split 'var' according to the greater of 'well/file' and 'frame' in 'df'
-	if (all(c("well", "file") %in% names(df)))
-		group <- ifelse(nlevels(df$file) > nlevels(df$well), "file", "well")
-	else if ("well" %in% names(df))
-   group <- "well"
-	else if ("file" %in% names(df))
-		group <- "file"
-	else
-		stop("can't be here: failed to find 'file' or 'well'")
+# split 'var' according to the greater of 'label/well/file' and 'frame' in 'df'
+	labs <- c("label", "well", "file")
+	labs <- labs[labs %in% names(df)]
+	nlevs <- sapply(df[labs], nlevels)
+	group <- names(which.max(nlevs))
+	if (length(group) == 0 | group == "")
+		stop("can't be here? Failed to find 'label', 'file' or 'well'")
 
 # split data frame by group, then split expression value by frame within each
 	spl.1 <- split(df, df[[group]], drop = FALSE)

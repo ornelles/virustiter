@@ -21,11 +21,12 @@ the same unique integer value.}
 by \code{expr}.}
 }
 \value{
-Either an integer \code{Image} mask or list of integer \code{Image} masks
-with the objects selected by \code{expr} if a \code{mask} was provided.
-If no \code{mask} was provided to the function, a nested list of integers
-identifying the objects satisfying the argument in \code{expr} which is
-as long as the longer of the levels in \code{frame} or \code{well}.
+If a \code{mask} was provided, the function will return an integer
+\code{Image} mask or list of integer \code{Image} masks
+with the objects selected by \code{expr}.
+If no \code{mask} was provided, a nested list of integers will be
+returned that identifies the objects satisfying the argument in \code{expr}
+which is as long as the longer of the levels in \code{frame} or \code{well}.
 }
 \description{
 Identify objects in data.frame produced by \code{\link{parseImages}} 
@@ -33,8 +34,9 @@ as specified by the expression \code{expr}.
 }
 \details{
 The data frame must have the variable \code{frame} and either \code{well}
-\code{file}. If both \code{well} and \code{file} are present, the longer 
-of these two factors will be used to split the data to find objects.
+\code{file} or \code{label}. If more than one these three variables are
+present, the longest of these three factors will be used to split the data
+before finding objects.
 }
 \examples{
   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))
