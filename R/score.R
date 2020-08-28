@@ -54,13 +54,15 @@ score <- function(df, bgnd = NULL, param = "mfi", ...)
 
   if (length(bgnd) == 1)     # single values
     df$positive <- df[[param]] > bgnd
-	else {	# search for names of bgnd among factors in df
-		choices <- lapply(df[sapply(df, is.factor)], levels)
+	else {	# search for names of bgnd among characters and factors in df
+		sel <- sapply(df, is.factor) | sapply(df, is.character)
+		choices <- lapply(df[sel], unique)
 		sel <- sapply(choices, function(v) all(names(bgnd) %in% v))
 		if (sum(sel) > 1)
 			stop("found ", sum(sel), " possible factors matching 'bgnd' in 'df'")
 		else if (sum(sel) == 0)
-			stop("'bgnd' must be a single value or a named vector matching a factor in 'df'")
+			stop("'bgnd' must be a single value or a named vector matching
+				a variable in 'df'")
 		else {
 			g <- names(which(sel))
 			df$positive <- df[[param]] > bgnd[df[[g]]]

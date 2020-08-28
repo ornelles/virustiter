@@ -40,11 +40,26 @@
 mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 	stringsAsFactors = TRUE)
 {
-# intercept data with 'plate' present
-	if ("plate" %in% names(phenoData) | "plate" %in% names(imageData)) {
-		msg <- c("mergePdata() ignores the 'plate' variable, see ?mergePdata.")
-		warning(msg, call. = FALSE)
+# intercept data with 'plate' present in both
+	if ("plate" %in% names(phenoData) & "plate" %in% names(imageData)) {
+		g <- phenoData$plate
+		phenoData <- split(phenoData, g)
+		imageData <- split(imageData, imageData$plate)
+		imageData <- Map(mergePdata, phenoData, imageData, moi = moi,
+			stringsAsFactors = stringsAsFactors)
+		imageData <- do.call(rbind, imageData)
+		rownames(imageData) <- NULL
+		return(imageData)
 	}
+
+# or else it may be an error if 'plate' is in only one of the two
+	if ("plate" %in% names(phenoData) & !"plate" %in% names(imageData))
+		stop('"plate" found in ', deparse(substitute(phenoData)), ' but not in ',
+			deparse(substitute(imageData)))
+	if (!"plate" %in% names(phenoData) & "plate" %in% names(imageData))
+		stop('"plate" found in ', deparse(substitute(imageData)), ' but not in ',
+			deparse(substitute(phenoData)))
+			
 # process and check data according to the presence of "well"
 	if ("well" %in% names(imageData) && !"well" %in% names(phenoData))
 		stop("'well' found in ", deparse(substitute(imageData)),
