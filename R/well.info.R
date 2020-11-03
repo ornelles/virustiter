@@ -13,7 +13,7 @@
 #' @details 
 #' 
 #' This function will parse the \code{character} string in \code{w}
-#' into a "harmonized" label with an optional arbitrary prefix used to
+#' into an optional "harmonized" label with an arbitrary prefix used to
 #' identify the plate, followed by a single character for the well,
 #' followed by the  column number formatted as per \code{format}.
 #' The code will fail if the row  value is not one of the 16 letters from
@@ -28,10 +28,11 @@
 #' 
 #' @return 
 #' 
-#' A named list of length four or five. 
+#' A named list of length three or five. Values for \code{label} and
+#' \code{plate} will be returned only if a plate prefix is used. 
 #' \itemize{
 #'  \item label, harmonized character representation of the entire label
-#'    including any prefix
+#'    including any prefix if present, otherwise this is not returned
 #' 	\item plate, prefix as a character string if present, otherwise
 #'    this is not returned
 #' 	\item well, harmonized well name as a factor
@@ -104,7 +105,7 @@ well.info <- function(w, format = "%02d", upper = TRUE, drop.levels = TRUE)
 
 # assemble list with or without prefix value
 	if (all(plate == ""))
-		ans <- list(label=label, well=well, row=row, column=column)
+		ans <- list(well=well, row=row, column=column)
 	else
 		ans <- list(label=label, plate=plate, well=well, row=row, column=column)
 	return(ans)

@@ -68,10 +68,14 @@ data. \strong{Each} data.frame will have the following variables:
   \item{\code{mfi}}{Mean fluorescence intensity for the target,
     measured with selected mask.}
 }
-Results from data organized by \strong{well} will also include:
+Results from data organized by \strong{well} with a \strong{plate} prefix
+will include:
 \describe{
   \item{\code{label}}{Harmonized, original well label}
-  \item{\code{plate}}{From optional prefix (if present)}
+  \item{\code{plate}}{From the plate prefix}
+}
+All results organized by \strong{well} will include:
+\describe{
   \item{\code{well}}{Harmonized well identifier from the
     \code{\link{well.info}} function}
   \item{\code{row}}{Row identifier ("A", "B", "C", etc.) as a factor}
@@ -122,9 +126,9 @@ a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
 A unique ID for each image can be created from a combination of
-\code{frame} and either \code{label}. This can be useful
-if it is necessary to determine a separate background value for each
-pair of images.
+\code{frame} and either \code{label}, \code{well} or \code{file}. This can
+be useful if it is necessary to determine a separate background value for
+each pair of images.
 \preformatted{
   df$uid <- with(df, interaction(label, frame))
     or if no prefix/plate is used
