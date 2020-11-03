@@ -5,7 +5,8 @@
 #' 
 #' @param w Label for the well (coerced to a character).
 #' @param format Character string as \code{\link{sprintf}} format for the
-#'   column (default of \code{"\%02d"}). 
+#'   column, default value of \code{NULL} pads the column value with zeros
+#'   as needed such as \code{"\%02d"} for more than 9 columns. 
 #' @param upper to use upper case when \code{TRUE}.
 #' @param drop.levels \code{logical} value to drop unused levels in
 #'   \code{row} and \code{column}.
@@ -48,7 +49,7 @@
 #' 
 #' @export
 #' 
-well.info <- function(w, format = "%02d", upper = TRUE, drop.levels = TRUE)
+well.info <- function(w, format = NULL, upper = TRUE, drop.levels = TRUE)
 {
 # coerce to character, ensure logical values
 	w <- as.character(w)
@@ -67,6 +68,12 @@ well.info <- function(w, format = "%02d", upper = TRUE, drop.levels = TRUE)
 	row <- substring(ww, 1, 1)	# row must be first position
 	column <- substring(ww, 2) # column must be 2nd position to end
 	column <- as.integer(column)
+
+# assign format string
+	if (is.null(format)) {
+		digits <- ceiling(log10(max(column)))
+		format <- paste0("%0", digits, "d")
+	}
 
 # error checking
 	if (any(grepl("[^[:alnum:]_-]", prefix)))

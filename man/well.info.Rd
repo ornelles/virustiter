@@ -4,13 +4,14 @@
 \alias{well.info}
 \title{Extract ID, Plate, Well, Row and Column Label}
 \usage{
-well.info(w, format = "\%02d", upper = TRUE, drop.levels = TRUE)
+well.info(w, format = NULL, upper = TRUE, drop.levels = TRUE)
 }
 \arguments{
 \item{w}{Label for the well (coerced to a character).}
 
 \item{format}{Character string as \code{\link{sprintf}} format for the
-column (default of \code{"\%02d"}).}
+column, default value of \code{NULL} pads the column value with zeros
+as needed such as \code{"\%02d"} for more than 9 columns.}
 
 \item{upper}{to use upper case when \code{TRUE}.}
 
