@@ -22,10 +22,10 @@
 #' \preformatted{
 #'   g <- pd$plate
 #'   pd <- split(pd, g)
-#'   df <- split(df, df$plate)
-#'   df <- Map(mergePdata, pd, df)
-#'   df <- do.call(rbind, df)
-#'   rownames(df) <- NULL
+#'   res <- split(res, res$plate)
+#'   res <- Map(mergePdata, pd, res)
+#'   res <- do.call(rbind, res)
+#'   rownames(res) <- NULL
 #'   pd <- unsplit(pd, g)
 #' }
 #'
@@ -40,25 +40,11 @@
 mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 	stringsAsFactors = TRUE)
 {
-# intercept data with 'plate' present in both
-	if ("plate" %in% names(phenoData) & "plate" %in% names(imageData)) {
-		g <- phenoData$plate
-		phenoData <- split(phenoData, g)
-		imageData <- split(imageData, imageData$plate)
-		imageData <- Map(mergePdata, phenoData, imageData, moi = moi,
-			stringsAsFactors = stringsAsFactors)
-		imageData <- do.call(rbind, imageData)
-		rownames(imageData) <- NULL
-		return(imageData)
+# intercept data with 'plate' present
+	if ("plate" %in% names(phenoData) | "plate" %in% names(imageData)) {
+		if (nlevels(factor(phenoData$plate)) > 1 | nlevels(factor(imageData$plate)) > 1)
+			stop("see mergePdata() help file to use 'plate' variable")
 	}
-
-# or else it may be an error if 'plate' is in only one of the two
-	if ("plate" %in% names(phenoData) & !"plate" %in% names(imageData))
-		stop('"plate" found in ', deparse(substitute(phenoData)), ' but not in ',
-			deparse(substitute(imageData)))
-	if (!"plate" %in% names(phenoData) & "plate" %in% names(imageData))
-		stop('"plate" found in ', deparse(substitute(imageData)), ' but not in ',
-			deparse(substitute(phenoData)))
 			
 # process and check data according to the presence of "well"
 	if ("well" %in% names(imageData) && !"well" %in% names(phenoData))
@@ -120,7 +106,7 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 # add temporary sorting variable for imageData and merge
 	sval <- tail(make.unique(c(names(imageData), "srt")), 1)
 	imageData[[sval]] <- seq_len(nrow(imageData))
-	res <- merge(phenoData, imageData)
+	res <- merge(phenoData, imageData, all.y = TRUE) # Ugh...need all.y = TRUE
 	ord <- order(res[[sval]])
 	res <- res[ord, ]
 	res <- res[names(res) != sval]

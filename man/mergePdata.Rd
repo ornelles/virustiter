@@ -37,10 +37,10 @@ and then join the data back together. The following might work:
 \preformatted{
   g <- pd$plate
   pd <- split(pd, g)
-  df <- split(df, df$plate)
-  df <- Map(mergePdata, pd, df)
-  df <- do.call(rbind, df)
-  rownames(df) <- NULL
+  res <- split(res, res$plate)
+  res <- Map(mergePdata, pd, res)
+  res <- do.call(rbind, res)
+  rownames(res) <- NULL
   pd <- unsplit(pd, g)
 }
 }
