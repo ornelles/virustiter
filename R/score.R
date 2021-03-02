@@ -65,7 +65,8 @@ score <- function(df, bgnd = NULL, param = "mfi", ...)
 				a variable in 'df'")
 		else {
 			g <- names(which(sel))
-			df$positive <- df[[param]] > bgnd[df[[g]]]
+#			df$positive <- df[[param]] > bgnd[df[[g]]]
+			df$positive <- df[[param]] > bgnd[as.character(df[[g]])]
 		}
 	}
   return(df)
