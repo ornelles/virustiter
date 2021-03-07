@@ -53,7 +53,7 @@ plotWell <- function(myWell, df, byFrame = TRUE, cex = 1, invert.y = TRUE, ...)
 	if (invert.y)
 		df$ym <- -df$ym
 
-	myWell <- well.info(myWell)$well
+	wellData <- well.info(myWell)
 	adj.cex <- cex
 	myCex <- scale(sqrt(df$area), center = FALSE)
 	leg.text <- as.character(round(quantile(df$area)))
@@ -63,9 +63,10 @@ plotWell <- function(myWell, df, byFrame = TRUE, cex = 1, invert.y = TRUE, ...)
 		form <- as.formula("ym ~ xm | well:factor(frame)")
 	else
 		form <- as.formula("ym ~ xm | well")
-	obj <- xyplot(form, df, subset = well%in%myWell,
+	obj <- xyplot(form, df,
+		subset = row %in% wellData$row & column %in% wellData$column,
 		groups = positive,
-		cex = myCex*adj.cex,
+		cex = myCex * adj.cex,
 		panel = function(x, y, ..., cex, subscripts, groups) {
 					panel.xyplot(x, y, ..., cex = cex[subscripts],
 					col = ifelse(groups[subscripts] == "FALSE", myCol[1], myCol[2]))

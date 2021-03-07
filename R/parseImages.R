@@ -318,11 +318,14 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		props <- c(frame = list(rep(seq_along(ncells), ncells)), props)
 
 	# create data.frame of results based on imageType
-		myName <- names(nucImages)[idx]
-		if (imageType == "byWell")
-			res <- data.frame(well.info(myName), lapply(props, unlist))
-		else # imageType == "byFile"
-			res <- data.frame(file = myName, lapply(props, unlist))
+		if (imageType == "byWell") {
+			myWell <- lapply(well.info(names(nucImages)), "[", idx)
+			res <- data.frame(myWell, lapply(props, unlist))
+		}
+		else {	# imageType == "byFile"
+			myFile <- names(nucImages)[idx]
+			res <- data.frame(file = myFile, lapply(props, unlist))
+		}
 
 	# accumulate in ans
 		ans[[idx]] <- res

@@ -43,7 +43,7 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 # intercept data with 'plate' present
 	if ("plate" %in% names(phenoData) | "plate" %in% names(imageData)) {
 		if (nlevels(factor(phenoData$plate)) > 1 | nlevels(factor(imageData$plate)) > 1)
-			stop("see mergePdata() help file to use 'plate' variable")
+			warning("see mergePdata() help to use 'plate' variable for merging")
 	}
 			
 # process and check data according to the presence of "well"
@@ -60,13 +60,13 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 			stop(paste(diffWell, collapse = ", "), " are missing from ",
 				deparse(substitute(phenoData)))
 
-	# process plate
-		pdPlate <- unique(phenoData$plate)
-		idPlate <- unique(imageData$plate)
-		diffPlate <- setdiff(idWell, pdWell)
-		if (length(diffPlate) != 0)
-			stop(paste(diffPlate, collapse = ", "), " are missing from ",
-				deparse(substitute(phenoData)))
+#	# process plate
+#		pdPlate <- unique(phenoData$plate)
+#		idPlate <- unique(imageData$plate)
+#		diffPlate <- setdiff(idWell, pdWell)
+#		if (length(diffPlate) != 0)
+#			stop(paste(diffPlate, collapse = ", "), " are missing from ",
+#				deparse(substitute(phenoData)))
 
 	# replace (or add) harmonized row and column information to phenotype data
 		phenoData$column <- well.info(phenoData$well)$column
@@ -118,7 +118,8 @@ mergePdata <- function(phenoData, imageData, moi = c("moi", "x"),
 	}
 
 # reorganize data
-	pdnames <- c("dir","file","plate","well","column","row","frame","type","unit")
+#	pdnames <- c("dir","file","plate","well","column","row","frame","type","unit")
+	pdnames <- c("dir","file","well","column","row","frame","type","unit")
 	first <- pdnames[pdnames %in% names(res)]
 	last <- names(res)[!names(res) %in% pdnames]
 	res <- res[c(first, last)]
