@@ -66,7 +66,7 @@ getShift <- function(mask, target, parscale = c(25, 25), FUN = idiff)
 		ans <- lapply(seq_len(dm[3]),
 			function(i) .getShift(mask[,,i], target[,,i], FUN, parscale))
 	else 
-		ans <- as.list(.getShift(mask, target, FUN, parscale))
+		ans <- list(.getShift(mask, target, FUN, parscale))
 	return(ans)
 }
 
