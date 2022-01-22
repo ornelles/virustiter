@@ -10,7 +10,8 @@ trimMask(
   k = c(1.5, 3),
   border = 0,
   brush = 0,
-  ecc.max = 1
+  ecc.max = 1,
+  reenumerate = TRUE
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ multiplier to determine the cutoff from the \code{\link{median}} and
 
 \item{ecc.max}{Exclude objects with elliptical eccentricity greater than
 this value.}
+
+\item{reenumerate}{Logical value (default of TRUE) passed to rmObjects()
+to re-enumerate the objects after trimming.}
 }
 \value{
 Object mask or list of masks with objects removed and re-enumerated.

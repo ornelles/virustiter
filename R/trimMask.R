@@ -22,6 +22,8 @@
 #'   \code{\link[EBImage:morphology]{erode}} the mask. 
 #' @param ecc.max Exclude objects with elliptical eccentricity greater than
 #'   this value.
+#' @param reenumerate Logical value (default of TRUE) passed to rmObjects()
+#'   to re-enumerate the objects after trimming.
 #' 
 #' @details
 #' 
@@ -55,7 +57,7 @@
 #' @export
 #'
 trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
-	ecc.max = 1)
+	ecc.max = 1, reenumerate = TRUE)
 {
 	require(EBImage)
 	if (missing(mask)) {
@@ -66,13 +68,14 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
       '  brush = -5 to erode mask with disc of radius 5 pixels',
       '  brush = 5 to dilate mask with disc of radius 5 pixels',
 			'  border = 2 to drop objects within 2 pixels of image border',
-      '  ecc.max = 0.75 to drop objects with eccentricity > 0.75')
+      '  ecc.max = 0.75 to drop objects with eccentricity > 0.75',
+      '  reenumerate = FALSE prevents re-enumeration for repeated application')
 		cat(usage, sep = "\n")
 		return(invisible(NULL))
 	}
 
 # process function
-	.proc <- function(mask, cutoff, k, border, brush, ecc.max)
+	.proc <- function(mask, cutoff, k, border, brush, ecc.max, reenumerate)
 	{
 	# check on mask type
 		if (colorMode(mask) != 0)
@@ -93,19 +96,20 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 			large <- lapply(area, function(z) which(z > upper))
 			mask <- rmObjects(mask, small, reenumerate = FALSE)
 			mask <- rmObjects(mask, large, reenumerate = FALSE)
-			mask <- reenumerate(mask) # needed because reenumeration may not OCCUR for no large
+			if (reenumerate) 
+				mask <- reenumerate(mask) # needed because reenumeration may not OCCUR for no large
 		}
 	# trim border objects
 		if (border > 0) {
 			sel <- edgeObjects(mask, border = border)
-			mask <- rmObjects(mask, sel, reenumerate = TRUE)
+			mask <- rmObjects(mask, sel, reenumerate = reenumerate)
 		}
 	# trim by eccentricity
 		if (ecc.max != 1) {
 			ecc <- lapply(getFrames(mask),
 				function(v) computeFeatures.moment(v)[,"m.eccentricity"])
 			sel <- lapply(ecc, function(v) which(v > ecc.max))
-			mask <- rmObjects(mask, sel, reenumerate = TRUE)
+			mask <- rmObjects(mask, sel, reenumerate = reenumerate)
 		}
 	# apply erosion or dilation
 		brush <- as.integer(brush)
@@ -125,10 +129,10 @@ trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 # dispatch function according to argument 'mask'
 	if (is(mask, "Image"))
 		ans <- .proc(mask, cutoff = cutoff, k = k, border = border,
-				brush = brush, ecc.max = ecc.max)
+				brush = brush, ecc.max = ecc.max, reenumerate = reenumerate)
 	else if (all(sapply(mask, is, "Image")))
 		ans <- lapply(mask, .proc, cutoff = cutoff, k = k, border = border,
-				brush = brush, ecc.max = ecc.max)
+				brush = brush, ecc.max = ecc.max, reenumerate = reenumerate)
 	else
 		stop("'mask' must be an Image or list of images")
 	return(ans)
