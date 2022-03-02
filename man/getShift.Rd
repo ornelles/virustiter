@@ -4,7 +4,7 @@
 \alias{getShift}
 \title{Determine Optimal Image Shift}
 \usage{
-getShift(mask, target, parscale = c(25, 25), FUN = idiff)
+getShift(mask, target, parscale = c(25, 25), FUN = idiff, value = FALSE)
 }
 \arguments{
 \item{mask}{An object mask with connected pixels having the same 
@@ -19,11 +19,17 @@ nuclear masks in \code{mask}.}
 
 \item{FUN}{Function to be minimized over \code{x[1]} and \code{x[2]} 
 by \code{\link[stats]{optim}}. See the details for more information.}
+
+\item{value}{Logical value (default \code{FALSE}) to return the magnitude
+of the determined shift (\code{sqrt(dx^2 + dy^2)}).}
 }
 \value{
-A list of subpixel translations named \code{"dx"} and \code{"dy"} 
-that can be applied to the argument \code{target} with
+If \code{value = FALSE}, a list of subpixel translations named \code{"dx"}
+and \code{"dy"} that can be applied to the argument \code{target} with
 \code{\link{translate}} to maximize the alignment between mask and target.
+
+If \code{value = TRUE}, a list of values of the shift required for each
+image.
 }
 \description{
 Determine the optimal x-y shift to align the target image with the
@@ -49,6 +55,7 @@ amounts to unit change in the optimizing function empirically,
 \examples{
  path <- system.file("extdata", "by_folder/b2", package = "virustiter")
  x <- getImages(path)
+ getShift(nucMask(x$nuc[[1]]), x$tgt[[1]], value = TRUE)
  getShift(nucMask(x$nuc[[1]]), x$tgt[[1]])
 
 }

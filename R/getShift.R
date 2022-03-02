@@ -11,7 +11,9 @@
 #'   \code{parscale} parameter for the \code{\link{optim}} function. See 
 #'   \code{\link{optim}} for more details. 
 #' @param FUN Function to be minimized over \code{x[1]} and \code{x[2]} 
-#'   by \code{\link[stats]{optim}}. See the details for more information.  
+#'   by \code{\link[stats]{optim}}. See the details for more information.
+#' @param value Logical value (default \code{FALSE}) to return the magnitude
+#'   of the determined shift (\code{sqrt(dx^2 + dy^2)}). 
 #' 
 #' @details
 #' 
@@ -33,20 +35,25 @@
 #' 
 #' @return
 #' 
-#' A list of subpixel translations named \code{"dx"} and \code{"dy"} 
-#' that can be applied to the argument \code{target} with
-#' \code{\link{translate}} to maximize the alignment between mask and target. 
+#' If \code{value = FALSE}, a list of subpixel translations named \code{"dx"}
+#' and \code{"dy"} that can be applied to the argument \code{target} with
+#' \code{\link{translate}} to maximize the alignment between mask and target.
+#'
+#' If \code{value = TRUE}, a list of values of the shift required for each
+#' image. 
 #' 
 #' @examples
 #'  path <- system.file("extdata", "by_folder/b2", package = "virustiter")
 #'  x <- getImages(path)
+#'  getShift(nucMask(x$nuc[[1]]), x$tgt[[1]], value = TRUE)
 #'  getShift(nucMask(x$nuc[[1]]), x$tgt[[1]])
 #'
 #' @import EBImage  
 #' 
 #' @export
 #' 
-getShift <- function(mask, target, parscale = c(25, 25), FUN = idiff)
+getShift <- function(mask, target, parscale = c(25, 25), FUN = idiff,
+	value = FALSE)
 {
 	dm <- dim(mask)
 	if (!identical(dm, dim(target)))
@@ -61,13 +68,19 @@ getShift <- function(mask, target, parscale = c(25, 25), FUN = idiff)
 		setNames(round(res$par, 1), c("dx", "dy"))
 	}
 
-# return a list for an 2 x n array of shifts
+# prepare a list for an 2 x n array of shifts
 	if (length(dm) > 2)
 		ans <- lapply(seq_len(dm[3]),
 			function(i) .getShift(mask[,,i], target[,,i], FUN, parscale))
 	else 
 		ans <- list(.getShift(mask, target, FUN, parscale))
-	return(ans)
+
+# convert to RMS values if 'value' == TRUE
+	if (value == FALSE)
+		return(ans)
+	else
+		return(setNames(sapply(ans, function(x) sqrt(x[1]^2 + x[2]^2)),
+			seq_along(ans)))
 }
 
 #
