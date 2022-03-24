@@ -1,9 +1,9 @@
-#' Find Background Value by Otsu's Method
+#' Find Background Value by Otsu's method or a best guess
 #' 
 #' Calculate a value between background and foreground pixels using
-#' an approximation of Otsu's method for a mixture of values with a
-#' normal density. This function assumes the background population
-#' has a normal distribution and lies on the left of distribution. 
+#' an approximation of Otsu's method for a bimodal mixture of values
+#' or a unimodal normal distribution. This function assumes that the
+#' background value will lie to the right of the left-most population.
 #' 
 #' @param x Fluorescent values to evaluate.
 #' @param mult Numeric multiplier applied to the standard deviation,
@@ -16,19 +16,22 @@
 #' distributions where the background population follows a normal distribution. 
 #' The maximum of this population is determined from a kernel density estimate
 #' and the \emph{left} half of the distribution is fit to a Gaussian
-#' distribution. The value returned is the position of the peak +
-#' \code{mult} times the standard deviation of the distribution.
+#' distribution with the \code{\link[MASS]{fitdistr}} function. The value
+#' returned is the position of the peak + \code{mult} times the estimated
+#' standard deviation of the distribution.
+#'
 #' Because fluorescent values are typically log-transformed before analysis,
-#' the values are log transformed before analysis. This can be turned off
-#' with the \code{log} parameter. Typically, the parameter \code{mult}
+#' the values are log-transformed by default before analysis. This can be turned
+#' off with the \code{log} parameter. Typically, the parameter \code{mult}
 #' must be empirically determined. Note that with \code{mult = 0}, the mean
 #' value of the background intensity will be returned.
 #'
-#' This code replaces a previous version that used the \code{half.range.mode()}
-#' function in the \code{genefilter} package. This version uses the
-#' \code{\link[MASS]{fitdistr}} function. 
-#' 
+#' If the distribution is heavily skewed to the left (mostly dark values),
+#' the standard deviation of the distribution will be estimated as 1.35x
+#' the interquartile range. 
+#'
 #' @seealso \code{\link{getZero}}
+#' @seealso \code{\link{getBgnd}}
 #'
 #' @return
 #' 
@@ -51,15 +54,28 @@
 #' 
 findBgnd <- function(x, mult = 2.5, log = TRUE)
 {
-	if (log == TRUE)
+	if (log) {
+		if (all(x <= 0)) stop("positive values are needed if log = TRUE")
 		x <- log(x[x > 0])
+	}
+# determine density distribution and see if it is symmetrical
 	d <- density(x)
 	xmid <- d$x[which.max(d$y)]
 	xl <- x[x <= xmid]
 	xx <- c(xl, 2*xmid  - xl)
-	fit <- MASS::fitdistr(xx, "normal")
-	ans <- fit$est[1] + mult * fit$est[2]
+
+# fit to a half-distribution if at least 2% of the values are in the left
+	if (length(xx) >= 0.02 * floor(length(x))) {
+		fit <- MASS::fitdistr(xx, "normal")
+		ans <- fit$est[1] + mult * fit$est[2]
+	}
+
+# otherwise use interquartile range assuming an exponential-like distribution
+	else
+		ans <- min(x) + mult * IQR(x, na.rm = TRUE)/1.349
+
+# return estimate
 	if (log == TRUE)
 		ans <- exp(ans)
-	return(ans)
+	return(unname(ans))
 }

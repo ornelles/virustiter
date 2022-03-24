@@ -2,7 +2,7 @@
 % Please edit documentation in R/findBgnd.R
 \name{findBgnd}
 \alias{findBgnd}
-\title{Find Background Value by Otsu's Method}
+\title{Find Background Value by Otsu's method or a best guess}
 \usage{
 findBgnd(x, mult = 2.5, log = TRUE)
 }
@@ -20,26 +20,28 @@ deviation of the normal population.
 }
 \description{
 Calculate a value between background and foreground pixels using
-an approximation of Otsu's method for a mixture of values with a
-normal density. This function assumes the background population
-has a normal distribution and lies on the left of distribution.
+an approximation of Otsu's method for a bimodal mixture of values
+or a unimodal normal distribution. This function assumes that the
+background value will lie to the right of the left-most population.
 }
 \details{
 Data are assumed to be drawn from two unimodal, continuous 
 distributions where the background population follows a normal distribution. 
 The maximum of this population is determined from a kernel density estimate
 and the \emph{left} half of the distribution is fit to a Gaussian
-distribution. The value returned is the position of the peak +
-\code{mult} times the standard deviation of the distribution.
+distribution with the \code{\link[MASS]{fitdistr}} function. The value
+returned is the position of the peak + \code{mult} times the estimated
+standard deviation of the distribution.
+
 Because fluorescent values are typically log-transformed before analysis,
-the values are log transformed before analysis. This can be turned off
-with the \code{log} parameter. Typically, the parameter \code{mult}
+the values are log-transformed by default before analysis. This can be turned
+off with the \code{log} parameter. Typically, the parameter \code{mult}
 must be empirically determined. Note that with \code{mult = 0}, the mean
 value of the background intensity will be returned.
 
-This code replaces a previous version that used the \code{half.range.mode()}
-function in the \code{genefilter} package. This version uses the
-\code{\link[MASS]{fitdistr}} function.
+If the distribution is heavily skewed to the left (mostly dark values),
+the standard deviation of the distribution will be estimated as 1.35x
+the interquartile range.
 }
 \examples{
   x <- c(rlnorm(200), rlnorm(120, 4))
@@ -51,4 +53,6 @@ function in the \code{genefilter} package. This version uses the
 }
 \seealso{
 \code{\link{getZero}}
+
+\code{\link{getBgnd}}
 }
