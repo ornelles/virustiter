@@ -269,6 +269,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 # initialize variable to collect results
 	nGroups <- length(nucImages)
 	ans <- rep(list(NULL), nGroups)
+	names(ans) <- names(nucImages)
 
 # initialize progress bar
 	if (imageType == "byWell")
@@ -328,11 +329,9 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 			myFile <- names(nucImages)[idx]
 			res <- data.frame(file = myFile, lapply(props, unlist))
 		}
-
 	# accumulate in ans
 		ans[[idx]] <- res
 	}
-	names(ans) <- names(nucImages)
 #
 # done with processing each group of images
 #
