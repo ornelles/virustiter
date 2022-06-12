@@ -16,7 +16,7 @@
 #' @details
 #'
 #' The data frame must have the variable \code{frame} and either \code{well}
-#' \code{file} or \code{label}. If more than one these three variables are
+#' \code{file} or \code{tag}. If more than one these three variables are
 #' present, the longest of these three factors will be used to split the data
 #' before finding objects.
 #'
@@ -26,8 +26,7 @@
 #' \code{Image} mask or list of integer \code{Image} masks
 #' with the objects selected by \code{expr}.
 #' If no \code{mask} was provided, a nested list of integers will be
-#' returned that identifies the objects satisfying the argument in \code{expr}
-#' which is as long as the longer of the levels in \code{frame} or \code{well}.
+#' returned that identifies the objects satisfying the argument in \code{expr}.
 #' 
 #' @examples
 #'   x <- getImages(system.file("extdata", "by_folder/b4", package = "virustiter"))
@@ -55,8 +54,8 @@ findObjects <- function(expr, df, mask = NULL, invert = FALSE)
 		stop("'", deparse(substitute(df)), "' must be a data.frame")
 	dnames <- names(df)
 	if (!("frame" %in% dnames &
-			("label" %in% dnames |"well" %in% dnames | "file" %in% dnames)))
-		stop('"frame" and either "label", "well" or "file" must be in ',
+			("tag" %in% dnames |"well" %in% dnames | "file" %in% dnames)))
+		stop('"frame" and either "tag", "well" or "file" must be in ',
 			deparse(substitute(df)))
 
 # evaluate expression and assign to original data.frame
@@ -64,13 +63,13 @@ findObjects <- function(expr, df, mask = NULL, invert = FALSE)
 	vname <- tail(make.unique(c(names(df), "var")), 1)
 	df[[vname]] <- sel
 
-# split 'var' according to the greater of 'label/well/file' and 'frame' in 'df'
-	labs <- c("label", "well", "file")
+# split 'var' according to the greater of 'tag/well/file' and 'frame' in 'df'
+	labs <- c("tag", "well", "file")
 	labs <- labs[labs %in% names(df)]
 	nlevs <- sapply(df[labs], nlevels)
 	group <- names(which.max(nlevs))
 	if (length(group) == 0 | group == "")
-		stop("can't be here? Failed to find 'label', 'file' or 'well'")
+		stop("can't be here? Failed to find 'tag', 'file' or 'well'")
 
 # split data frame by group, then split expression value by frame within each
 	spl.1 <- split(df, df[[group]], drop = FALSE)

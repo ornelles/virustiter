@@ -25,8 +25,7 @@ If a \code{mask} was provided, the function will return an integer
 \code{Image} mask or list of integer \code{Image} masks
 with the objects selected by \code{expr}.
 If no \code{mask} was provided, a nested list of integers will be
-returned that identifies the objects satisfying the argument in \code{expr}
-which is as long as the longer of the levels in \code{frame} or \code{well}.
+returned that identifies the objects satisfying the argument in \code{expr}.
 }
 \description{
 Identify objects in data.frame produced by \code{\link{parseImages}} 
@@ -34,7 +33,7 @@ as specified by the expression \code{expr}.
 }
 \details{
 The data frame must have the variable \code{frame} and either \code{well}
-\code{file} or \code{label}. If more than one these three variables are
+\code{file} or \code{tag}. If more than one these three variables are
 present, the longest of these three factors will be used to split the data
 before finding objects.
 }
