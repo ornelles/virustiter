@@ -10,8 +10,10 @@ Additional information about the experiment must be provided in a "phenotype" da
 
 Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
 
-## Significant Changes in Version 0.0.4.0
-Data can now include a prefix that serves as an identifier to the plate. The unique identifier for each well is now called `label`. This means that a well identified as 2A6 is parsed as `label = 2A6`, `plate = 1`, `well = "A6"`, `row = "A"` and `column = 6`. Not all of the code (`mergePdata` in particular) accomodates this new variable and new organization. Helpful (hopefully) information is provided where needed.
+## Significant Changes in Version 0.0.5.1
+The `parseImages` now should no longer fail if a fluorescent target image has no cells.
+
+Data can now include a prefix that serves as an identifier to the plate. The unique identifier for each well is now called `label`. This means that a well identified as 2A6 is parsed as `label = 2A6`, `prefix = 1`, `well = "A6"`, `row = "A"` and `column = 6`. Not all of the code (`mergePdata` in particular) accommodates this new variable and new organization. Helpful (hopefully) information is provided where needed. Note that using a variable named `label` in another context may create a conflict with this. Not entirely certain.
 
 A `which.images = NULL` option has be introduced for `checkImages` to handle images that are not organized as paired images. 
 
@@ -142,7 +144,7 @@ The following code demonstrates one method of exploring values near the optimal 
 - Develop a good vignette for this and the `EBImageExtra` package
 - Develop a workflow for determining the optimal nuclear mask
 - Continue editing the text of this to be a useful stand-alone instruction
-- Adjust the code to work more robustly with the new `plate` variable 
+- Adjust the code to work more robustly with the new `prefix` variable 
 
 ## License
 GPL-3
