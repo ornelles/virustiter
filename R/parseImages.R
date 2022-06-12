@@ -70,12 +70,12 @@
 #' specified by the argument \code{which.images}.
 #'
 #' A unique ID for each image can be created from a combination of
-#' \code{frame} and either \code{label}, \code{well} or \code{file}. This can
+#' \code{frame} and either \code{tag}, \code{well} or \code{file}. This can
 #' be useful if it is necessary to determine a separate background value for
 #' each pair of images.
 #' \preformatted{
-#'   df$uid <- with(df, interaction(label, frame))
-#'     or if no prefix/plate is used
+#'   df$uid <- with(df, interaction(tag, frame))
+#'     or if no prefix is used
 #'   df$uid <- with(df, interaction(well, frame))
 #'   df$uid <- with(df, interaction(file, frame))
 #' }
@@ -97,8 +97,8 @@
 #' Results from data organized by \strong{well} with a \strong{plate} prefix
 #' will include:
 #' \describe{
-#'   \item{\code{label}}{Harmonized, original well label}
-#'   \item{\code{plate}}{From the plate prefix}
+#'   \item{\code{tag}}{Harmonized, original well tag}
+#'   \item{\code{prefix}}{From the plate prefix}
 #' }
 #' All results organized by \strong{well} will include:
 #' \describe{
@@ -175,7 +175,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 # assign value to imageType as "byWell" or "byFile" and complete message
 	if (all(sel)) { # extract well and numeric optional prefix
 		imageType <- "byWell"
-#		plate <- well.info(field2)$plate
+#		prefix <- well.info(field2)$prefix
 #		well <- well.info(field2)$well
 #		filename <- NULL
 	}
@@ -310,15 +310,17 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	# count cells, perform error check and assemble in one list
 		ncells <- lapply(props, lengths)
 		if (length(unique.default(ncells)) != 1)
-			stop("different lengths found at group idx:", "\narea = ", ncells[1],
+			stop("different properties found at group ", idx, ":\narea = ", ncells[1],
 				"\n  xm = ", ncells[2], "\n  ym = ", ncells[3],
 				"\n dna = ", ncells[4], "\n mfi = ", ncells[5], "\n")
 		else
 			ncells <- ncells[[1]]
 		props <- c(frame = list(rep(seq_along(ncells), ncells)), props)
 
-	# create data.frame of results based on imageType
-		if (imageType == "byWell") {
+	# create data.frame of results if cells were found based on imageType
+		if (ncells == 0)
+			res <- NULL
+		else if (imageType == "byWell") {
 			myWell <- lapply(well.info(names(nucImages)), "[", idx)
 			res <- data.frame(myWell, lapply(props, unlist))
 		}
