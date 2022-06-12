@@ -71,8 +71,8 @@ data. \strong{Each} data.frame will have the following variables:
 Results from data organized by \strong{well} with a \strong{plate} prefix
 will include:
 \describe{
-  \item{\code{label}}{Harmonized, original well label}
-  \item{\code{plate}}{From the plate prefix}
+  \item{\code{tag}}{Harmonized, original well tag}
+  \item{\code{prefix}}{From the plate prefix}
 }
 All results organized by \strong{well} will include:
 \describe{
@@ -126,12 +126,12 @@ a multi-layered tiff file where the sequence of images in the file is
 specified by the argument \code{which.images}.
 
 A unique ID for each image can be created from a combination of
-\code{frame} and either \code{label}, \code{well} or \code{file}. This can
+\code{frame} and either \code{tag}, \code{well} or \code{file}. This can
 be useful if it is necessary to determine a separate background value for
 each pair of images.
 \preformatted{
-  df$uid <- with(df, interaction(label, frame))
-    or if no prefix/plate is used
+  df$uid <- with(df, interaction(tag, frame))
+    or if no prefix is used
   df$uid <- with(df, interaction(well, frame))
   df$uid <- with(df, interaction(file, frame))
 }
