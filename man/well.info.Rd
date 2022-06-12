@@ -2,12 +2,12 @@
 % Please edit documentation in R/well.info.R
 \name{well.info}
 \alias{well.info}
-\title{Extract ID, Plate, Well, Row and Column Label}
+\title{Extract ID, Prefix, Well, Row and Column Label}
 \usage{
 well.info(w, format = NULL, upper = TRUE, drop.levels = TRUE)
 }
 \arguments{
-\item{w}{Label for the well (coerced to a character).}
+\item{w}{Label (tag) for the well (coerced to a character).}
 
 \item{format}{Character string as \code{\link{sprintf}} format for the
 column, default value of \code{NULL} pads the column value with zeros
@@ -19,12 +19,12 @@ as needed such as \code{"\%02d"} for more than 9 columns.}
 \code{row} and \code{column}.}
 }
 \value{
-A named list of length three or five. Values for \code{label} and
-\code{plate} will be returned only if a plate prefix is used. 
+A named list of length three or five. Values for \code{tag} and
+\code{prefix} will be returned only if a plate prefix is used. 
 \itemize{
- \item label, harmonized character representation of the entire label
+ \item tag, harmonized character representation of the entire well name
    including any prefix if present, otherwise this is not returned
-	\item plate, prefix as a character string if present, otherwise
+	\item prefix, prefix as a character string if present, otherwise
    this is not returned
 	\item well, harmonized well name as a factor
 	\item row, row as a factor with levels A-P (or a-p)
@@ -33,11 +33,11 @@ A named list of length three or five. Values for \code{label} and
 }
 \description{
 Create a uniform representation for a multi-titer well with an optional 
-prefix extracted as plate
+prefix extracted as prefix
 }
 \details{
 This function will parse the \code{character} string in \code{w}
-into an optional "harmonized" label with an arbitrary prefix used to
+into an optional "harmonized" tag with an arbitrary prefix used to
 identify the plate, followed by a single character for the well,
 followed by the  column number formatted as per \code{format}.
 The code will fail if the row  value is not one of the 16 letters from
