@@ -310,16 +310,15 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 
 	# count cells, perform error check and assemble in one list
 		ncells <- lapply(props, lengths)
-		if (length(unique.default(ncells)) != 1)
+		if (length(unique.default(ncells)) != 1) {
 			stop("different properties found at group ", idx, ":\narea = ", ncells[1],
 				"\n  xm = ", ncells[2], "\n  ym = ", ncells[3],
 				"\n dna = ", ncells[4], "\n mfi = ", ncells[5], "\n")
-		else
-			ncells <- ncells[[1]]
+		}
 		props <- c(frame = list(rep(seq_along(ncells), ncells)), props)
 
 	# create data.frame of results if cells were found based on imageType
-		if (ncells == 0)
+		if (all(ncells[[1]] == 0))
 			res <- NULL
 		else if (imageType == "byWell") {
 			myWell <- lapply(well.info(names(nucImages)), "[", idx)
