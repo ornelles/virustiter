@@ -315,10 +315,11 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 				"\n  xm = ", ncells[2], "\n  ym = ", ncells[3],
 				"\n dna = ", ncells[4], "\n mfi = ", ncells[5], "\n")
 		}
+		ncells <- ncells[[1]] # use first value
 		props <- c(frame = list(rep(seq_along(ncells), ncells)), props)
 
 	# create data.frame of results if cells were found based on imageType
-		if (all(ncells[[1]] == 0))
+		if (all(ncells == 0))
 			res <- NULL
 		else if (imageType == "byWell") {
 			myWell <- lapply(well.info(names(nucImages)), "[", idx)
