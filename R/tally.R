@@ -114,8 +114,16 @@ tally <- function(df, pd = NULL, moi = NULL, by = NULL, param = "mfi")
 		group <- levels(as.factor(res$group))
 		res <- cbind(group, unit, res[c("pos", "neg")], x, y)
 	}
-	if (!is.null(pd))
-		res <- mergePdata(pd, res)
+	if (!is.null(pd)) {
+		n1 <- max(nchar(levels(as.factor(pd$well))))
+		n2 <- max(nchar(levels(as.factor(df$well))))
+		nmax <- max(n1, n2)
+		if (nmax <= 2)
+			formatString <- NULL
+		else 
+			formatString <- sprintf("%%0%dd", nmax - 1)
+		res <- mergePdata(pd, res, formatString = formatString)
+	}
 	rownames(res) <- NULL
 	return(res)
 }
