@@ -42,7 +42,7 @@ The format for well names (and column names) may differ between the imageData
 and phenoData. An "Error in mergePData(pd, df)" might report "A1, A2, <...>
 are missing from pd." This can happen if, for example, the imageData uses only
 a few of the possible 96 wells in phenoData. Change the \code{formatString} 
-parameter to a value such as "%02d" to force a consistent format. This value
+parameter to a value such as "\%02d" to force a consistent format. This value
 is passed to the \code{\link{well.info}} as the parameter \code{format}.
 
 This function performs a \code{data.frame} merge with additional checks. It
