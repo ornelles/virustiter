@@ -8,9 +8,11 @@ The sets of images associated with each moi can occur in two forms. Most typical
 
 Additional information about the experiment must be provided in a "phenotype" data frame that **must** contain the moi and unit of measure (as VP,  ml, ul, nl, etc). This data frame can contain additional information describing the experiment. The "phenotype" data are merged with the image data for further analysis.
 
-Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()` and `trimMask()` for more details and additional options to optimize detection. 
+Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()`, `trimMask()` and `cellMask()` for more details and additional options to optimize detection. 
 
-## Significant Changes in Version 0.0.5.1
+## Significant Changes in Version 0.0.5.2
+`mergePdata` now has the `formatString` option to force that the phenodata and image data use the same format for wells (a conflict such as "A1" vs "A01" can be fixed.)
+
 The `parseImages` now should no longer fail if a fluorescent target image has no cells.
 
 Data can now include a prefix that serves as an identifier to the plate. The unique identifier for each well is now called `label`. This means that a well identified as 2A6 is parsed as `label = 2A6`, `prefix = 1`, `well = "A6"`, `row = "A"` and `column = 6`. Not all of the code (`mergePdata` in particular) accommodates this new variable and new organization. Helpful (hopefully) information is provided where needed. Note that using a variable named `label` in another context may create a conflict with this. Not entirely certain.
