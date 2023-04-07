@@ -10,6 +10,9 @@ Additional information about the experiment must be provided in a "phenotype" da
 
 Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()`, `trimMask()` and `cellMask()` for more details and additional options to optimize detection. 
 
+## Significant Changes in Version 0.0.6.0
+`getCutoff` has been added to automatically identify and optionally plot optimal cutoff values for trimming nuclear masks.
+
 ## Significant Changes in Version 0.0.5.2
 `mergePdata` now has the `formatString` option to force that the phenodata and image data use the same format for wells (a conflict such as "A1" vs "A01" can be fixed.)
 
