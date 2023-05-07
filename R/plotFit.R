@@ -25,8 +25,8 @@
 #'  the plot. 
 #' @param frame.plot a logical value indicating whether a box should be drawn
 #'  around the plot.
-#' @param digits integer indicating the number of significant digits to be
-#'  used for the calculated x label
+#' @param digits integer indicating the number of significant decimal palces 
+#'  to use for the calculated x-axis label
 #' @param ... arguments to be passed to \code{\link[graphics]{plot.default}}
 #' 
 #' @details
@@ -42,7 +42,7 @@
 #' \code{par(ask = TRUE)} to see each in turn or use 
 #' \code{par(mfrow = c(nr, nc))} to place \code{nr * nc} plots on one device.
 #' 
-#' Additional curves can be added with the \code{link{addOneFit}} as shown in 
+#' Additional curves can be added with the \code{\link{addOneFit}} as shown in 
 #' the examples.
 #' 
 #' @return
@@ -51,22 +51,23 @@
 #' producing a plot (or plots).
 #' 
 #' @examples
-#' # sample result from tally()
-#'   tally_example <- read.csv(system.file("extdata", "tally_result.csv", 
-#'    package = "virustiter"))
-#'  fm_example <- getFit(tally_example)
-#' # fully automatic and with minimal annotation
-#'   plotFit(fm_example)
-#'   plotFit(fm_example, ann = FALSE, axes = FALSE, lty.ref = NA)
-#' # create shifted example and add to plot
-#'  tally_example_2 <- tally_example
-#'  tally_example_2$pos <- c(0, tally_example$pos[4:12], 1, 1)
-#'  tally_example_2$neg <- c(1000, tally_example$neg[4:12], 1000, 1000)
-#'  fm_example2 <- getFit(tally_example_2)
-#'  plotFit(fm_example, "Two fits", xlab = "Multiplicity (ml/cell)")
-#'  addOneFit(fm_example2)
-#'  legend("topleft", legend = c("Example 1", "Example 2"), lty = 1, 
-#'    col = c(2, 4), bty = "n")
+#' # sample result from tally() with two sets of data
+#'   plotFit_data <- read.csv(system.file("extdata", "plotFit_data.csv", 
+#'     package = "virustiter"))
+#'   fm <- getFit(plotFit_data, by = "row")
+#'
+#' # Default format and example with minimal annotation
+#'   plotFit(fm$A)
+#'   plotFit(fm$A, ann = FALSE, axes = FALSE, lty.ref = NA)
+#'
+#' # Example of two plots
+#'   plotFit(fm$A, "Two fits", xlab = "Multiplicity (ml/cell)")
+#'   addOneFit(fm$B)
+#'   legend("topleft", legend = c("A", "B"), lty = 1, col = c(2, 4), bty = "n")
+#'
+#' # With two panel figure 
+#'   par(mfrow = c(2, 1))
+#'   plotFit(fm, main = names(fm))
 #'
 #' @export
 #'
@@ -114,7 +115,7 @@ plotFit <- function(fm, main = NULL, lty.fit = 1, col.fit = 2, lty.ref = 2,
         if (grepl("[munpf]l", units, ignore.case = TRUE)) { # units are volume
           val <- 1/xpp
           expt <- floor(log10(abs(val)))
-          mant <- round(val/10^expt, 2)
+          mant <- round(val/10^expt, digits)
           if (is.finite(xpp))
             xlab <- bquote("Titer = " * .(mant) %*% 10^.(expt) * " IU/ml")
           else
