@@ -16,8 +16,8 @@
 #' For \code{getTiter}, a named numeric vector with the estimated titer in
 #' IU per ml.
 #'
-#' For \code{getEC63}, a named numeric vector with the volume corresponding to 1
-#' 1 infectious units.
+#' For \code{getEC63}, a named numeric vector with the volume corresponding to
+#' one infectious unit.
 #'
 #' If \code{level} was provided, the return value is a matrix with additional
 #' columns providing the desired +/- confidence intervals.
@@ -59,28 +59,30 @@ getTiter <- function(fm, digits = 3, level = 0.95)
 #' @name getEC63
 #' @rdname getTiter
 #'
-#' @return
-#'
-#' For \code{getEC63}, either a named numeric vector or matrix with the estimated
-#' volume corresponding to 1 infectious unit with +/- 95\% confidence intervals.
-#'
 #' @export
 #'
-getEC63 <- function(fm, level)
+getEC63 <- function(fm, level =  0.95)
 {
-  if (missing(level) || is.null(level)) level <- 0.95
+  if (!is.null(level)) {
+    level <- as.numeric(level)[1]
+    if (level <= 0 | level >= 1)
+      stop("'level' must be NULL or a single value between 0 and 1")
+  }
+	# working function
   .coef <- function(fm, level) {
     cf <- numeric(3)
     if (is.null(fm))
       cf <- c(NA, NA, NA)
     else {
       cf[1] <- exp(-coef(fm))
-      cfVal <- try(confint(fm, level = level))
-      if(class(cfVal)[1] != "try-error")
-        cf[c(3,2)] <- exp(-cfVal)
+			if (!is.null(level)) {
+				cfVal <- try(confint(fm, level = level))
+				if(class(cfVal)[1] != "try-error")
+					cf[c(3,2)] <- exp(-cfVal)
+				names(cf) <- c("est", "lo.CI", "hi.CI")
+			}
     }
-    names(cf) <- c("est", "lo.CI", "hi.CI")
-    cf
+    if (is.null(level)) return(cf[1]) else return(cf)
   }
 
   if ("list" %in% class(fm))
