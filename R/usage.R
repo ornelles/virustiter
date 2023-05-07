@@ -44,7 +44,6 @@ usage <- function() {
 	"   plotPlate(df)       # plot plate showing positives",
 	"   plotWell(df, well)  # plot each cell in a well showing positives and sizes",
 	"   plotFit(fm)         # plot fit(s) with calculated values using base graphics",
-	"   plotOneFit(fm)      # plot fit with options to adjust colors",
 	"   addOneFit(fm)       # add best-fit line to existing base graph",
 	"   getAIC(df, bg)      # evaluate fitted model(s) from df at bg values",
 	"   getTiter(fm)        # get titer as IU per ml (if volume units were used)",
