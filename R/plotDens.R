@@ -102,8 +102,7 @@ plotDens <- function(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
 			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		ord <- order(levels(as.factor(df[[panel]]))) # preserve factor order
-		lab.panel <- as.character(unique(df[[panel]]))[ord]
+		lab.panel <- levels(as.factor(df[[panel]])) # preserve order of factors
 		bgnd <- rep(bgnd, length(lab.panel))
 		names(bgnd) <- lab.panel
 	}

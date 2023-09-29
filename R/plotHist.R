@@ -66,7 +66,6 @@ plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
 # process 'panel' argument
 	if (missing(panel)) {
 		if ("well" %in% names(df)) panel <- "well"
-		if ("well" %in% names(df)) panel <- "well"
 		else if ("file" %in% names(df)) panel <- "file"
 		else stop("unable to assign panel group as 'well' or 'file'")
 	}
@@ -99,8 +98,7 @@ plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
 			names(bgnd) <- paste(lab.panel, lab.bgnd)
 	}
 	else { # single background value provided
-		ord <- order(levels(as.factor(df[[panel]]))) # preserve order of factors
-		lab.panel <- as.character(unique(df[[panel]]))[ord]
+		lab.panel <- levels(as.factor(df[[panel]])) # preserve order of factors
 		bgnd <- rep(bgnd, length(lab.panel))
 		names(bgnd) <- lab.panel
 	}
