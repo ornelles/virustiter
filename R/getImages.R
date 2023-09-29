@@ -103,8 +103,10 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		ff <- source
 	else
 		stop("unable to use files/source in ", deparse(substitute(source)))
-	if (verbose)
+	if (verbose) {
 		message("Found ", length(ff), " image file", ifelse(length(ff) == 1, "", "s"))
+		flush.console()
+	}
 
 # extract fields to determine if images are organized by well or stack
 	spl <- strsplit(ff, "/")
@@ -138,8 +140,10 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("CAN'T HAPPEN! Unexpected value for 'imageType'")
 
 # read all images as a list and coerce to grayscale with a warning
-	if (verbose)
+	if (verbose) {
 		message("Reading images grouped by ", ifelse(imageType == "byWell", "well", "file"))
+		flush.console()
+	}
 	img <- lapply(ffsplit, function(f) suppressWarnings(readImage(f)))
 	if (any(sapply(img, colorMode) != 0)) {
 		warning("images have been converted to grayscale by uniform RGB averaging",
@@ -182,9 +186,14 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		tgtImages <- Map(function(x, i) x[,,i], img, idx)
 
 # count and report on the number of groups to display
-	nff <- length(ffsplit)
-	if (verbose)
-		message("Found ", nff, " group", ifelse(nff == 1, "", "s"), " of images")
+	nspl <- length(ffsplit)
+	msg <- sprintf("Found %d group%s of image %s", nspl,
+		ifelse(nspl == 1, "", "s"),
+		switch(n_field, "singles", "pairs", "triplets", "quads", "sets", "sets"))
+	if (verbose) {
+		message(msg)
+		flush.console()
+	}
 
 # report on findings 
 	if (verbose) {
@@ -193,6 +202,7 @@ getImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		count[is.na(count)] <- 1
 		message(sprintf("%3d: %d pair%s in %s\n", seq_along(id), count,
 			ifelse(count == 1, "", "s"), id), appendLF = FALSE)
+		flush.console()
 	}
 
 # return image pairs

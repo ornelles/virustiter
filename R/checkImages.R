@@ -215,7 +215,10 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 
 	# count and report on the number of groups to display
 		nspl <- length(ffsplit)
-		message("Found ", nspl, " group", ifelse(nspl == 1, "", "s"), " of image pairs")
+		msg <- sprintf("Found %d group%s of image %s", nspl,
+			ifelse(nspl == 1, "", "s"),
+			switch(n_field, "singles", "pairs", "triplets", "quads", "sets", "sets"))
+		message(msg)
 		flush.console()
 	}
 
