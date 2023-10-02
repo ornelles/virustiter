@@ -83,9 +83,10 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 		stop("The 'EBImage' package must be installed with biocLite")
 	method <- match.arg(method)
 
-# provide immediate warnings
+# provide immediate warnings and return list of files
+	ff <- NULL
 	owarn <- options(warn = 1)
-	on.exit(options(owarn))
+	on.exit({options(owarn); if (!is.null(ff)) return(ff)})
 	
 # verify source files or directories
 	if (length(source) == 1 && !file.exists(source))
@@ -192,7 +193,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 			" in 'which.images'")
 		if (any(bad))
 			stop(sum(bad), " of ", length(bad),
-				"images had fewer frames than specified in 'which.images'")
+				" images had fewer frames than specified in 'which.images'")
 
 	# are total images in each group a multiple of field size?
 		bad <- which(n %% n_field != 0)
