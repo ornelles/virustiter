@@ -1,6 +1,6 @@
 Package: virustiter
 Title: Virus Titer and Related Functions for Fluorescent Micrographs
-Version: 0.1.0.1
+Version: 0.1.0.2
 Authors@R: person("David", "Ornelles", email = "ornelles@wakehealth.edu", role = c("aut", "cre"))
 Description: R functions to read fluorescent images and determine viral titer.
 Depends: R (>= 4.0.0), lattice, EBImage
