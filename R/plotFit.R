@@ -6,6 +6,10 @@
 #' @param main plot title as a character, vector of characters or list of
 #'  characters to be used as the plot title(s). Values will be replicated as
 #'  necessary. If \code{NULL}, the plot date will be used.
+#' @param pch,col,col.pch plot character and color for data points. The default
+#'  color for the points and the fitted line is \code{col} but these can be
+#'  changed with the appropriate argument. \code{col} will also be used as the
+#'  default color for other plot elements.
 #' @param lty.fit,col.fit line type and color for the GLM best-fit line.  Set
 #'  \code{lty.fit} to \code{NA} to exclude the best-fit line.
 #' @param lty.ref,col.ref line type and color for the value on the x-axis
@@ -40,7 +44,7 @@
 #' 
 #' If \code{fm} is a list of fitted models, each will be plotted. Use 
 #' \code{par(ask = TRUE)} to see each in turn or use 
-#' \code{par(mfrow = c(nr, nc))} to place \code{nr * nc} plots on one device.
+#' \code{par(mfrow = c(nr, nc))} to place \code{nr x nc} plots on one device.
 #' 
 #' Additional curves can be added with the \code{\link{addOneFit}} as shown in 
 #' the examples.
@@ -63,7 +67,7 @@
 #' # Example of two plots
 #'   plotFit(fm$A, "Two fits", xlab = "Multiplicity (ml/cell)")
 #'   addOneFit(fm$B)
-#'   legend("topleft", legend = c("A", "B"), lty = 1, col = c(2, 4), bty = "n")
+#'   legend("topleft", legend = c("A", "B"), lty = 1, col = c(1, 2), bty = "n")
 #'
 #' # With two panel figure 
 #'   par(mfrow = c(2, 1))
@@ -71,9 +75,10 @@
 #'
 #' @export
 #'
-plotFit <- function(fm, main = NULL, lty.fit = 1, col.fit = 2, lty.ref = 2,
-  col.ref = 4, xlim = NULL, ylim = NULL, ann = par("ann"), xlab = NULL,
-  ylab = NULL, axes = TRUE, frame.plot = axes, digits = 3, ...) 
+plotFit <- function(fm, main = NULL, pch = 1, col = 1, col.pch = col,
+	lty.fit = 1, col.fit = col, lty.ref = 2, col.ref = "gray",
+	xlim = NULL, ylim = NULL, ann = par("ann"), xlab = NULL, ylab = NULL,
+	axes = TRUE, frame.plot = axes, digits = 3, ...) 
 {
   # argument check
     if (!(is(fm, "glm") | all(sapply(fm, is, "glm"))))
@@ -86,9 +91,10 @@ plotFit <- function(fm, main = NULL, lty.fit = 1, col.fit = 2, lty.ref = 2,
     main <- main[seq_along(fm)]
 
   # working function to dispatch on each glm model
-    .plotFit <- function(mod, main = main, lty.fit = lty.fit, col.fit = col.fit,
-      lty.ref = lty.ref, col.ref = col.ref, xlim = xlim, ylim = ylim, ann = ann,
-      xlab = xlab, ylab = ylab, axes = axes, frame.plot = frame.plot, ...)
+    .plotFit <- function(mod, main = main, pch = pch, col = col,
+    	col.pch = col.pch, lty.fit = lty.fit, col.fit = col.fit, lty.ref = lty.ref,
+    	col.ref = col.ref, xlim = xlim, ylim = ylim, ann = ann, xlab = xlab,
+    	ylab = ylab, axes = axes, frame.plot = frame.plot, digits = digits, ...)
     {
     # generate plot title
       if (is.null(main[[1]])) main <- paste("Plot generated", Sys.Date())
@@ -130,7 +136,8 @@ plotFit <- function(fm, main = NULL, lty.fit = 1, col.fit = 2, lty.ref = 2,
       
     # plot with base graphics
       plot(y ~ x, subset = x > 0, log = "x", xlim = xlim, ylim = ylim,
-        xlab = "", ylab = "", axes = FALSE, ann = FALSE, frame.plot = FALSE, ...)
+        xlab = "", ylab = "", axes = FALSE, ann = FALSE, frame.plot = FALSE,
+        pch = pch, col = col.pch,  ...)
       if (!is.na(lty.fit)) lines(xp, yp, lty = lty.fit, col = col.fit)
       if (!is.na(lty.ref)) lines(c(xlo, xpp, xpp), c(ypp, ypp, ylim[1]),
         lty = lty.ref, col = col.ref)
@@ -142,13 +149,14 @@ plotFit <- function(fm, main = NULL, lty.fit = 1, col.fit = 2, lty.ref = 2,
   # dispatch function
     if(is(fm, "list")) {
       ll <- function(x) as.list(list(x)) # prevents zero-length arguments
-      junk <- Map(.plotFit, fm, main = main, lty.fit = ll(lty.fit),
-        col.fit = ll(col.fit), lty.ref = ll(lty.ref), col.ref = ll(col.ref),
+      junk <- Map(.plotFit, fm, main = main, pch = ll(pch), col = ll(col),
+      	col.pch = ll(col.pch), lty.fit = ll(lty.fit), col.fit = ll(col.fit),
+      	lty.ref = ll(lty.ref), col.ref = ll(col.ref),
         xlim = ll(xlim), ylim = ll(ylim), ann = ll(ann), xlab = ll(xlab),
-        ylab = ll(ylab), axes = ll(axes), frame.plot = ll(frame.plot), ...)
+        ylab = ll(ylab), axes = ll(axes), frame.plot = ll(frame.plot),
+        digits = ll(digits), ...)
     }
     else 
-      junk <- .plotFit(fm, main, lty.fit = lty.fit, col.fit = col.fit,
-        lty.ref = lty.ref, col.ref = col.ref, xlim = xlim, ylim = ylim, ann = ann,
-        xlab = xlab, ylab = ylab, axes = axes, frame.plot = frame.plot, ...)
+      junk <- .plotFit(fm, main, pch, col, col.pch, lty.fit, col.fit, lty.ref,
+      	col.ref, xlim, ylim, ann, xlab, ylab, axes, frame.plot, ...)
 }

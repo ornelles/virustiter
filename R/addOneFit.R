@@ -2,17 +2,21 @@
 #'
 #' Add a single fitted model plot to an existing plot made with base graphics
 #'
-#' Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
-#'
-#' @param fm Fitted model or list of fitted models from \code{\link{getFit}}.
-#' @param pch.col Pch color passed to \code{plot}.
-#' @param line.col Color for best-fit line appropriate for \code{par("col")}.
+#' @param fm single fitted model from \code{\link{getFit}}.
+#' @param pch,col,col.pch plot character and color for data points and the 
+#'  default color for the fitted line. Set \code{pch} to \code{NA}
+#'  to exclude plotting characters.
+#' @param lty.fit,col.fit line type and color for the GLM best-fit line.  Set
+#'  \code{lty.fit} to \code{NA} to exclude the best-fit line.
+#' @param lty.ref,col.ref line type and color for the value on the x-axis
+#'  that intersect the 63% value on the best-fit line. Set \code{lty.ref} to
+#'  \code{NA} to exclude the reference line.
 #' @param ... Additional arguments passed to \code{\link{plot}}.
 #'
 #' @details
 #'
 #' Base graphics are used to add a plot to an existing plot produced by 
-#' \code{\link{plotFit}} or \code{\link{plotOneFit}}. The first argument is
+#' \code{\link{plotFit}}. The first argument is
 #' a single fitted model from \code{\link{getFit}}. The function calls
 #' \code{\link{getEC63}} to obtain the fit and confidence intervals.
 #'
@@ -23,20 +27,28 @@
 #'
 #' @export
 #'  
-addOneFit <- function(fm, line.col=4, ref.col=4, pch.col=line.col, ...) {
-	moi <- exp(fm$model[[2]])		# model data.frame holds values used for fit
-	y <- prop.table(fm$model[[1]],1)[,1]
-	res <- fm$data  # entire data.frame handed to glm()
-	cf <- getEC63(fm)
-
-	xlo <- min(moi[moi > 0])
-	xhi <- max(moi)
-	xp <- exp(seq(log(xlo), log(xhi), length=101))
-	yp <- predict(fm, data.frame(x = xp), type="response")
-	xpp <- cf[1]
-	ypp <- 1 - exp(-1)
-
-	points(y ~ moi, subset = moi > 0, col = pch.col, ...)
-	lines(xp, yp, col = line.col)
-	lines(c(xlo, xpp, xpp),c(ypp, ypp, -0.02), lty = 2, col = ref.col)
+addOneFit <- function(fm, pch = 1, col = 2, col.pch = col, lty.fit = 1,
+	col.fit = col, lty.ref = 2, col.ref = "gray",  ...)
+{
+	# bookkeeping 
+		moi <- exp(fm$model[[2]])		# model data.frame holds values used for fit
+		y <- prop.table(fm$model[[1]],1)[,1]
+		res <- fm$data  # entire data.frame handed to glm()
+		cf <- getEC63(fm)
+	
+		xlo <- min(moi[moi > 0])
+		xhi <- max(moi)
+		xp <- exp(seq(log(xlo), log(xhi), length=101))
+		yp <- predict(fm, data.frame(x = xp), type="response")
+		xpp <- cf[1]
+		ypp <- 1 - exp(-1)
+	
+	# points
+		if (!is.na(pch))  points(y ~ moi, subset = moi > 0, pch = pch,
+			col = col.pch, ...)
+	# fitted line
+		if (!is.na(lty.fit)) lines(xp, yp, col = col.fit, lty = lty.fit, ...)
+	# reference line
+		if (!is.na(lty.ref)) lines(c(xlo, xpp, xpp),c(ypp, ypp, -0.02),
+			lty = lty.ref, col = col.ref, ...)
 }
