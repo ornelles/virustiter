@@ -4,14 +4,31 @@
 \alias{addOneFit}
 \title{Add Single Fitted Model to Plot}
 \usage{
-addOneFit(fm, line.col = 4, ref.col = 4, pch.col = line.col, ...)
+addOneFit(
+  fm,
+  pch = 1,
+  col = 2,
+  col.pch = col,
+  lty.fit = 1,
+  col.fit = col,
+  lty.ref = 2,
+  col.ref = "gray",
+  ...
+)
 }
 \arguments{
-\item{fm}{Fitted model or list of fitted models from \code{\link{getFit}}.}
+\item{fm}{single fitted model from \code{\link{getFit}}.}
 
-\item{line.col}{Color for best-fit line appropriate for \code{par("col")}.}
+\item{pch, col, col.pch}{plot character and color for data points and the 
+default color for the fitted line. Set \code{pch} to \code{NA}
+to exclude plotting characters.}
 
-\item{pch.col}{Pch color passed to \code{plot}.}
+\item{lty.fit, col.fit}{line type and color for the GLM best-fit line.  Set
+\code{lty.fit} to \code{NA} to exclude the best-fit line.}
+
+\item{lty.ref, col.ref}{line type and color for the value on the x-axis
+that intersect the 63% value on the best-fit line. Set \code{lty.ref} to
+\code{NA} to exclude the reference line.}
 
 \item{...}{Additional arguments passed to \code{\link{plot}}.}
 }
@@ -23,12 +40,8 @@ adding to an existing plot with \code{\link{points}} and \code{\link{lines}}.
 Add a single fitted model plot to an existing plot made with base graphics
 }
 \details{
-Prepare a single diagnostic plot with more labeling options than \code{plotFit()}.
-
-
-
 Base graphics are used to add a plot to an existing plot produced by 
-\code{\link{plotFit}} or \code{\link{plotOneFit}}. The first argument is
+\code{\link{plotFit}}. The first argument is
 a single fitted model from \code{\link{getFit}}. The function calls
 \code{\link{getEC63}} to obtain the fit and confidence intervals.
 }
