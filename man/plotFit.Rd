@@ -7,10 +7,13 @@
 plotFit(
   fm,
   main = NULL,
+  pch = 1,
+  col = 1,
+  col.pch = col,
   lty.fit = 1,
-  col.fit = 2,
+  col.fit = col,
   lty.ref = 2,
-  col.ref = 4,
+  col.ref = "gray",
   xlim = NULL,
   ylim = NULL,
   ann = par("ann"),
@@ -28,6 +31,11 @@ plotFit(
 \item{main}{plot title as a character, vector of characters or list of
 characters to be used as the plot title(s). Values will be replicated as
 necessary. If \code{NULL}, the plot date will be used.}
+
+\item{pch, col, col.pch}{plot character and color for data points. The default
+color for the points and the fitted line is \code{col} but these can be
+changed with the appropriate argument. \code{col} will also be used as the
+default color for other plot elements.}
 
 \item{lty.fit, col.fit}{line type and color for the GLM best-fit line.  Set
 \code{lty.fit} to \code{NA} to exclude the best-fit line.}
@@ -78,7 +86,7 @@ information in \code{\link[graphics]{plot.default}} for details.
 
 If \code{fm} is a list of fitted models, each will be plotted. Use 
 \code{par(ask = TRUE)} to see each in turn or use 
-\code{par(mfrow = c(nr, nc))} to place \code{nr * nc} plots on one device.
+\code{par(mfrow = c(nr, nc))} to place \code{nr x nc} plots on one device.
 
 Additional curves can be added with the \code{\link{addOneFit}} as shown in 
 the examples.
@@ -96,7 +104,7 @@ the examples.
 # Example of two plots
   plotFit(fm$A, "Two fits", xlab = "Multiplicity (ml/cell)")
   addOneFit(fm$B)
-  legend("topleft", legend = c("A", "B"), lty = 1, col = c(2, 4), bty = "n")
+  legend("topleft", legend = c("A", "B"), lty = 1, col = c(1, 2), bty = "n")
 
 # With two panel figure 
   par(mfrow = c(2, 1))
