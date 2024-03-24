@@ -29,7 +29,7 @@
 #'  the plot. 
 #' @param frame.plot a logical value indicating whether a box should be drawn
 #'  around the plot.
-#' @param digits integer indicating the number of significant decimal palces 
+#' @param digits integer indicating the number of significant decimal places 
 #'  to use for the calculated x-axis label
 #' @param ... arguments to be passed to \code{\link[graphics]{plot.default}}
 #' 
@@ -158,5 +158,5 @@ plotFit <- function(fm, main = NULL, pch = 1, col = 1, col.pch = col,
     }
     else 
       junk <- .plotFit(fm, main, pch, col, col.pch, lty.fit, col.fit, lty.ref,
-      	col.ref, xlim, ylim, ann, xlab, ylab, axes, frame.plot, ...)
+      	col.ref, xlim, ylim, ann, xlab, ylab, axes, frame.plot, digits, ...)
 }

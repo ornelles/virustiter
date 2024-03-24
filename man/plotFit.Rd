@@ -64,7 +64,7 @@ the plot.}
 \item{frame.plot}{a logical value indicating whether a box should be drawn
 around the plot.}
 
-\item{digits}{integer indicating the number of significant decimal palces 
+\item{digits}{integer indicating the number of significant decimal places 
 to use for the calculated x-axis label}
 
 \item{...}{arguments to be passed to \code{\link[graphics]{plot.default}}}
