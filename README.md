@@ -1,6 +1,6 @@
 ## Synopsis
 
-This is a suite of imaging code to determine viral titers from fluorescent micrographs. In a typical application, paired fluorescent images of the cell nucleus and a viral antigen are collected analyzed. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages and can make use of the (private) `EBImageExtra` package.
+This is a suite of imaging code to determine viral titer from fluorescent micrographs. In a typical application, paired fluorescent images of the cell nucleus and a viral antigen are collected and analyzed. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages and can make use of the (private) `EBImageExtra` package.
 
 ## Overview
 
@@ -8,11 +8,15 @@ The tools in this package have primarily been developed to determine viral titer
 
 The sets of images associated with each moi can occur in two forms. Most typically, they are collected as individual image files in separate directories where each directory is named for the well such as A1, A2, and so on. In this case, the files within a directory are identified sequentially as file001.tif, file002.tif, etc. Alternatively, the paired images for each moi can be a set of multi-layered TIFF file where the member of each set includes the DNA and viral antigen images.
 
-Additional information about the experiment needs to be provided in a "phenotype" data frame that **must** contain the moi and unit of measure (as VP,  ml, ul, nl, etc). This data frame can contain additional information describing the experiment. The "phenotype" data are merged with the image data for further analysis.
+Additional information about the experiment needs to be provided in a "phenotype" data frame that **must** contain the moi and unit of measure (as VP, ml, ul, nl, etc). This data frame can contain additional information describing the experiment. The "phenotype" data are merged with the image data for further analysis.
 
 Individual cells are identified by the DNA stain which is used to generate a nuclear mask. This nuclear mask is applied to the viral antigen image file and the mean fluorescence intensity is measured for each cell defined by the nuclear mask. An option is provided to expand or contract the size of the nuclear mask in order to include more or less of the associated cytoplasm. See the help function for `parseImages()`, `trimMask()` and `cellMask()` for more details and additional options to optimize detection. 
 
 ## Significant Changes
+
+### Version 0.2
+
+Revised fitting functions and associated helper functions to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. 
 
 ### Version 0.1.0.1, 0.1.0.2
 
@@ -149,7 +153,6 @@ Supporting functions include these as well as others:
    addOneFit(fm)       # add best-fit line to existing base graph
    getAIC(df, bg)      # evaluate fitted model(s) from df at bg values
    getTiter(fm)        # get titer as IU per ml (if volume units were used)
-   getEC63(fm)         # get volume required for 1 infectious units +/- 95% CI
    getShift(mask, tgt) # get optimal x-y shift to align tgt with (nuc) mask
    translate(x, v)     # apply (optimal) x-y shift in v to image x
 ```

@@ -47,7 +47,6 @@ usage <- function() {
 	"   addOneFit(fm)       # add best-fit line to existing base graph",
 	"   getAIC(df, bg)      # create and evaluate fitted model(s) from df at bg values",
 	"   getTiter(fm)        # get titer as IU per ml (if volume units were used)",
-  "   getEC63(fm)         # get volume required for 1 infectious units +/- 95% CI",
 	"   getShift(mask, tgt) # get optimal x-y shift to align tgt with (nuc) mask",
 	"   translate(x, v)     # apply (optimal) x-y shift in v to image x",
 	"")
