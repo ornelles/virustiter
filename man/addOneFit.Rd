@@ -43,5 +43,5 @@ Add a single fitted model plot to an existing plot made with base graphics
 Base graphics are used to add a plot to an existing plot produced by 
 \code{\link{plotFit}}. The first argument is
 a single fitted model from \code{\link{getFit}}. The function calls
-\code{\link{getEC63}} to obtain the fit and confidence intervals.
+\code{\link{getTiter}} to obtain the fit and confidence intervals.
 }

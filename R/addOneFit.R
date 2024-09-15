@@ -18,7 +18,7 @@
 #' Base graphics are used to add a plot to an existing plot produced by 
 #' \code{\link{plotFit}}. The first argument is
 #' a single fitted model from \code{\link{getFit}}. The function calls
-#' \code{\link{getEC63}} to obtain the fit and confidence intervals.
+#' \code{\link{getTiter}} to obtain the fit and confidence intervals.
 #'
 #' @return
 #'
@@ -31,24 +31,25 @@ addOneFit <- function(fm, pch = 1, col = 2, col.pch = col, lty.fit = 1,
 	col.fit = col, lty.ref = 2, col.ref = "gray",  ...)
 {
 	# bookkeeping 
-		moi <- exp(fm$model[[2]])		# model data.frame holds values used for fit
+		x <- exp(fm$model[[2]])		# model data.frame holds values used for fit
 		y <- prop.table(fm$model[[1]],1)[,1]
 		res <- fm$data  # entire data.frame handed to glm()
-		cf <- getEC63(fm)
 	
-		xlo <- min(moi[moi > 0])
-		xhi <- max(moi)
-		xp <- exp(seq(log(xlo), log(xhi), length=101))
-		yp <- predict(fm, data.frame(x = xp), type="response")
-		xpp <- cf[1]
+		xlo <- min(x[x > 0])
+		xhi <- max(x)
+		xp <- exp(seq(log(xlo), log(xhi), length = 51))
+		yp <- predict(fm, data.frame(x = xp), type = "response")
+		xpp <- getTiter(fm, NULL)
 		ypp <- 1 - exp(-1)
 	
 	# points
-		if (!is.na(pch))  points(y ~ moi, subset = moi > 0, pch = pch,
-			col = col.pch, ...)
+		if (!is.na(pch))
+			points(y ~ x, subset = x > 0, pch = pch, col = col.pch, ...)
 	# fitted line
-		if (!is.na(lty.fit)) lines(xp, yp, col = col.fit, lty = lty.fit, ...)
+		if (!is.na(lty.fit))
+			lines(xp, yp, col = col.fit, lty = lty.fit, ...)
 	# reference line
-		if (!is.na(lty.ref)) lines(c(xlo, xpp, xpp),c(ypp, ypp, -0.02),
-			lty = lty.ref, col = col.ref, ...)
+		if (!is.na(lty.ref))
+			lines(c(xlo, xpp, xpp), c(ypp, ypp, -0.02), lty = lty.ref,
+				col = col.ref, ...)
 }

@@ -4,16 +4,16 @@
 \alias{getAIC}
 \title{Obtain AIC for Given Background Value}
 \usage{
-getAIC(df, bgnd, by = c("sequential", "column", "row"))
+getAIC(df, bgnd, by)
 }
 \arguments{
-\item{df}{Annotated \code{data.frame} or list of \code{data.frame}s with
+\item{df}{annotated \code{data.frame} or list of \code{data.frame}s with
 imaging results.}
 
-\item{bgnd}{Numeric vector of background values to test.}
+\item{bgnd}{numeric vector of background values to test.}
 
-\item{by}{A character string indicating the organization of the results as
-being a single result or by column or by rows.}
+\item{by}{(optional) name of the variable in the results \code{data.frame}
+that will be used to split the results before fitting}
 }
 \value{
 The AIC value associated with the fit for each value of bgnd or list of AIC
