@@ -4,17 +4,22 @@
 \alias{getFit}
 \title{Fit Infectivity Results with Binomial GLM Model}
 \usage{
-getFit(obj, by = c("sequential", "column", "row"))
+getFit(obj, by)
 }
 \arguments{
-\item{obj}{A \code{data.frame} produced by \code{\link{tally}} or by \code{\link{score}}.}
+\item{obj}{a \code{data.frame} produced by \code{\link{tally}}
+or by \code{\link{score}}.}
 
-\item{by}{A character string indicating the organization of the results
+\item{by}{the name of the variable in the results \code{data.frame}
+that will be used to split the results before fitting
 (see details.)}
 }
 \value{
-A fitted \code{glm} model or list of models. Each fitted model has the unit
-of measure attached as an attribute with the text value from \code{unit}.
+A fitted \code{glm} model \emph{or} list of such models. Each fitted model
+has the unit of measure attached as an attribute with the text value from
+\code{unit}. The \code{link} function will either be "logit" or "cloglog" 
+and can be identified with the \code{\link{family}} function. Note that
+the fitted model uses the \code{log} of the moi values for fitting.
 }
 \description{
 Fit the results in a \code{data.frame} produced by either \code{\link{tally}} or
@@ -23,20 +28,26 @@ Fit the results in a \code{data.frame} produced by either \code{\link{tally}} or
 \details{
 This function will fit a GLM binomial model using a two-column response
 where the fit is weighted by the total numbers of cases. Data are fit by
-the \code{\link{glm}} function using a complementary log-log model. The data
-can be organized as a single, sequential series of values \emph{or} by
-rows \emph{or} columns. If the argument \code{by} is \code{"sequential"},
-all the data are assumed to represent a single assay. If \code{by} is
-either \code{"row"} or \code{"column"}, fits will be generated for data
-partitioned by row or column, respectively.
+the \code{\link{glm}} function using the \code{binomial} \code{\link{family}}
+with either the default \code{"logit"} \emph{or} the complementary log-log
+\code{"cloglog"} link function. The \code{"logit"} link is
+appropriate for symmetrical data. The \code{"cloglog"} link is better for
+asymmetrical data. The best fit will be chosen Akaike's criteria.
+
+If the parameter \code{by} is specified, the data frame will first be split
+by this variable after coercion to a \code{factor}. In previous versions,
+this option only accepted "columns" or "rows" as a potential variable. 
 
 The argument \code{obj} must be produced either by \code{\link{tally}} or by
-\code{\link{score}}. If a variable named \code{"positive"} is present, the data
+\code{\link{score}}. If a variable named \code{"positive"} is present, data
 are assumed to have been produced by \code{\link{score}} and the function
 \code{\link{tally}} will be called before proceeding. If variables named 
 \code{"pos"} and \code{"neg"} are present, the data are assumed to be the
 product of \code{\link{tally}}. In the case of a data frame produced by
-\code{\link{score}}, the data must have a variable named \code{"moi"} or \code{"x"}
-representing the multiplicity of infection. Data produced by \code{\link{tally}}
-will always have a variable named \code{"x"} representing the multiplicity.
+\code{\link{score}}, the data must have a variable named \code{"moi"} or
+\code{"x"} representing the multiplicity of infection. If \bold{both}
+\code{"x"} and \code{"moi"} are present, an attempt will be made to choose
+the more informative value and a warning will be issued. Data produced by
+\code{\link{tally}} will always have a variable named \code{"x"} as the
+independent variable representing the multiplicity in the \code{glm} model.
 }
