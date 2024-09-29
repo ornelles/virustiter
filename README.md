@@ -14,9 +14,9 @@ Individual cells are identified by the DNA stain which is used to generate a nuc
 
 ## Significant Changes
 
-### Version 0.2
+### Version 0.2, 0.21
 
-Revised fitting functions and associated helper functions to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. 
+Revised fitting functions and associated helper functions to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. `findBgnd()` and `getBgnd()` use functions from the package `multimode` to find saddle points. `findBgnd()` will also accept numeric values in addition to integer `Image` masks.
 
 ### Version 0.1.0.1, 0.1.0.2
 

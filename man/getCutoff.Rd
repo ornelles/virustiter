@@ -4,31 +4,34 @@
 \alias{getCutoff}
 \title{Get cutoff values for nuclear mask area}
 \usage{
-getCutoff(mask, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
+getCutoff(area, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
 }
 \arguments{
-\item{mask}{An \code{Image} object, array, or a \code{list} of
+\item{area}{either an \code{Image} object, array, or a \code{list} of
 these objects containing a binary mask defining regions of the image
-to be segmented. Typically, this would obtained from
-\code{\link[virustiter]{nucMask}}.}
+to be segmented. Typically, these binary masks would obtained from
+\code{\link[virustiter]{nucMask}}. Alternatively, this can be a numeric
+value for which "cutoff" values are desired.}
 
-\item{lo}{A optional numeric value indicating the approximate minimum value.
+\item{lo}{a optional numeric value indicating the approximate minimum value.
 This value will be used to search for the true saddle point. If negative,
 the search will start at the lower 10 percentile of the area.}
 
-\item{hi}{A optional numeric value for the expected upper limit of the
+\item{hi}{a optional numeric value for the expected upper limit of the
 cutoff. If missing, the\code{quantile} will be used to determine the
 upper limit.}
 
-\item{breaks}{Number of bins used for the area histograms (default of 256).}
+\item{breaks}{a number (or means) to determining the number of cells for
+the optional histogram (see \code{link[graphics]{hist}})}
 
-\item{quant}{If \code{hi} is not provided, the area given by this
+\item{quant}{if \code{hi} is not provided, the area given by this
 quantile will be used as the upper limit.}
 
-\item{plot}{If \code{TRUE}, plot histogram with selected cutoff points}
+\item{plot}{if \code{TRUE}, plot histogram with selected cutoff points}
 }
 \value{
-Vector of two values recommended as nuclear mask cutoff parameters.
+Vector of two values recommended as cutoff values suitable for
+\code{link[virustiter]{trimMask}}
 }
 \description{
 Find appropriate range limits for the area of nuclei defined in a
