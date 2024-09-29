@@ -9,45 +9,33 @@ findBgnd(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
 \arguments{
 \item{x}{fluorescent values to evaluate}
 
-\item{mult}{numeric multiplier applied to the standard deviation,
-with default value of 3}
+\item{mult}{numeric multiplier applied to the standard deviation
+for a non-bimodal distributions, default value of 3}
 
 \item{log}{a \code{logical} flag to use log-transformed values}
 
-\item{crit}{the critical p-value between 0 and 1 to distinquish
+\item{crit}{the critical p-value between 0 and 1 to distinguish
 bimodal from non-bimodal populations, default of 0.1}
+
+\item{ratio.limit}{if the ratio of the first peak height to the second peak
+height exceeds this value (1/10), the population could be bimodal}
 }
 \value{
-For non-bimodally distributed values, the value estimated as position of the
-most abundant values + mult * standard. For bimodally distributed values,
-the value at the valley between the two populations.
-
- @examples
-   dev.new(width = 6, height = 8)
-   set.seed(1234)
-   par(mfrow = c(2, 1))
-   x1 <- c(rlnorm(100), rlnorm(30, 4))
-   plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
-   bg <- findBgnd(x1)
-   abline(v = log(bg), col = 2) # background limit
-   x2 <- c(rlnorm(80), rlnorm(40, 6, sdlog = 5))
-   plot(density(log(x2)), main = "Non-bimodal")
-   bg <- sapply(0:4, function(m) findBgnd(x2, mult = m))
-   abline(v = log(bg), col = 1:5) # background limit
-   txt <- expression(mult %*% sd)
-   legend("topright", legend = 0:4, title = txt, lty = 1, col = 1:5)
+For bimodally distributed values, the value at the valley between the two
+populations. For non-bimodally distributed values, the value of the
+most abundant value + mult * standard deviation of the estimated distribution.
 }
 \description{
-Calculate a value between background and foreground.
+Find the fluorescent value between negative and positive cells
 }
 \details{
-The \code{link[multimode]{modetest}} function provides a test of whether the
-values are bimodal or multimodal. If the p-value from this test is less
+The \code{link[multimode]{modetest}} function tests whether the values have
+a bimodal (or multimodal) distribution. If the p-value from this test is less
 than the critical value (\code{crit}), the background value is considered
 to be the value at the first "valley" in the kernel density distribution.
 For such bimodal distributions, the \code{mult} parameter is ignored.
 
-If the distribution is not bimodal,the population is assumed to be a mixture
+If the distribution is not bimodal, the population is assumed to be a mixture
 of values from a normal distribution of low values and a lognormal (or log)
 distribution of high values. The maximum of low values is determined from a
 kernel density estimate and the \emph{left} half of the distribution is fit
@@ -60,7 +48,8 @@ values are log-transformed by default. This can be turned
 off with the \code{log} parameter. Typically, the parameter \code{mult}
 must be empirically determined for non-bimodal distributions. (See the
 examples for the impact of \code{mult} on the return value. Note that with
-\code{mult = 0}, the mean value of the background intensity will be returned.
+\code{mult = 0}, the mean value of a non-bimodal distribution will be
+returned.
 
 If the distribution is very heavily skewed to the left (mostly dark values),
 the standard deviation of the distribution will be estimated as 1.35x
@@ -68,6 +57,24 @@ the interquartile range.
 
 It may be helpful to discard exceptionally low values before finding
 an estimated background should the estimated background be absurdly low.
+The code currently discards the upper and lower 1%% of values before
+fitting to a (log-)normal distribution.
+}
+\examples{
+  dev.new(width = 6, height = 8)
+  set.seed(1234)
+  par(mfrow = c(2, 1))
+  x1 <- c(rlnorm(100), rlnorm(30, 4))
+  plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
+  bg <- findBgnd(x1)
+  abline(v = log(bg), col = 2) # background limit
+  x2 <- c(rlnorm(80), rlnorm(40, 6, sdlog = 5))
+  plot(density(log(x2)), main = "Non-bimodal")
+  bg <- sapply(0:4, function(m) findBgnd(x2, mult = m))
+  abline(v = log(bg), col = 1:5) # background limit
+  txt <- expression(mult \%*\% sd)
+  legend("topright", legend = 0:4, title = txt, lty = 1, col = 1:5)
+
 }
 \seealso{
 \code{\link{getZero}}
