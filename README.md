@@ -160,7 +160,7 @@ Often the background value needs to be optimized with parameters provided to `ge
 
 The sample data provided here yields a less than ideal cutoff value for the background when using default settings. The control values (moi of 0) are so tight that the default value of `mult = 2.5` for the 'mad' multiplier is too generous.
 
-The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible background values. The results from `plotHist()` show that the values with `mult` = 1.55 or 1.95 may be better than the default value of 2.5.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible background values. The results from `plotHist()` show that the values with `mult` = 1.55 or 1.95 may be better than the default value of 2.5. Note that this limitation may have been overcome with the new code for finding background values in version 0.2.1.
 ```
   mm <- seq(1, 2.5, 0.05)
   bg <- sapply(mm, function(m) getBgnd(df, mult = m))
