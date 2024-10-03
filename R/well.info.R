@@ -1,7 +1,7 @@
 #' Extract ID, Prefix, Well, Row and Column Label
 #' 
 #' Create a uniform representation for a multi-titer well with an optional 
-#' prefix extracted as prefix 
+#' prefix extracted as prefix \emph{or} generate well labels.
 #' 
 #' @param w label (tag) for the well (coerced to a character) \emph{or} a
 #'  single numeric value of 6, 12, 24, 48, 96, or 384 to generate well labels.
@@ -30,7 +30,7 @@
 #' use of leading zeros for the column number. 
 #' 
 #' If \code{w} is an integer, well labels ("A1", "A01", etc) will be generated
-#' for the requested number of wells (6, 12, 24, 48, 96 or 384 in the direction
+#' for the requested number of wells (6, 12, 24, 48, 96 or 384) in the direction
 #' indicated by \code{byrow}.
 #'
 #' @return 
