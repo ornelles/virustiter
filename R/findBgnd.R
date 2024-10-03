@@ -13,7 +13,7 @@
 #' 
 #' @details
 #' 
-#' The \code{link[multimode]{modetest}} function tests whether the values have
+#' The \code{\link[multimode]{modetest}} function tests whether the values have
 #' a bimodal (or multimodal) distribution. If the p-value from this test is less
 #' than the critical value (\code{crit}), the background value is considered
 #' to be the value at the first "valley" in the kernel density distribution.
@@ -30,9 +30,9 @@
 #' Because fluorescent values are typically log-transformed before analysis,
 #' values are log-transformed by default. This can be turned
 #' off with the \code{log} parameter. Typically, the parameter \code{mult}
-#' must be empirically determined for non-bimodal distributions. (See the
+#' must be empirically determined for non-bimodal distributions. See the
 #' examples for the impact of \code{mult} on the return value. Note that with
-#' \code{mult = 0}, the mean value of a non-bimodal distribution will be
+#' \code{mult = 0}, the peak value of a non-bimodal distribution will be
 #' returned.
 #' 
 #' If the distribution is very heavily skewed to the left (mostly dark values),

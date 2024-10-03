@@ -16,19 +16,19 @@
 #'   cutoff. If missing, the\code{quantile} will be used to determine the
 #'   upper limit.
 #' @param breaks a number (or means) to determining the number of cells for
-#'   the optional histogram (see \code{link[graphics]{hist}})
+#'   the optional histogram (see \code{\link[graphics]{hist}})
 #' @param quant if \code{hi} is not provided, the area given by this
 #'   quantile will be used as the upper limit.
 #' @param plot if \code{TRUE}, plot histogram with selected cutoff points
 #'
 #' @details
 #'
-#' Get the low and high cutoffs to give to \code{\link[virustiter]{trimMask}}.
+#' Get the low and high cutoffs to provide to \code{\link[virustiter]{trimMask}}.
 #'
 #' @return
 #' 
 #' Vector of two values recommended as cutoff values suitable for
-#' \code{link[virustiter]{trimMask}}
+#' \code{\link[virustiter]{trimMask}}
 #'
 #' @import EBImage
 #'

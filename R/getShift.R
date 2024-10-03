@@ -39,8 +39,8 @@
 #' and \code{"dy"} that can be applied to the argument \code{target} with
 #' \code{\link{translate}} to maximize the alignment between mask and target.
 #'
-#' If \code{value = TRUE}, a list of values of the shift required for each
-#' image. 
+#' If \code{value = TRUE}, a list of \emph{magnitude} of the shift required for
+#' each image. 
 #' 
 #' @examples
 #'  path <- system.file("extdata", "by_folder/b2", package = "virustiter")
