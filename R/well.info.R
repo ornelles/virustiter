@@ -1,15 +1,17 @@
 #' Extract ID, Prefix, Well, Row and Column Label
 #' 
 #' Create a uniform representation for a multi-titer well with an optional 
-#' prefix extracted as prefix 
+#' prefix extracted as prefix \emph{or} generate well labels.
 #' 
-#' @param w Label (tag) for the well (coerced to a character).
+#' @param w label (tag) for the well (coerced to a character) \emph{or} a
+#'  single numeric value of 6, 12, 24, 48, 96, or 384 to generate well labels.
 #' @param format Character string as \code{\link{sprintf}} format for the
 #'   column, default value of \code{NULL} pads the column value with zeros
 #'   as needed such as \code{"\%02d"} for more than 9 columns. 
 #' @param upper to use upper case when \code{TRUE}.
 #' @param drop.levels \code{logical} value to drop unused levels in
 #'   \code{row} and \code{column}.
+#' @param byrow \code{logical} value when generating well labels.
 #' 
 #' @details 
 #' 
@@ -27,9 +29,14 @@
 #' by different processes that may differ by the lower or upper case or the
 #' use of leading zeros for the column number. 
 #' 
+#' If \code{w} is an integer, well labels ("A1", "A01", etc) will be generated
+#' for the requested number of wells (6, 12, 24, 48, 96 or 384) in the direction
+#' indicated by \code{byrow}.
+#'
 #' @return 
 #' 
-#' A named list of length three or five. Values for \code{tag} and
+#' A character vector of well names or a named list of length three or five.
+#' Values for \code{tag} and
 #' \code{prefix} will be returned only if a plate prefix is used. 
 #' \itemize{
 #'  \item tag, harmonized character representation of the entire well name
@@ -46,12 +53,32 @@
 #'   well.info("a6", format = "%d", upper = TRUE)
 #'   well.info("Plate_2b92", format = "%05d")
 #'   well.info("Plate_2b92", format = "%05d", drop.levels = FALSE)
+#'   well.info(12)
 #' 
 #' @export
 #' 
-well.info <- function(w, format = NULL, upper = TRUE, drop.levels = TRUE)
+well.info <- function(w, format = NULL, upper = TRUE, drop.levels = TRUE,
+	byrow = TRUE)
 {
-# coerce to character, ensure logical values
+# check for special case of w as numeric
+	byrow <- as.logical(byrow)
+	if (is(w, "numeric") && length(w) == 1) {
+		if (w == 6) nr <- 2
+		else if (w == 12) nr <- 3
+		else if (w == 24) nr <- 4
+		else if (w == 48) nr <- 6
+		else if (w == 96) nr <- 8
+		else if (w == 384) nr <- 16
+		else
+			stop("'w' must be 6, 12, 24, 48, 96 or 384 to generate well labels")
+		nc <- w/nr
+		fmt <- if (w > 12) "%s%02d" else "%s%d" 
+		if (byrow == TRUE) v <- expand.grid(column = 1:nc, row = LETTERS[1:nr])[,2:1]
+		else v <- expand.grid(row = LETTERS[1:nr], column = 1:nc)
+		return(apply(v, 1, function(x) sprintf(fmt, x[1], as.numeric(x[2]))))
+	}
+		
+# otherwise coerce to character, ensure logical values
 	w <- as.character(w)
 	upper <- as.logical(upper)
 	drop.levels <- as.logical(drop.levels)
