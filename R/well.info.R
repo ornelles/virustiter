@@ -72,7 +72,7 @@ well.info <- function(w, format = NULL, upper = TRUE, drop.levels = TRUE,
 		else
 			stop("'w' must be 6, 12, 24, 48, 96 or 384 to generate well labels")
 		nc <- w/nr
-		fmt <- if (w > 12) "%s%02d" else "%s%d" 
+		fmt <- if (w > 24) "%s%02d" else "%s%d" 
 		if (byrow == TRUE) v <- expand.grid(column = 1:nc, row = LETTERS[1:nr])[,2:1]
 		else v <- expand.grid(row = LETTERS[1:nr], column = 1:nc)
 		return(apply(v, 1, function(x) sprintf(fmt, x[1], as.numeric(x[2]))))
