@@ -41,8 +41,8 @@
 #'
 #' It may be helpful to discard exceptionally low values before finding
 #' an estimated background should the estimated background be absurdly low.
-#' The code currently discards the upper and lower 1%% of values before
-#' fitting to a (log-)normal distribution.  
+#' The code currently discards the upper and lower 1 per cent of values before
+#' fitting to a normal (or lognormal) distribution.  
 #' 
 #' @seealso \code{\link{getZero}}
 #' @seealso \code{\link{getBgnd}}
@@ -63,13 +63,15 @@
 #'   dev.new(width = 6, height = 8)
 #'   set.seed(1234)
 #'   par(mfrow = c(2, 1))
+#'
 #'   x1 <- c(rlnorm(100), rlnorm(30, 4))
-#'   plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
 #'   bg <- findBgnd(x1)
+#'   plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
 #'   abline(v = log(bg), col = 2) # background limit
+#'
 #'   x2 <- c(rlnorm(80), rlnorm(40, 6, sdlog = 5))
-#'   plot(density(log(x2)), main = "Non-bimodal")
 #'   bg <- sapply(0:4, function(m) findBgnd(x2, mult = m))
+#'   plot(density(log(x2)), main = "Non-bimodal")
 #'   abline(v = log(bg), col = 1:5) # background limit
 #'   txt <- expression(mult %*% sd)
 #'   legend("topright", legend = 0:4, title = txt, lty = 1, col = 1:5)
@@ -78,45 +80,45 @@
 #' 
 findBgnd <- function(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
 {
-	if (log) {
-		if (all(x <= 0)) stop("positive values are needed if log = TRUE")
-		x <- log(x[x > 0])
-	}
-	if (crit < 0 | crit > 1) stop("'crit' must be between 0 and 1")
+  if (log) {
+    if (all(x <= 0)) stop("positive values are needed if log = TRUE")
+    x <- log(x[x > 0])
+  }
+  if (crit < 0 | crit > 1) stop("'crit' must be between 0 and 1")
 
 # Is there evidence for a biomodal distribution?
 # This only tests for the likelihood of more than 1 peak (mode).
 # Distributions with more than two peaks would be treated as non-bimodal.
 # The method of Silverman (method = "SI") was chosen with 100 replicates
 # for the sake of speed.
-	bimodal <- FALSE
-	pval <- multimode::modetest(x, mod0 = 1, method = "SI", B = 100)$p.value
-	if (pval < crit) { # if less than crit, probably bimodal
-		v <- suppressWarnings(multimode::locmodes(x, mod0 = 2))
-		if (v$fvalue[1]/v$fvalue[3] > ratio.limit)
-			bimodal <- TRUE
-		else
-			bimodal <- FALSE
-	}
+  bimodal <- FALSE
+  pval <- multimode::modetest(x, mod0 = 1, method = "SI", B = 100)$p.value
+  if (pval < crit) { # if less than crit, probably bimodal
+    v <- suppressWarnings(multimode::locmodes(x, mod0 = 2))
+    if (v$fvalue[1]/v$fvalue[3] > ratio.limit)
+      bimodal <- TRUE
+    else
+      bimodal <- FALSE
+  }
 
 # find breakpoint
-	if (bimodal == TRUE) 
-		ans <- v$locations[2]
-	else { # otherwise, see if left half can be fit to a Gaussian distribution
-		d <- density(x[x > quantile(x, 0.01) & x < quantile(x, 0.99)]) # trim?
-		xmid <- d$x[which.max(d$y)]
-		xl <- x[x <= xmid]
-		xx <- c(xl, 2*xmid  - xl) # extract left half
-		if (length(xx) >= 0.05 * floor(length(x))) {
-			fit <- MASS::fitdistr(xx, "normal")
-			ans <- fit$est[1] + mult * fit$est[2]
-		}
-		else # if not, make best guess
-			ans <- min(x) + mult * IQR(x, na.rm = TRUE)/1.349
-	}
+  if (bimodal == TRUE) 
+    ans <- v$locations[2]
+  else { # otherwise, see if left half can be fit to a Gaussian distribution
+    d <- density(x[x > quantile(x, 0.01) & x < quantile(x, 0.99)]) # trim?
+    xmid <- d$x[which.max(d$y)]
+    xl <- x[x <= xmid]
+    xx <- c(xl, 2*xmid  - xl) # extract left half
+    if (length(xx) >= 0.05 * floor(length(x))) {
+      fit <- MASS::fitdistr(xx, "normal")
+      ans <- fit$est[1] + mult * fit$est[2]
+    }
+    else # if not, make best guess
+      ans <- min(x) + mult * IQR(x, na.rm = TRUE)/1.349
+  }
 
 # return estimated breakpoint
-	if (log == TRUE)
-		ans <- exp(ans)
-	return(unname(ans))
+  if (log == TRUE)
+    ans <- exp(ans)
+  return(unname(ans))
 }

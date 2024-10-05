@@ -1,4 +1,4 @@
-#' Get cutoff values for nuclear mask area
+#' Get Cutoff Values for Nuclear Mask Area
 #'
 #' Find appropriate range limits for the area of nuclei defined in a
 #' binary nuclear mask. The limits will be defined by the "saddle"
@@ -8,7 +8,7 @@
 #'   these objects containing a binary mask defining regions of the image
 #'   to be segmented. Typically, these binary masks would obtained from
 #'   \code{\link[virustiter]{nucMask}}. Alternatively, this can be a numeric
-#'   value for which "cutoff" values are desired.
+#'   vector for which "cutoff" values are desired.
 #' @param lo a optional numeric value indicating the approximate minimum value.
 #'   This value will be used to search for the true saddle point. If negative,
 #'   the search will start at the lower 10 percentile of the area.
@@ -34,37 +34,37 @@
 #'
 #' @export
 #'
-	getCutoff <- function(area, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
-	{
-	# argument check
-		if (is(area, "list")) {
-			sel <- sapply(area, function(x) is.integer(imageData(x)))
-			if (!all(sel))
-				stop("'", deparse(substitute(area)),
-					"' is a list but not all are integer Image masks")
-			else
-				area <- getVal(area, val = "s.area")
-		}
-		else if (is(area, "Image") && is.integer(imageData(area))) {
-			if (!is.integer(imageData(area)))
-				stop("'", deparse(substitute(x)), "' is not an integer Image mask")
-			else
-				area <- getVal(area, val = "s.area")
-		}
-		else if (!is.numeric(area))
-			stop("unable to use '", deparse(substitute(x)), "'")
+getCutoff <- function(area, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
+{
+# argument check
+  if (is(area, "list")) {
+    sel <- sapply(area, function(x) is.integer(imageData(x)))
+    if (!all(sel))
+      stop("'", deparse(substitute(area)),
+        "' is a list but not all are integer Image masks")
+    else
+      area <- getVal(area, val = "s.area")
+  }
+  else if (is(area, "Image") && is.integer(imageData(area))) {
+    if (!is.integer(imageData(area)))
+      stop("'", deparse(substitute(x)), "' is not an integer Image mask")
+    else
+      area <- getVal(area, val = "s.area")
+  }
+  else if (!is.numeric(area))
+    stop("unable to use '", deparse(substitute(x)), "'")
 
-		if (missing(hi)) hi <- quantile(area, quant)
-		if (missing(lo) || lo < 0) lo <- quantile(area, 0.1) # use 10% as a guess
+  if (missing(hi)) hi <- quantile(area, quant)
+  if (missing(lo) || lo < 0) lo <- quantile(area, 0.1) # use 10% as a guess
 
-    hh <- hist(area[area < quantile(area, quant)], breaks = breaks, plot = FALSE)
-    adj <- min(which(hh$mids > lo))
-    j <- which.max(hh$counts[hh$mids > lo]) + adj
-    i <- which.min(runmed(hh$counts[1:j], 5))
-    ans <- c(hh$mids[i], hi)
-		if (plot) {
-			hist(area, breaks = breaks)
-			abline(v = ans, col = 2)
-		}
-		return(unname(ans))
-	}
+  hh <- hist(area[area < quantile(area, quant)], breaks = breaks, plot = FALSE)
+  adj <- min(which(hh$mids > lo))
+  j <- which.max(hh$counts[hh$mids > lo]) + adj
+  i <- which.min(runmed(hh$counts[1:j], 5))
+  ans <- c(hh$mids[i], hi)
+  if (plot) {
+    hist(area, breaks = breaks)
+    abline(v = ans, col = 2)
+  }
+  return(unname(ans))
+}

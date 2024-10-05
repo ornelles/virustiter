@@ -57,20 +57,22 @@ the interquartile range.
 
 It may be helpful to discard exceptionally low values before finding
 an estimated background should the estimated background be absurdly low.
-The code currently discards the upper and lower 1%% of values before
-fitting to a (log-)normal distribution.
+The code currently discards the upper and lower 1 per cent of values before
+fitting to a normal (or lognormal) distribution.
 }
 \examples{
   dev.new(width = 6, height = 8)
   set.seed(1234)
   par(mfrow = c(2, 1))
+
   x1 <- c(rlnorm(100), rlnorm(30, 4))
-  plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
   bg <- findBgnd(x1)
+  plot(density(log(x1)), main = "Bimodal ('mult' is ignored)")
   abline(v = log(bg), col = 2) # background limit
+
   x2 <- c(rlnorm(80), rlnorm(40, 6, sdlog = 5))
-  plot(density(log(x2)), main = "Non-bimodal")
   bg <- sapply(0:4, function(m) findBgnd(x2, mult = m))
+  plot(density(log(x2)), main = "Non-bimodal")
   abline(v = log(bg), col = 1:5) # background limit
   txt <- expression(mult \%*\% sd)
   legend("topright", legend = 0:4, title = txt, lty = 1, col = 1:5)

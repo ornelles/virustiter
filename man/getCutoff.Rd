@@ -2,7 +2,7 @@
 % Please edit documentation in R/getCutoff.R
 \name{getCutoff}
 \alias{getCutoff}
-\title{Get cutoff values for nuclear mask area}
+\title{Get Cutoff Values for Nuclear Mask Area}
 \usage{
 getCutoff(area, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
 }
@@ -11,7 +11,7 @@ getCutoff(area, lo, hi, breaks = 256, quant = 0.995, plot = FALSE)
 these objects containing a binary mask defining regions of the image
 to be segmented. Typically, these binary masks would obtained from
 \code{\link[virustiter]{nucMask}}. Alternatively, this can be a numeric
-value for which "cutoff" values are desired.}
+vector for which "cutoff" values are desired.}
 
 \item{lo}{a optional numeric value indicating the approximate minimum value.
 This value will be used to search for the true saddle point. If negative,
