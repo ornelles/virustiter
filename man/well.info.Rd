@@ -7,44 +7,46 @@
 well.info(w, format = NULL, upper = TRUE, drop.levels = TRUE)
 }
 \arguments{
-\item{w}{Label (tag) for the well (coerced to a character).}
+\item{w}{label (tag) for the well (coerced to a character)}
 
-\item{format}{Character string as \code{\link{sprintf}} format for the
+\item{format}{character string as \code{\link{sprintf}} format for the
 column, default value of \code{NULL} pads the column value with zeros
-as needed such as \code{"\%02d"} for more than 9 columns.}
+as needed such as \code{"\%02d"} for more than 9 columns}
 
-\item{upper}{to use upper case when \code{TRUE}.}
+\item{upper}{use upper case for row labels if \code{TRUE}}
 
-\item{drop.levels}{\code{logical} value to drop unused levels in
-\code{row} and \code{column}.}
+\item{drop.levels}{drop unused levels in \code{row} and \code{column}
+otherwise the respective levels for \code{row} and \code{column} are
+the letters A to P and numbers 1 to 384.}
 }
 \value{
-A named list of length three or five. Values for \code{tag} and
-\code{prefix} will be returned only if a plate prefix is used. 
+A named list of length three or five. A value for \code{tag} and
+\code{prefix} will be returned only if a prefix is identified. 
 \itemize{
  \item tag, harmonized character representation of the entire well name
    including any prefix if present, otherwise this is not returned
-	\item prefix, prefix as a character string if present, otherwise
+ \item prefix, prefix as a character string if present, otherwise
    this is not returned
-	\item well, harmonized well name as a factor
-	\item row, row as a factor with levels A-P (or a-p)
-	\item column, column number as a factor with levels 1-24
+ \item well, harmonized well name as a factor
+ \item row, row as a factor with levels A-P (or a-p)
+ \item column, column number as a factor with levels 1-24
 }
 }
 \description{
 Create a uniform representation for a multi-titer well with an optional 
-prefix extracted as prefix
+prefix extracted as prefix.
 }
 \details{
 This function will parse the \code{character} string in \code{w}
-into an optional "harmonized" tag with an arbitrary prefix used to
-identify the plate, followed by a single character for the well,
-followed by the  column number formatted as per \code{format}.
-The code will fail if the row  value is not one of the 16 letters from
-A to P or if the column number is not in the range of 1 to 384.
+into an optional "harmonized" tag with an arbitrary character prefix,
+(typically used to designate plate number), followed by a \strong{single}
+character for the well ending with the column number formatted as per
+the \code{sprintf} formatted \code{format}. The code will fail if the row 
+value is not one of the 16 letters from A to P or if the column number
+is not in the range of 1 to 384.
 
 The prefix must contain only alphanumeric characters (0-9, a-z, A-Z), the
-underscore character, or the hyphen.
+underscore character or the hyphen.
 
 This function is also used to \emph{harmonize} well information generated
 by different processes that may differ by the lower or upper case or the

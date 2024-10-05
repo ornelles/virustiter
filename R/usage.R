@@ -49,6 +49,8 @@ usage <- function() {
 	"   getTiter(fm)        # get titer as IU per ml (if volume units were used)",
 	"   getShift(mask, tgt) # get optimal x-y shift to align tgt with (nuc) mask",
 	"   translate(x, v)     # apply (optimal) x-y shift in v to image x",
+  "   make.plate(n)       # generate a data.frame representing an n-well plate",
+	"   well.info(w)        # extract 'harmonized' information from well labels",
 	"")
 	ft <- tempfile()
 	writeLines(txt, con = ft, sep = "\n")

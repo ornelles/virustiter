@@ -28,8 +28,8 @@ If \code{value = FALSE}, a list of subpixel translations named \code{"dx"}
 and \code{"dy"} that can be applied to the argument \code{target} with
 \code{\link{translate}} to maximize the alignment between mask and target.
 
-If \code{value = TRUE}, a list of values of the shift required for each
-image.
+If \code{value = TRUE}, a list of \emph{magnitude} of the shift required for
+each image.
 }
 \description{
 Determine the optimal x-y shift to align the target image with the

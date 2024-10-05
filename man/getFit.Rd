@@ -32,7 +32,7 @@ the \code{\link{glm}} function using the \code{binomial} \code{\link{family}}
 with either the default \code{"logit"} \emph{or} the complementary log-log
 \code{"cloglog"} link function. The \code{"logit"} link is
 appropriate for symmetrical data. The \code{"cloglog"} link is better for
-asymmetrical data. The best fit will be chosen Akaike's criteria.
+asymmetrical data. The best fit will be chosen by Akaike's criteria.
 
 If the parameter \code{by} is specified, the data frame will first be split
 by this variable after coercion to a \code{factor}. In previous versions,

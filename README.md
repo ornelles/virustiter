@@ -1,6 +1,6 @@
 ## Synopsis
 
-This is a suite of imaging code to determine viral titer from fluorescent micrographs. In a typical application, paired fluorescent images of the cell nucleus and a viral antigen are collected and analyzed. The code requires the `EBImage`, `lattice`, and `latticeExtra` packages and can make use of the (private) `EBImageExtra` package.
+This is a suite of imaging code to determine viral titer from fluorescent micrographs. In a typical application, paired fluorescent images of the cell nucleus and a viral antigen are collected and analyzed. The code requires the `EBImage`, `lattice`, `latticeExtra` and `multimode` packages and can make use of the (private) `EBImageExtra` package.
 
 ## Overview
 
@@ -16,7 +16,7 @@ Individual cells are identified by the DNA stain which is used to generate a nuc
 
 ### Version 0.2, 0.21
 
-Revised fitting functions and associated helper functions to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. `findBgnd()` and `getBgnd()` use functions from the package `multimode` to find saddle points. `findBgnd()` will also accept numeric values in addition to integer `Image` masks.
+The fitting functions and associated helper functions have been revised to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. `findBgnd()` and `getBgnd()` use functions from the package `multimode` to find saddle points. `findBgnd()` will also accept numeric values in addition to integer `Image` masks.
 
 ### Version 0.1.0.1, 0.1.0.2
 
@@ -64,6 +64,10 @@ Second, ensure that the `devtools` and `latticeExtra` packages are installed.
 ```
   install.packages("devtools")
   install.packages("latticeExtra")
+```
+Third, ensure that the `multimode` package and its dependencies are installed.
+```
+  install.packages("multimode")
 ```
 Finally, the `virustiter` package can be installed from GitHub.
 ```
@@ -155,12 +159,14 @@ Supporting functions include these as well as others:
    getTiter(fm)        # get titer as IU per ml (if volume units were used)
    getShift(mask, tgt) # get optimal x-y shift to align tgt with (nuc) mask
    translate(x, v)     # apply (optimal) x-y shift in v to image x
+   make.plate(n)       # generate a data.frame representing an n-well plate
+	 well.info(w)        # extract 'harmonized' information from well labels
 ```
 Often the background value needs to be optimized with parameters provided to `getBgnd()` as well as those provided to `parseImages()`. Use the plotting tools `plotDens()` and `plotHist()` to evaluate different choices of background values.
 
-The sample data provided here yields a less than ideal cutoff value for the background when using default settings. The control values (moi of 0) are so tight that the default value of `mult = 2.5` for the 'mad' multiplier is too generous.
+The sample data provided here may yield a less than ideal cutoff value for the background when using default settings. The control values (moi of 0) are so tight that the default value of `mult = 2.5` for the 'mad' multiplier may be too generous.
 
-The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible background values. The results from `plotHist()` show that the values with `mult` = 1.55 or 1.95 may be better than the default value of 2.5. Note that this limitation may have been overcome with the new code for finding background values in version 0.2.1.
+The following code demonstrates one method of exploring values near the optimal cutoff value with `getAIC()`. The AIC values point to two possible background values. The results from `plotHist()` show that the values with `mult` = 1.55 or 1.95 may be better than the default value of 2.5. Note that this limitation may have been overcome with the new code for finding background values in version 0.2.1 that compares the `"logit"` and `"cloglog"` link in the binomial regression used to fit the data.
 ```
   mm <- seq(1, 2.5, 0.05)
   bg <- sapply(mm, function(m) getBgnd(df, mult = m))
@@ -175,7 +181,7 @@ The following code demonstrates one method of exploring values near the optimal 
 - Develop a good vignette for this and the `EBImageExtra` package
 - Develop a workflow for determining the optimal nuclear mask
 - Adjust the code to work more robustly with the new `prefix` variable
-- Optimize `parseImages` to take advantage of multiple cores (parallel computing)
+- Optimize `parseImages` to be more friendly to parallel computing
 
 ## License
 
