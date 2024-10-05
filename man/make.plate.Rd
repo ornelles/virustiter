@@ -2,7 +2,7 @@
 % Please edit documentation in R/make.plate.R
 \name{make.plate}
 \alias{make.plate}
-\title{Create data.frame with Tag, Prefix, Well, Column and Row}
+\title{Create data.frame with Tag, Prefix, Well, Row and Column}
 \usage{
 make.plate(n, prefix = NULL, digits = NULL, upper = TRUE, byrow = TRUE)
 }

@@ -1,4 +1,4 @@
-#' Create data.frame with Tag, Prefix, Well, Column and Row
+#' Create data.frame with Tag, Prefix, Well, Row and Column
 #' 
 #' Create a data.frame representing a multi-well plate with an optional 
 #' prefix.
@@ -76,7 +76,7 @@ make.plate <- function(n, prefix = NULL, digits = NULL, upper = TRUE,
   well <- factor(well)
   column <- factor(v$column, levels = 1:nc)
   row <- factor(v$row, levels = rowvals[1:nr])
-  ans <- data.frame(well = well, column = column, row = row) 
+  ans <- data.frame(well = well, row = row, column = column) 
 
 # process optional prefix and assemble data.frame
   if (!is.null(prefix)) {
