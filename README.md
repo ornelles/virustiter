@@ -14,6 +14,10 @@ Individual cells are identified by the DNA stain which is used to generate a nuc
 
 ## Significant Changes
 
+### Version 0.3
+
+More organized structure under the hood with stand-alone file for `@import` and `@importFrom` directives. `findBgnd()` will report if a bimodal population was identified. `plotFit()` includes an option to impose limit on the y-scale.
+
 ### Version 0.2, 0.21
 
 The fitting functions and associated helper functions have been revised to select the optimal `binomial` family as either `"logit"` or `"cloglog"` based on the AIC value. This required considerable changes to the original, rather add-hoc fitting function based on `glm`. The internal function`EC63` has been removed and replaced with a call to `dose.p()` from the "`MASS`" package. `plotFit()` now uses the name of the fitted model as a default. `getFit()` accepts a variable name to split the data before performing the curve fitting. `findBgnd()` and `getBgnd()` use functions from the package `multimode` to find saddle points. `findBgnd()` will also accept numeric values in addition to integer `Image` masks.
