@@ -79,8 +79,6 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	separate = FALSE, nx = 2)
 {
 # requires EBImage, ensure appropriate values for parameters
-	if (!require(EBImage))
-		stop("The 'EBImage' package must be installed with biocLite")
 	method <- match.arg(method)
 
 # provide immediate warnings and return list of files
@@ -120,7 +118,7 @@ checkImages <- function(source, type = "tiff", which.images = c(1, 2, 2),
 	if (all(file.info(source)$isdir))
 		ff <- list.images(path = source, type = type, pattern = pattern)
 	else if (all(grepl("zip$", source, ignore.case = TRUE))) {
-		file.remove(list.files(tempdir(), full = TRUE, recursive = TRUE))
+		file.remove(list.files(tempdir(), full.names = TRUE, recursive = TRUE))
 		unzip(source, exdir = tempdir())
 		ff <- list.images(path = tempdir(), type = type, pattern = pattern)
 	}

@@ -22,6 +22,7 @@ plotFit(
   ylab = NULL,
   frame.plot = axes,
   digits = 2,
+  useLimits = TRUE,
   ...
 )
 }
@@ -66,6 +67,9 @@ around the plot.}
 
 \item{digits}{integer indicating the number of significant decimal places 
 to use for the calculated x-axis label}
+
+\item{useLimits}{a logical value to impose upper and lower limits to the
+titer reported in the plot}
 
 \item{...}{arguments to be passed to \code{\link[graphics]{plot.default}}}
 }

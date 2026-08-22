@@ -59,7 +59,6 @@
 trimMask <- function(mask, cutoff = FALSE, k = c(1.5, 3), border = 0, brush = 0,
 	ecc.max = 1, reenumerate = TRUE)
 {
-	require(EBImage)
 	if (missing(mask)) {
 		usage <- c("trimMask argument hints:",
 			'  k = c(3,5) to drop objects < 3x mad(area) and > 5x mad(area)',

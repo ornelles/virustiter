@@ -29,6 +29,7 @@
 #' An object of the same structure as the argument \code{x} that has been
 #' linearly scaled and cropped.
 #'
+#' @importFrom EBImage numberOfFrames
 #' @export
 #'
 setZero <- function(x, zero, min.value = 0, ...)

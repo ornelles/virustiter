@@ -26,6 +26,8 @@
 #'   with \code{\link{cellMask}}. This larger mask will be used to measure
 #'   fluorescence intensity in the target image. If \code{FALSE} (default),
 #'   the nuclear mask will be used to measure fluorescence intensities. 
+#' @param args.cMask A list of arguments passed to \code{\link{cellMask}}.
+#'   This argument is ignored if a \code{nMask} is provided.
 #' @param equalize If the background varies significantly among the fluorescent
 #'   target images (or among the frames of target images), when \code{TRUE},
 #'   this option adjusts the fluorescent target images to have a common
@@ -138,11 +140,7 @@
 parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
 	equalize = FALSE, simplify = TRUE)
-{image
-# requires EBImage, ensure appropriate values for parameters
-	if (!require(EBImage))
-		stop("The 'EBImage' package must be installed with biocLite")
-
+{
 # check first two arguments, extract images, ensure that they are lists
 	if (is.null(tgt)) { # first argument is a list of length 2
 		if (!is.list(nuc) || length(nuc) != 2)

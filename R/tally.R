@@ -47,9 +47,6 @@
 #'   v <- score(v)
 #'   tally(v)
 #'
-#' @import
-#' EBImage
-#'
 #' @export
 #'  
 tally <- function(df, pd = NULL, moi = NULL, by = NULL, param = "mfi")

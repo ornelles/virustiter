@@ -53,8 +53,7 @@
 #' populations. For non-bimodally distributed values, the value of the
 #' most abundant value + mult * standard deviation of the estimated distribution.
 #' 
-#' @import
-#' EBImage
+#' @import EBImage
 #'
 #' @importFrom MASS fitdistr
 #' @importFrom multimode modetest locmodes
@@ -102,8 +101,10 @@ findBgnd <- function(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
   }
 
 # find breakpoint
-  if (bimodal == TRUE) 
+  if (bimodal == TRUE) {
+    message("bimodal population identified")
     ans <- v$locations[2]
+  }
   else { # otherwise, see if left half can be fit to a Gaussian distribution
     d <- density(x[x > quantile(x, 0.01) & x < quantile(x, 0.99)]) # trim?
     xmid <- d$x[which.max(d$y)]

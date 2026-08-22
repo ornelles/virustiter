@@ -16,7 +16,7 @@
 #' 
 #' This function is a replacement for the EBImage code of the same name. 
 #' 
-#' @import EBImage
+#' @importFrom EBImage numberOfFrames getFrame combine
 #'
 #' @examples
 #' 
@@ -59,5 +59,5 @@ translate <- function (x, v, filter = c("bilinear", "none"), ...)
 	if (length(ans) == 1)
 		return(ans[[1]])
 	else
-		return(combine(ans))
+		return(EBImage::combine(ans))
 }

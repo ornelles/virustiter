@@ -21,7 +21,7 @@
 #'   xt <- thresh2(xb, width = 12, offset = 0.05)
 #'   plot(combine(xb, xt), all = TRUE)
 #' 
-#' @import EBImage
+#' @importFrom EBImage filter2 makeBrush
 #' 
 #' @export
 #'

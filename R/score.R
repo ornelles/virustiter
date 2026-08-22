@@ -32,9 +32,6 @@
 #'   xtabs(~ positive, v)
 #'   plot(log(mfi) ~ area, v, col = c(1,2)[positive + 1])
 #'
-#' @import
-#' EBImage
-#'
 #' @export
 #'
 score <- function(df, bgnd = NULL, param = "mfi", ...)

@@ -31,6 +31,8 @@
 #'  around the plot.
 #' @param digits integer indicating the number of significant decimal places 
 #'  to use for the calculated x-axis label
+#' @param useLimits a logical value to impose upper and lower limits to the
+#'  titer reported in the plot
 #' @param ... arguments to be passed to \code{\link[graphics]{plot.default}}
 #' 
 #' @details
@@ -73,12 +75,15 @@
 #'   par(mfrow = c(2, 1))
 #'   plotFit(fm, main = names(fm))
 #'
+#' @importFrom MASS dose.p
+#'
 #' @export
 #'
 plotFit <- function(fm, main = NULL, pch = 1, col = 1, col.pch = col,
 	lty.fit = 1, col.fit = col, lty.ref = 2, col.ref = "gray",
 	xlim = NULL, ylim = NULL, ann = par("ann"), axes = TRUE,
-	xlab = NULL, ylab = NULL, frame.plot = axes, digits = 2, ...) 
+	xlab = NULL, ylab = NULL, frame.plot = axes, digits = 2, useLimits = TRUE,
+	...) 
 {
   # argument check
     if (!(is(fm, "glm") | all(sapply(fm, is, "glm"))))
@@ -116,19 +121,28 @@ plotFit <- function(fm, main = NULL, pch = 1, col = 1, col.pch = col,
       yp <- predict(mod, data.frame(x = xp), type = "response")
 
     # reference lines
-      xpp <- 1/getTiter(mod, level = NULL)
+			titer <- getTiter(mod, level = NULL)
+      xpp <- 1/titer
       ypp <- 1 - exp(-1)
 
     # annotation
       if (is.null(xlab)) {
+				if (useLimits) { # require no lower than 99% negative
+					units <- attr(mod, "unit")
+					mult <- switch(units, ml = 1, ul = 1e3, nl = 1e6, pl = 1e9, 1)
+					xlo <- mult/exp(as.numeric(MASS::dose.p(mod,cf = 1:2, p = 0.99)))
+					xhi <- 100*mult/exp(as.numeric(MASS::dose.p(mod,cf = 1:2, p = 0.01)))
+				}
         if (grepl("[munpf]l", units, ignore.case = TRUE)) { # units are volume
-          val <- 1/xpp
+          val <- ifelse(1/xpp < xlo, xlo, 1/xpp)
           expt <- floor(log10(abs(val)))
           mant <- round(val/10^expt, digits)
-          if (is.finite(xpp))
+          if (is.finite(xpp) & titer < xlo)
+            xlab <- bquote("Titer < " * .(mant) %*% 10^.(expt) * " IU/" * .(units))
+          else if (is.finite(xpp) & titer < xhi)
             xlab <- bquote("Titer = " * .(mant) %*% 10^.(expt) * " IU/" * .(units))
           else
-            xlab <- "Titer = NaN"
+            xlab <- "[undefined titer]"
         }
         else
 					xlab <- sprintf(sprintf("One IU = %%0.%dg", digits), xpp)

@@ -46,6 +46,9 @@ This argument is ignored if a \code{nMask} is provided. Otherwise, if
 \code{NULL}, \code{\link{trimMask}} will be called with default parameters.
 If \code{FALSE}, no trimming will be performed.}
 
+\item{args.cMask}{A list of arguments passed to \code{\link{cellMask}}.
+This argument is ignored if a \code{nMask} is provided.}
+
 \item{equalize}{If the background varies significantly among the fluorescent
 target images (or among the frames of target images), when \code{TRUE},
 this option adjusts the fluorescent target images to have a common

@@ -94,9 +94,9 @@ getFit <- function(obj, by)
 # return value is list
 	fmList <- lapply(spl, function(dat) {
 		fm1 <- tryCatch(glm(cbind(pos, neg) ~ log(x), data = dat, subset = x > 0,
-			family = binomial("logit")), error = function(e) NA)
+			family = stats::binomial("logit")), error = function(e) NA)
 		fm2 <- tryCatch(glm(cbind(pos, neg) ~ log(x), data = dat, subset = x > 0,
-			family = binomial("cloglog")), error = function(e) NA)
+			family = stats::binomial("cloglog")), error = function(e) NA)
 		if (!"try-error" %in% class(fm1) & "try-error" %in% class(fm2))
 			return (fm1)
 		else if ("try-error" %in% class(fm1) & !"try-error" %in% class(fm2))

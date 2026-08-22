@@ -22,8 +22,6 @@
 plotPlate <- function(df, size = NULL, cex = 1/2, alpha = 1/2, main = NULL,
 	invert.y = TRUE, layout = NULL, ...)
 {
-	require(lattice)
-
 # default to well first
 	if ("well" %in% names(df)) {
 		byWell <- TRUE

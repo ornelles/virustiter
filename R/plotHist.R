@@ -33,9 +33,9 @@
 #'
 #' The plot is returned as an invisible \code{lattice} object.
 #'
-#' @import
-#' lattice
-#' latticeExtra
+#' @import lattice
+#' @importFrom latticeExtra xscale.components.log10ticks
+#' @importFrom latticeExtra xscale.components.logpower
 #'
 #' @export
 #'  
@@ -132,7 +132,7 @@ plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
 	else if (is.numeric(logsc))
 		xsc <- latticeExtra::xscale.components.logpower
 	else
-		xsc <- latticeExtra::xscale.components.default
+		xsc <- xscale.components.default
 
 # create lattice formula and object
 	form <- as.formula(paste("~", param, "|", panel))
