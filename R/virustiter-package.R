@@ -10,6 +10,7 @@
 ## usethis namespace: start
 #' @import EBImage
 #' @import lattice
+#' @importFrom EBImageExtra circularity
 #' @importFrom MASS dose.p fitdistr
 #' @importFrom multimode locmodes modetest
 #' @importFrom stats AIC glm qnorm

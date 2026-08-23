@@ -1,7 +1,6 @@
 #' Get Value from ComputeFeatures.xxx Function
 #' 
-#' Extract a value through one of the \code{computeFeatures} family of
-#' functions using an object mask and reference image or a list of each.
+#' Extract a value using an object mask and reference image or a list of each.
 #'
 #' @param mask An object mask or list of objects masks with
 #'   connected pixels having the same integer value. 
@@ -9,14 +8,17 @@
 #'   \code{Image} objects corresponding to the objects in \code{mask}
 #'   or \code{NULL} if a reference image is not required. If \code{ref}
 #'   is a character string, it is \emph{assumed} to be the value
-#'   for \code{val} and will be used in place of the default.
+#'   for \code{val} and will be used in place of the default. This argument
+#'   is ignored for \code{val} of "circularity" or "area".
 #' @param val A character string identifying the parameter
-#'   to return from the \code{computeFeatures} function assigned
-#'   to \code{FUN}. The default value of \code{"b.mean"} returns the
-#'   mean intensity with the
+#'   to return from the \code{computeFeatures} function or the special
+#'   function assigned to \code{FUN}. The default value of \code{"b.mean"} 
+#'   returns the mean intensity with the
 #'   \code{\link[EBImage:computeFeatures]{computeFeatures.basic}}
+#'   function. The value \code{"circularity"} returns the circularity of
+#'   each object in mask using the \code{\link[EBImageExtra]{circularity}}
 #'   function.
-#' @param FUN A \code{\link[EBImage]{computeFeatures}} function to be
+#' @param FUN An optional \code{\link[EBImage]{computeFeatures}} function to be
 #'   applied over \code{mask} and \code{ref}. The default of 
 #'   \code{NULL} uses the character string in \code{val} to select
 #'   the appropriate function. If this function is specified,
@@ -32,7 +34,8 @@
 #' Objects identified in \code{mask} will be projected onto \code{ref} 
 #' and quantified with the function specified in \code{FUN}. The single 
 #' value specified by \code{val} will be returned as a list if \code{
-#' simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
+#' simplify == FALSE} or as a single vector if \code{simplify == TRUE}. The
+#' 
 #'
 #' Common usages include getting the mean intensity from an object mask
 #' and reference image or getting the area of objects from an object mask
@@ -76,7 +79,8 @@
 #' A vector if \code{simplify} is \code{TRUE} or a list of values obtained
 #' from \code{FUN}.
 #' 
-#' @import EBImage  
+#' @import EBImage
+#' @importFrom EBImageExtra circularity
 #' 
 #' @export
 #'
@@ -88,7 +92,8 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 			"b.q099", "b.sd"),
 		shape = c("s.area", "s.perimeter", "s.radius.max", "s.radius.mean",
 			"s.radius.min", "s.radius.sd"),
-		moment = c("m.cx", "m.cy", "m.eccentricity", "m.majoraxis", "m.theta"))
+		moment = c("m.cx", "m.cy", "m.eccentricity", "m.majoraxis", "m.theta"),
+    circularity = "circularity")
 
 # help function if mask is missing
 	if (missing(mask)) {
@@ -111,18 +116,22 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 	if(!(is(val, "character") && length(val) == 1))
 		stop("'val' must be a single character string")
 
-# assign computeFeatures function and variable
+# assign variable name and function from computeFeatures or circularity
 	if (is.null(FUN)) { # identify function from 'val'
-		sel <- lapply(varList, function(v) grep(val, v, ignore.case = TRUE, value = TRUE))
+		sel <- lapply(varList, function(v) grep(val, v, ignore.case = TRUE,
+      value = TRUE))
 		if (sum(lengths(sel)) == 0)
-			stop("unable to match \"", val, "\" with a computeFeatures function")
+			stop("unable to match \"", val, "\" with a computeFeatures or
+        circularity function")
 		if (sum(lengths(sel)) > 1)
-			stop("\"", val, "\" does not identify a unique computeFeatures variable")
+			stop("\"", val, "\" does not identify a unique variable for
+        computeFeatures or circularity")
 		val <- unlist(sel)
 		FUN <- switch(names(val),
 			basic = EBImage::computeFeatures.basic,
 			shape = EBImage::computeFeatures.shape,
-			moment = EBImage::computeFeatures.moment)
+			moment = EBImage::computeFeatures.moment,
+      circularity = circularity)
 	}
 # assign 'ref' to 'NULL' for case of computeFeatures.shape
 	if (identical(FUN, EBImage::computeFeatures.shape)) {
@@ -131,17 +140,33 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 		else
 			ref <- NULL
 	}
-# working function with special case for "s.area"
+# assign 'ref' to 'NULL' for case of circularity
+	if (identical(FUN, circularity)) {
+		if (is(mask, "list"))
+			ref <- rep(list(NULL), length(mask))
+		else
+			ref <- NULL
+	}
+# working function with special case for "s.area" and "circularity"
 	.proc <- function(mask, ref, val, FUN, dots) {
 		if (is.null(ref) && val == "s.area") {
 			lapply(getFrames(mask), function(x) tabulate(x[x > 0]))
 		}
+    else if (val == "circularity") {
+      res <- lapply(getFrames(mask), function (m)
+        apply(stackObjects(m, m), 3, circularity))
+      return(unlist(res))
+    }
 		else if (is.null(ref)) {
 			res <- lapply(getFrames(mask), function(m)
 				do.call(FUN, args = c(list(m), dots))[,val])
 			return(unlist(res))
 		}
 		else {
+      nframes_mask <- numberOfFrames(mask)
+      nframes_ref <- numberOfFrames(ref)
+      if (numberOfFrames(mask) != numberOfFrames(ref))
+        stop("'mask' and 'ref' must have same number of frames")
 			res <- Map(FUN, getFrames(mask), getFrames(ref), MoreArgs = dots)
 			res <- do.call(rbind, res)
 			return(res[,val])
@@ -149,12 +174,15 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 	}
 
 # determine if 'mask' and 'ref' are lists or Images and dispatch .proc
-	if (is(mask, "Image") && (is(ref, "NULL") | is(ref, "Image")))
+	if (is(mask, "Image") && is(ref, "NULL"))
 		ans <- .proc(mask, ref, val, FUN, dots)
+  else if (is(mask, "Image") && is(ref, "Image")) {
+    ans <- .proc(mask, ref, val, FUN, dots)
+  }
 	else if (is(mask, "list")) {
 		if (!all(sapply(mask, is, "Image")))
 			stop("'mask' must be an Image object or list of Image objects")
-		if (length(mask) != length(ref))
+		if (length(mask) != length(ref) && !is(ref, "NULL"))
 			stop("'mask' and 'ref' must of the same length")
 		ans <- Map(.proc, mask, ref, val, list(FUN), list(dots)) # list() needed 
 	}
@@ -163,7 +191,7 @@ getVal <- function(mask, ref = NULL, val = "b.mean", FUN = NULL, simplify = TRUE
 
 # report on substitution of ref for val if needed
 	if (SwapRef)
-		warning("used \"", val, "\" as the character string for 'val'")
+		message('\"', val, "\" used as the character string for 'val'")
 
 # unlist the results if simplify is TRUE
 	if (simplify == TRUE)

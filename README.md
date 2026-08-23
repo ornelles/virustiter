@@ -14,9 +14,9 @@ Individual cells are identified by the DNA stain which is used to generate a nuc
 
 ## Significant Changes
 
-### Version 0.3
+### Version 0.3, 0.31
 
-More organized structure under the hood with stand-alone file for `@import` and `@importFrom` directives. `findBgnd()` will report if a bimodal population was identified. `plotFit()` includes an option to impose limit on the y-scale.
+More organized structure under the hood with stand-alone file for `@import` and `@importFrom` directives. `findBgnd()` will report if a bimodal population was identified. `plotFit()` includes an option to impose limit on the y-scale. `getVal()` now accepts "circularity" as an argument to measure the circularity of object masks.
 
 ### Version 0.2, 0.21
 
@@ -151,7 +151,7 @@ Supporting functions include these as well as others:
    cellMask(mask)      # expand a nuclear mask into a cell mask
    edgeObjects(mask)   # identify objects near the edge of a mask
    findObjects(expr, df) # find objects in data.frame identified by expr
-   getVal(mask, ref)   # extract one 'computeFeatures' value using mask and ref
+   getVal(mask, ref)   # extract one 'computeFeatures' value or circularity from mask and ref
    p2p()               # interactively measure point-to-point distances
    plotHist(df)        # histogram of each well with optional background values
    plotDens(df)        # calculate and show background values with densityplot

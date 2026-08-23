@@ -14,16 +14,19 @@ connected pixels having the same integer value.}
 \code{Image} objects corresponding to the objects in \code{mask}
 or \code{NULL} if a reference image is not required. If \code{ref}
 is a character string, it is \emph{assumed} to be the value
-for \code{val} and will be used in place of the default.}
+for \code{val} and will be used in place of the default. This argument
+is ignored for \code{val} of "circularity" or "area".}
 
 \item{val}{A character string identifying the parameter
-to return from the \code{computeFeatures} function assigned
-to \code{FUN}. The default value of \code{"b.mean"} returns the
-mean intensity with the
+to return from the \code{computeFeatures} function or the special
+function assigned to \code{FUN}. The default value of \code{"b.mean"} 
+returns the mean intensity with the
 \code{\link[EBImage:computeFeatures]{computeFeatures.basic}}
+function. The value \code{"circularity"} returns the circularity of
+each object in mask using the \code{\link[EBImageExtra]{circularity}}
 function.}
 
-\item{FUN}{A \code{\link[EBImage]{computeFeatures}} function to be
+\item{FUN}{An optional \code{\link[EBImage]{computeFeatures}} function to be
 applied over \code{mask} and \code{ref}. The default of 
 \code{NULL} uses the character string in \code{val} to select
 the appropriate function. If this function is specified,
@@ -41,14 +44,14 @@ A vector if \code{simplify} is \code{TRUE} or a list of values obtained
 from \code{FUN}.
 }
 \description{
-Extract a value through one of the \code{computeFeatures} family of
-functions using an object mask and reference image or a list of each.
+Extract a value using an object mask and reference image or a list of each.
 }
 \details{
 Objects identified in \code{mask} will be projected onto \code{ref} 
 and quantified with the function specified in \code{FUN}. The single 
 value specified by \code{val} will be returned as a list if \code{
-simplify == FALSE} or as a single vector if \code{simplify == TRUE}.
+simplify == FALSE} or as a single vector if \code{simplify == TRUE}. The
+
 
 Common usages include getting the mean intensity from an object mask
 and reference image or getting the area of objects from an object mask
