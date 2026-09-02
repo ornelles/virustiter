@@ -35,6 +35,7 @@
 #'   and using the entire range of target images for the expected range.
 #' @param simplify Return a single \code{data.frame} of results if \code{TRUE},
 #'   otherwise return a list of \code{data.frames} for each member of the list.
+#' @param verbose logical value to provide status messages
 #'
 #' @details
 #'
@@ -139,7 +140,7 @@
 #'
 parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	args.nMask = NULL, args.trimMask = NULL, args.cMask = NULL,
-	equalize = FALSE, simplify = TRUE)
+	equalize = FALSE, simplify = TRUE, verbose = FALSE)
 {
 # check first two arguments, extract images, ensure that they are lists
 	if (is.null(tgt)) { # first argument is a list of length 2
@@ -148,7 +149,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		nucImages <- nuc[[1]]
 		tgtImages <- nuc[[2]]
 	}
-	else if (is(nuc, "Image") & is(tgt, "Image")) { # both are images
+	else if (is(nuc, "Image") && is(tgt, "Image")) { # both are images
 		nucImages <- list(nuc)
 		tgtImages <- list(tgt)
 	}
@@ -158,6 +159,9 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		nucImages <- nuc
 		tgtImages <- tgt
 	}
+
+# messaging function
+	msg <- function(x, verbose, ...) if(verbose) message(x, ...)
 
 # filenames to determine if images are organized by well or stack
 	if (is(names(nucImages), "character")) {
@@ -186,20 +190,20 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 	else {
 		imageType <- "byFile"
 		names(nucImages) <- sprintf("image%04d", seq_along(nucImages))
-		message("Treating organization of images as 'file'")
+		msg("Treating organization of images as 'file'", verbose)
 	}
 
 # optionally equalize tgt images using the range of all tgt values
 	if (equalize == TRUE) {
-		message("Equalizing target images...", appendLF = FALSE)
+		msg("Equalizing target images...", appendLF = FALSE, verbose)
 		tgtRange <- range(sapply(tgt, range))
 		tgtImages <- lapply(tgtImages, bnormalize, inputRange = tgtRange)
-		message("done"); flush.console()
+		msg("done", verbose); flush.console()
 	}
 
 # process nMask with additional arguments in args.nMask
-	if (is.null(nMask)) { 
-		message("Creating nuclear masks...", appendLF = FALSE)
+	if (is.null(nMask)) {
+		msg("Creating nuclear masks...", appendLF = FALSE, verbose)
 		arg.list <- formals("nucMask")
 		arg.list$dna <- nucImages
 		nms <- names(args.nMask)
@@ -207,17 +211,18 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		sel <- names(arg.list) %in% nms
 		arg.list <- c(arg.list[!sel], args.nMask[nms])
 		nmask <- do.call("nucMask", arg.list)
-		message("done"); flush.console()
+		msg("done", verbose); flush.console()
 	}
 	else {
-		message("Using nuclear masks in '", deparse(substitute(nMask)), "'")
+		txt <- paste0("Using nuclear masks in '", deparse(substitute(nMask)), "'")
+		msg(txt, verbose)
 		nmask <- nMask
 	}
 
 # remove small and large nuclei with arguments in args.trimMask
 	if (is.null(nMask) && is.null(args.trimMask) ||
 			is.null(nMask) && !identical(args.trimMask, FALSE)) {
-		message("Trimming nuclear masks...", appendLF = FALSE)
+		msg("Trimming nuclear masks...", appendLF = FALSE, verbose)
 		arg.list <- formals("trimMask")
 		arg.list$mask <- nmask
 		nms <- names(args.trimMask)
@@ -225,24 +230,25 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		sel <- names(arg.list) %in% nms
 		arg.list <- c(arg.list[!sel], args.trimMask[nms])
 		nmask <- do.call("trimMask", arg.list)
-		message("done"); flush.console()
+		msg("done", verbose); flush.console()
 	}
 
 # process cMask
 	if (identical(cMask, TRUE)) {
-		message("Creating cell masks...", appendLF = FALSE)
+		msg("Creating cell masks...", appendLF = FALSE, verbose)
 		arg.list <- formals("cellMask")
 		nms <- names(args.cMask)
 		nms <- nms[nms %in% names(arg.list)] # find replacements
 		sel <- names(arg.list) %in% nms
 		arg.list <- c(arg.list[!sel], args.cMask[nms])
 		cmask <- Map(cellMask, nmask, MoreArgs = arg.list)
-		message("done"); flush.console()
+		msg("done", verbose); flush.console()
 	}
 	else if(identical(cMask, FALSE))
 		cmask <- nmask
 	else if (is(cMask, "list") || is(cMask, "Image")) {
-		message("Using cell masks in '", deparse(substitute(cMask)), "'")
+		txt <- paste0("Using cell masks in '", deparse(substitute(cMask)), "'")
+		msg(txt, verbose)
 		cmask <- cMask
 	}
 	else
@@ -271,9 +277,9 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 
 # initialize progress bar
 	if (imageType == "byWell")
-		message("Processing images by 'well'")
+		msg("Processing images by 'well'", verbose)
 	else
-		message("Processing images by 'file'")
+		msg("Processing images by 'file'", verbose)
 	flush.console()
 	showProgress <- ifelse(nGroups > 1, TRUE, FALSE)
 	if (showProgress)
@@ -304,7 +310,7 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		ym <- lapply(FM, function(v) v[, "m.cy"])
 		dna <- lapply(FD, function(v) v[, "b.mean"])
 		mfi <- lapply(FT, function(v) v[, "b.mean"])
-		props <- list(area=area, xm=xm, ym=ym, dna=dna, mfi=mfi)
+		props <- list(area = area, xm = xm, ym = ym, dna = dna, mfi = mfi)
 
 	# count cells, perform error check and assemble in one list
 		ncells <- lapply(props, lengths)
@@ -341,6 +347,6 @@ parseImages <- function(nuc, tgt = NULL, nMask = NULL, cMask = FALSE,
 		rownames(ans) <- NULL
 	}
 	if (showProgress) close(pb)
-	message("Done")
+	msg("Done", verbose)
 	return(ans)
 }

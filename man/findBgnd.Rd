@@ -4,7 +4,14 @@
 \alias{findBgnd}
 \title{Find Background Value}
 \usage{
-findBgnd(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
+findBgnd(
+  x,
+  mult = 3,
+  log = TRUE,
+  crit = 0.1,
+  ratio.limit = 1/10,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{x}{fluorescent values to evaluate}
@@ -19,6 +26,8 @@ bimodal from non-bimodal populations, default of 0.1}
 
 \item{ratio.limit}{if the ratio of the first peak height to the second peak
 height exceeds this value (1/10), the population could be bimodal}
+
+\item{verbose}{logical value to report using a bimodal population}
 }
 \value{
 For bimodally distributed values, the value at the valley between the two

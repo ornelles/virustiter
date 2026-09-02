@@ -13,7 +13,8 @@ parseImages(
   args.trimMask = NULL,
   args.cMask = NULL,
   equalize = FALSE,
-  simplify = TRUE
+  simplify = TRUE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -57,6 +58,8 @@ and using the entire range of target images for the expected range.}
 
 \item{simplify}{Return a single \code{data.frame} of results if \code{TRUE},
 otherwise return a list of \code{data.frames} for each member of the list.}
+
+\item{verbose}{logical value to provide status messages}
 }
 \value{
 A data.frame (or list of data.frames) containing  processed image

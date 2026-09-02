@@ -18,6 +18,8 @@
 #' @param mult Multiplier constant passed to \code{\link{findBgnd}}.
 #' @param log \code{logical} flag passed to \code{\link{findBgnd}} to use
 #'   log-transformed values.
+#' @param verbose Logical value based to \code{\link{findBgnd}} to report
+#'   finding bimodal population.
 #'
 #' @details
 #'
@@ -57,7 +59,8 @@
 #'
 #' @export
 #'
-getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE)
+getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE,
+	verbose = FALSE)
 {
 	if (missing(df)) {
 		usage <- c("getBgnd examples:",
@@ -116,7 +119,8 @@ getBgnd <- function(df, by, param = "mfi", mult = 2.5, log = TRUE)
 		names(temp) <- c("g", "y")
 		levels(temp$g) <- levels(df[[by]])
 	}
-	res <- aggregate(y ~ g, temp, function(v) findBgnd(v, mult = mult, log = log))
+	res <- aggregate(y ~ g, temp, function(v)
+		findBgnd(v, mult = mult, log = log, verbose = verbose))
 	ret <- c(res[["y"]])
 	names(ret) <- if(by == "control") rep("control", length(ret)) else res$g
 	return(ret)

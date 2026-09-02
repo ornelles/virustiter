@@ -1,7 +1,7 @@
 #' Find Background Value
-#' 
+#'
 #' Find the fluorescent value between negative and positive cells
-#' 
+#'
 #' @param x fluorescent values to evaluate
 #' @param mult numeric multiplier applied to the standard deviation
 #'   for a non-bimodal distributions, default value of 3
@@ -10,15 +10,16 @@
 #'   bimodal from non-bimodal populations, default of 0.1
 #' @param ratio.limit if the ratio of the first peak height to the second peak
 #'   height exceeds this value (1/10), the population could be bimodal
-#' 
+#' @param verbose logical value to report using a bimodal population
+#'
 #' @details
-#' 
+#'
 #' The \code{\link[multimode]{modetest}} function tests whether the values have
 #' a bimodal (or multimodal) distribution. If the p-value from this test is less
 #' than the critical value (\code{crit}), the background value is considered
 #' to be the value at the first "valley" in the kernel density distribution.
 #' For such bimodal distributions, the \code{mult} parameter is ignored.
-#' 
+#'
 #' If the distribution is not bimodal, the population is assumed to be a mixture
 #' of values from a normal distribution of low values and a lognormal (or log)
 #' distribution of high values. The maximum of low values is determined from a
@@ -26,7 +27,7 @@
 #' to a Gaussian distribution with the \code{\link[MASS]{fitdistr}} function.
 #' The value returned is the position of the peak + \code{mult} times the
 #' estimated standard deviation of the fitted distribution.
-#' 
+#'
 #' Because fluorescent values are typically log-transformed before analysis,
 #' values are log-transformed by default. This can be turned
 #' off with the \code{log} parameter. Typically, the parameter \code{mult}
@@ -34,7 +35,7 @@
 #' examples for the impact of \code{mult} on the return value. Note that with
 #' \code{mult = 0}, the peak value of a non-bimodal distribution will be
 #' returned.
-#' 
+#'
 #' If the distribution is very heavily skewed to the left (mostly dark values),
 #' the standard deviation of the distribution will be estimated as 1.35x
 #' the interquartile range.
@@ -42,17 +43,17 @@
 #' It may be helpful to discard exceptionally low values before finding
 #' an estimated background should the estimated background be absurdly low.
 #' The code currently discards the upper and lower 1 per cent of values before
-#' fitting to a normal (or lognormal) distribution.  
-#' 
+#' fitting to a normal (or lognormal) distribution.
+#'
 #' @seealso \code{\link{getZero}}
 #' @seealso \code{\link{getBgnd}}
 #'
 #' @return
-#' 
+#'
 #' For bimodally distributed values, the value at the valley between the two
 #' populations. For non-bimodally distributed values, the value of the
 #' most abundant value + mult * standard deviation of the estimated distribution.
-#' 
+#'
 #' @import EBImage
 #'
 #' @importFrom MASS fitdistr
@@ -74,16 +75,17 @@
 #'   abline(v = log(bg), col = 1:5) # background limit
 #'   txt <- expression(mult %*% sd)
 #'   legend("topright", legend = 0:4, title = txt, lty = 1, col = 1:5)
-#' 
+#'
 #' @export
-#' 
-findBgnd <- function(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
+#'
+findBgnd <- function(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10,
+	verbose = FALSE)
 {
   if (log) {
     if (all(x <= 0)) stop("positive values are needed if log = TRUE")
     x <- log(x[x > 0])
   }
-  if (crit < 0 | crit > 1) stop("'crit' must be between 0 and 1")
+  if (crit < 0 || crit > 1) stop("'crit' must be between 0 and 1")
 
 # Is there evidence for a biomodal distribution?
 # This only tests for the likelihood of more than 1 peak (mode).
@@ -102,14 +104,14 @@ findBgnd <- function(x, mult = 3, log = TRUE, crit = 0.1, ratio.limit = 1/10)
 
 # find breakpoint
   if (bimodal == TRUE) {
-    message("bimodal population identified")
     ans <- v$locations[2]
+    if (verbose) message("bimodal population identified")
   }
   else { # otherwise, see if left half can be fit to a Gaussian distribution
     d <- density(x[x > quantile(x, 0.01) & x < quantile(x, 0.99)]) # trim?
     xmid <- d$x[which.max(d$y)]
     xl <- x[x <= xmid]
-    xx <- c(xl, 2*xmid  - xl) # extract left half
+    xx <- c(xl, 2 * xmid  - xl) # extract left half
     if (length(xx) >= 0.05 * floor(length(x))) {
       fit <- MASS::fitdistr(xx, "normal")
       ans <- fit$est[1] + mult * fit$est[2]

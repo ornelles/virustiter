@@ -4,7 +4,7 @@
 \alias{getBgnd}
 \title{Determine Background Value to Define Positive Samples}
 \usage{
-getBgnd(df, by, param = "mfi", mult = 2.5, log = TRUE)
+getBgnd(df, by, param = "mfi", mult = 2.5, log = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{df}{Annotated \code{data.frame} with fluorescent values to evaluate.}
@@ -25,6 +25,9 @@ typically \code{"mfi"} or \code{"y"}.}
 
 \item{log}{\code{logical} flag passed to \code{\link{findBgnd}} to use
 log-transformed values.}
+
+\item{verbose}{Logical value based to \code{\link{findBgnd}} to report
+finding bimodal population.}
 }
 \value{
 A named numeric vector of background values.
