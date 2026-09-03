@@ -12,13 +12,13 @@ getBgnd(df, by, param = "mfi", mult = 2.5, log = TRUE, verbose = FALSE)
 \item{by}{Character string identifying the grouping factor in \code{df}
 used to determine background values. Values of "row" or "column" will
 split the data by row or column before identifying background values.
-If \code{by} is "row" or "column" or if \code{by} is not provided, 
+If \code{by} is "row" or "column" or if \code{by} is not provided,
 values associated with \code{type == "control"}, \code{moi == 0} or
 \code{x == 0} will be used to determine the background. To override the
 search for control values in each row or column, change the variable
 name of interest to something other than "row" or "column."}
 
-\item{param}{Variable name in \code{df} as a character string to evaluate, 
+\item{param}{Variable name in \code{df} as a character string to evaluate,
 typically \code{"mfi"} or \code{"y"}.}
 
 \item{mult}{Multiplier constant passed to \code{\link{findBgnd}}.}
@@ -38,15 +38,15 @@ values in the argument \code{param}. The group used to determine the
 background is specified with the argument \code{by}.
 }
 \details{
-The value between positive and negative values in \code{param} will be 
+The value between positive and negative values in \code{param} will be
 determined according to \code{by}. If this value is "control" or is missing,
 all values identified as \code{type == "control"} or with \code{x/moi == 0}
-will be treated as background. If this value is "row" or "column", 
+will be treated as background. If this value is "row" or "column",
 any values with \code{type == "control"} or with \code{x/moi == 0} in each
 row or column will be used to define the background for that row or column.
 If true zero moi values are not present, the background will be determined
 by Otsu's method for the groups defined with the variable \code{by}.
-Typically this would be \code{"well"} or \code{"file"} but can be any factor 
+Typically this would be \code{"well"} or \code{"file"} but can be any factor
 variable in the data.frame \code{df}. The background value will be determined
 by the logic in \code{\link{findBgnd}}.
 

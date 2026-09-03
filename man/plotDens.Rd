@@ -16,6 +16,7 @@ plotDens(
   main = NULL,
   as.table = TRUE,
   layout = NULL,
+  verbose = FALSE,
   ...
 )
 }
@@ -46,6 +47,8 @@ the system date will be used.}
 
 \item{layout}{An optional numeric vector to specify layout of densityplot,
 passed to \code{densityplot}.}
+
+\item{verbose}{A \code{logical} value passed to \code{getBgnd}.}
 
 \item{...}{Additional arguments passed to \code{densityplot}.}
 }

@@ -18,6 +18,7 @@
 #' @param as.table A \code{logical} value passed to \code{histogram()}.
 #' @param layout An optional numeric vector to specify layout of histogram,
 #'   passed to \code{\link[lattice]{histogram}}.
+#' @param verbose A \code{logical} value passed to \code{getBgnd}.
 #' @param ... Additional arguments passed to \code{\link[lattice]{histogram}}.
 #'
 #' @details
@@ -40,7 +41,8 @@
 #' @export
 #'  
 plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL, 
-		mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
+		mult = NULL, main = NULL, as.table = TRUE, layout = NULL,
+		verbose = FALSE, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotHist examples:",
@@ -122,7 +124,7 @@ plotHist <- function(df, bgnd, param = "mfi", panel, log = TRUE, by = NULL,
 	else logsc <- as.numeric(log)
 
 # prepare x scale
-	xlist <- list()	
+	xlist <- list()
 	if (logsc != 0) {
 		xlist <- list(log = logsc)
 		bgnd <- log(bgnd, logsc)

@@ -9,17 +9,18 @@
 #' @param param Character string identifying the variable to be analyzed. Also
 #'   passed to \code{\link{getBgnd}} if required.
 #' @param panel Optional character string defining the \code{lattice} panels,
-#'   typically \code{"well"} or \code{"file"}. 
+#'   typically \code{"well"} or \code{"file"}.
 #' @param adjust Numeric value controlling bandwith, passed to the
 #'   \code{\link{density}} function.
 #' @param log Optional \code{logical} or \code{numeric} value to transform
-#'   \code{'param'} values. Also passed to \code{\link{getBgnd}} if required. 
+#'   \code{'param'} values. Also passed to \code{\link{getBgnd}} if required.
 #' @param by,mult Additional parameters passed to \code{\link{getBgnd}} if required.
 #' @param main Optional character string to serve as plot title. If \code{NULL},
 #'   the system date will be used.
 #' @param as.table A \code{logical} value passed to \code{densityplot}.
 #' @param layout An optional numeric vector to specify layout of densityplot,
 #'   passed to \code{densityplot}.
+#' @param verbose A \code{logical} value passed to \code{getBgnd}.
 #' @param ... Additional arguments passed to \code{densityplot}.
 #'
 #' @details
@@ -29,7 +30,7 @@
 #' \code{\link{plotHist}}. Both functions can be used to examine the uniformity
 #' of results from an imaging experiment and to interactively check the
 #' paramaters passed to \code{\link{getBgnd}} to determine a suitable background
-#' cutoff value. The background values are incorporated into the strip labels. 
+#' cutoff value. The background values are incorporated into the strip labels.
 #'
 #' @return
 #'
@@ -40,9 +41,10 @@
 #' @importFrom latticeExtra xscale.components.logpower
 #'
 #' @export
-#'  
+#'
 plotDens <- function(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
-		by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL, ...)
+		by = NULL, mult = NULL, main = NULL, as.table = TRUE, layout = NULL,
+		verbose = FALSE, ...)
 {
 	if (missing(df)) {
 		usage <- c("plotDens examples:",
@@ -126,7 +128,7 @@ plotDens <- function(df, bgnd, param = "mfi", panel, adjust = 1, log = TRUE,
 	else logsc <- as.numeric(log)
 
 # prepare x scale
-	xlist <- list()	
+	xlist <- list()
 	if (logsc != 0) {
 		xlist <- list(log = logsc)
 		bgnd <- log(bgnd, logsc)
